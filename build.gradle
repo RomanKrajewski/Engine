@@ -1,0 +1,45 @@
+plugins {
+    id "java"
+    id "maven-publish"
+    id "com.github.johnrengelman.shadow" version "4.0.2"
+}
+
+version = "0.1.0"
+group = "com.terraforged"
+
+repositories {
+    mavenCentral()
+    maven { url "https://io.terraforged.com/repository/maven/" }
+}
+
+dependencies {
+    compile "me.dags:Noise2D:0.5.0"
+    compileOnly "it.unimi.dsi:fastutil:8.2.1"
+}
+
+shadowJar {
+    classifier = "all"
+}
+
+build.dependsOn(shadowJar)
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+
+    if (System.getenv("MAVEN_USER") != null && System.getenv("MAVEN_PASS") != null) {
+        repositories {
+            maven {
+                name = "nexus"
+                url = "https://io.terraforged.com/repository/maven/"
+                credentials {
+                    username System.getenv("MAVEN_USER")
+                    password System.getenv("MAVEN_PASS")
+                }
+            }
+        }
+    }
+}
