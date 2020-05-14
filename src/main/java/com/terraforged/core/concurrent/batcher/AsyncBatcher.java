@@ -25,46 +25,55 @@
 
 package com.terraforged.core.concurrent.batcher;
 
-import java.util.ArrayList;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AsyncBatcher implements Batcher {
 
     private final ForkJoinPool pool;
-    private ArrayList<ForkJoinTask<?>> tasks;
+    private final Object notifier = new Object();
+
+    private int size = 0;
+    private int submitted = 0;
+    private final AtomicInteger count = new AtomicInteger();
 
     public AsyncBatcher(ForkJoinPool pool) {
         this.pool = pool;
     }
 
-    private void add(ForkJoinTask<?> task) {
-        if (tasks == null) {
-            tasks = new ArrayList<>();
+    @Override
+    public void markDone() {
+        if (count.incrementAndGet() >= size) {
+            synchronized (notifier) {
+                notifier.notifyAll();
+            }
         }
-        tasks.add(task);
     }
 
     @Override
     public void size(int size) {
-        tasks = new ArrayList<>(size);
+        this.count.set(0);
+        this.size = size;
+        this.submitted = 0;
     }
 
     @Override
-    public void submit(Runnable task) {
-        tasks.add(pool.submit(task));
-    }
-
-    @Override
-    public void submit(Callable<?> task) {
-        tasks.add(pool.submit(task));
+    public void submit(BatchedTask task) {
+        if (++submitted > size) {
+            throw new RuntimeException("Exceeded batch size. Submitted: " + submitted + ", Max Allowed: " + size);
+        }
+        task.setBatcher(this);
+        pool.submit(task);
     }
 
     @Override
     public void close() {
-        for (ForkJoinTask<?> task : tasks) {
-            task.join();
+        synchronized (notifier) {
+            try {
+                notifier.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

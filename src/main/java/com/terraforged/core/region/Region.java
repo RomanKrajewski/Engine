@@ -219,6 +219,7 @@ public class Region implements Disposable {
     public void generate(Heightmap heightmap, Batcher batcher, float offsetX, float offsetZ, float zoom) {
         float translateX = offsetX - ((blockSize.size * zoom) / 2F);
         float translateZ = offsetZ - ((blockSize.size * zoom) / 2F);
+        batcher.size(chunkSize.total * chunkSize.total);
         for (int cz = 0; cz < chunkSize.total; cz++) {
             for (int cx = 0; cx < chunkSize.total; cx++) {
                 int index = chunkSize.indexOf(cx, cz);
@@ -247,6 +248,8 @@ public class Region implements Disposable {
     }
 
     public void generateArea(Heightmap heightmap, Batcher batcher, int batchSize, float offsetX, float offsetZ, float zoom) {
+        System.out.println("AREA");
+
         int jobSize = chunkSize.total / batchSize;
         int jobCount = chunkSize.total / jobSize;
         if (jobCount * jobSize < chunkSize.total) {

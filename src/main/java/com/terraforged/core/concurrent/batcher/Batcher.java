@@ -1,5 +1,5 @@
 /*
- *   
+ *
  * MIT License
  *
  * Copyright (c) 2020 TerraForged
@@ -25,15 +25,13 @@
 
 package com.terraforged.core.concurrent.batcher;
 
-import java.util.concurrent.Callable;
-
-public interface Batcher extends AutoCloseable {
+public interface Batcher extends AutoCloseable, BatchNotifier {
 
     void size(int size);
 
-    void submit(Runnable task);
+    void submit(BatchedTask task);
 
-    void submit(Callable<?> task);
+    default void markDone() {}
 
     @Override
     void close();
