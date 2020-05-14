@@ -1,12 +1,10 @@
 package com.terraforged.core.region.chunk;
 
-import com.terraforged.core.concurrent.batcher.BatchNotifier;
-import com.terraforged.core.concurrent.batcher.BatchedTask;
 import com.terraforged.core.region.Region;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.Rivermap;
 
-public class ChunkBatchTask implements BatchedTask {
+public class ChunkBatchTask implements Runnable {
 
     private final int x;
     private final int z;
@@ -14,7 +12,6 @@ public class ChunkBatchTask implements BatchedTask {
     private final Region region;
     private final Heightmap heightmap;
 
-    private BatchNotifier notifier = BatchNotifier.NONE;
     protected Rivermap rivers = null;
 
     public ChunkBatchTask(int x, int z, int size, Region region, Heightmap heightmap) {
@@ -26,20 +23,7 @@ public class ChunkBatchTask implements BatchedTask {
     }
 
     @Override
-    public void setBatcher(BatchNotifier notifier) {
-        this.notifier = notifier;
-    }
-
-    @Override
     public void run() {
-        try {
-            drive();
-        } finally {
-            notifier.markDone();
-        }
-    }
-
-    private void drive() {
         for (int dz = 0; dz < size; dz++) {
             int cz = z + dz;
             if (cz > region.getChunkSize().total) {

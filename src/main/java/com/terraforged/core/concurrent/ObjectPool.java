@@ -97,6 +97,13 @@ public class ObjectPool<T> {
 
         @Override
         public void close() {
+            if (value instanceof AutoCloseable) {
+                try {
+                    ((AutoCloseable) value).close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             release();
         }
     }

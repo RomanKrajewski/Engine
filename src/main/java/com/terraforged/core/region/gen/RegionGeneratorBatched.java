@@ -1,5 +1,6 @@
 package com.terraforged.core.region.gen;
 
+import com.terraforged.core.concurrent.ObjectPool;
 import com.terraforged.core.region.Region;
 import com.terraforged.core.concurrent.Disposable;
 import com.terraforged.core.concurrent.batcher.Batcher;
@@ -22,8 +23,8 @@ public class RegionGeneratorBatched extends RegionGenerator {
     @Override
     public Region generateRegion(int regionX, int regionZ) {
         Region region = new Region(regionX, regionZ, factor, border, disposalListener);
-        try (Batcher batcher = threadPool.batcher()) {
-            region.generateArea(generator.getHeightmap(), batcher, batchSize);
+        try (ObjectPool.Item<Batcher> batcher = threadPool.batcher()) {
+            region.generateArea(generator.getHeightmap(), batcher.getValue(), batchSize);
         }
         postProcess(region);
         return region;
@@ -32,8 +33,8 @@ public class RegionGeneratorBatched extends RegionGenerator {
     @Override
     public Region generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
         Region region = new Region(0, 0, factor, border, disposalListener);
-        try (Batcher batcher = threadPool.batcher()) {
-            region.generateArea(generator.getHeightmap(), batcher, batchSize, centerX, centerZ, zoom);
+        try (ObjectPool.Item<Batcher> batcher = threadPool.batcher()) {
+            region.generateArea(generator.getHeightmap(), batcher.getValue(), batchSize, centerX, centerZ, zoom);
         }
         postProcess(region, centerX, centerZ, zoom, filter);
         return region;

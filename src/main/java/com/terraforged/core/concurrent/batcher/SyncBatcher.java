@@ -33,7 +33,7 @@ public class SyncBatcher implements Batcher {
     }
 
     @Override
-    public void submit(BatchedTask task) {
+    public void submit(Runnable task) {
         task.run();
     }
 

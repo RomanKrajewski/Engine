@@ -40,10 +40,16 @@ public class ThreadPool implements Executor {
 
     private final int size;
     private final ForkJoinPool service;
+    private final ObjectPool<Batcher> batchers;
 
     private ThreadPool(ForkJoinPool service, int size) {
         this.service = service;
         this.size = size;
+        if (service == null) {
+            batchers = new ObjectPool<>(10, () -> new AsyncBatcher(service));
+        } else {
+            batchers = new ObjectPool<>(1, SyncBatcher::new);
+        }
     }
 
     public int getSize() {
@@ -63,8 +69,8 @@ public class ThreadPool implements Executor {
         return service.submit(callable);
     }
 
-    public Batcher batcher() {
-        return new AsyncBatcher(service);
+    public ObjectPool.Item<Batcher> batcher() {
+        return batchers.get();
     }
 
     public static ThreadPool getPool() {
@@ -110,11 +116,6 @@ public class ThreadPool implements Executor {
             ForkJoinTask<T> task = ForkJoinTask.adapt(callable);
             task.invoke();
             return task;
-        }
-
-        @Override
-        public Batcher batcher() {
-            return new SyncBatcher();
         }
     }
 }

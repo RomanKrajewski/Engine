@@ -25,13 +25,11 @@
 
 package com.terraforged.core.concurrent.batcher;
 
-public interface Batcher extends AutoCloseable, BatchNotifier {
+public interface Batcher extends AutoCloseable {
 
     void size(int size);
 
-    void submit(BatchedTask task);
-
-    default void markDone() {}
+    void submit(Runnable task);
 
     @Override
     void close();

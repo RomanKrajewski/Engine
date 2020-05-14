@@ -1,5 +1,5 @@
 /*
- *   
+ *
  * MIT License
  *
  * Copyright (c) 2020 TerraForged
@@ -26,54 +26,43 @@
 package com.terraforged.core.concurrent.batcher;
 
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ForkJoinTask;
 
 public class AsyncBatcher implements Batcher {
 
+    private static final ForkJoinTask<?>[] empty = {};
+
     private final ForkJoinPool pool;
-    private final Object notifier = new Object();
 
     private int size = 0;
-    private int submitted = 0;
-    private final AtomicInteger count = new AtomicInteger();
+    private int count = 0;
+    private ForkJoinTask<?>[] tasks = empty;
 
     public AsyncBatcher(ForkJoinPool pool) {
         this.pool = pool;
     }
 
     @Override
-    public void markDone() {
-        if (count.incrementAndGet() >= size) {
-            synchronized (notifier) {
-                notifier.notifyAll();
-            }
+    public void size(int newSize) {
+        if (tasks.length < newSize) {
+            count = 0;
+            size = newSize;
+            tasks = new ForkJoinTask[newSize];
         }
     }
 
     @Override
-    public void size(int size) {
-        this.count.set(0);
-        this.size = size;
-        this.submitted = 0;
-    }
-
-    @Override
-    public void submit(BatchedTask task) {
-        if (++submitted > size) {
-            throw new RuntimeException("Exceeded batch size. Submitted: " + submitted + ", Max Allowed: " + size);
+    public void submit(Runnable task) {
+        if (count < size) {
+            tasks[count++] = pool.submit(task);
         }
-        task.setBatcher(this);
-        pool.submit(task);
     }
 
     @Override
     public void close() {
-        synchronized (notifier) {
-            try {
-                notifier.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        for (int i = 0; i < size; i++) {
+            tasks[i].quietlyJoin();
+            tasks[i] = null;
         }
     }
 }
