@@ -25,6 +25,7 @@
 
 package com.terraforged.world;
 
+import com.terraforged.core.concurrent.ObjectPool;
 import com.terraforged.core.filter.BeachDetect;
 import com.terraforged.core.filter.Erosion;
 import com.terraforged.core.filter.Filterable;
@@ -32,7 +33,6 @@ import com.terraforged.core.filter.Smoothing;
 import com.terraforged.core.filter.Steepness;
 import com.terraforged.core.region.Region;
 import com.terraforged.core.settings.FilterSettings;
-import com.terraforged.core.concurrent.ObjectPool;
 
 public class WorldFilters {
 

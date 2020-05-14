@@ -25,8 +25,8 @@
 
 package com.terraforged.world.terrain.decorator;
 
-import com.terraforged.core.cell.Cell;
 import com.terraforged.core.Seed;
+import com.terraforged.core.cell.Cell;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
 import me.dags.noise.Module;

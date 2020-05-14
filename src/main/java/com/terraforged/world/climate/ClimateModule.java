@@ -25,10 +25,10 @@
 
 package com.terraforged.world.climate;
 
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.settings.Settings;
 import com.terraforged.core.NumConstants;
 import com.terraforged.core.Seed;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.settings.Settings;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.continent.Continent;

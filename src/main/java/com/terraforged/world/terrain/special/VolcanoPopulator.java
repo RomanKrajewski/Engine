@@ -25,8 +25,8 @@
 
 package com.terraforged.world.terrain.special;
 
-import com.terraforged.core.cell.Cell;
 import com.terraforged.core.Seed;
+import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.heightmap.RegionConfig;
 import com.terraforged.world.terrain.Terrain;

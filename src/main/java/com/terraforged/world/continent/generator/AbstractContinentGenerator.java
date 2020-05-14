@@ -1,8 +1,8 @@
 package com.terraforged.world.continent.generator;
 
+import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.settings.WorldSettings;
-import com.terraforged.core.Seed;
 import com.terraforged.world.continent.Continent;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.heightmap.WorldHeightmap;

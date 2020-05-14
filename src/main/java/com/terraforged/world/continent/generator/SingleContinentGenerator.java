@@ -1,9 +1,9 @@
 package com.terraforged.world.continent.generator;
 
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.settings.WorldSettings;
 import com.terraforged.core.NumConstants;
 import com.terraforged.core.Seed;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.settings.WorldSettings;
 import com.terraforged.world.continent.MutableVeci;
 import me.dags.noise.func.DistanceFunc;
 import me.dags.noise.util.NoiseUtil;

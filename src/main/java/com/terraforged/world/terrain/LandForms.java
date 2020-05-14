@@ -25,8 +25,8 @@
 
 package com.terraforged.world.terrain;
 
-import com.terraforged.core.settings.TerrainSettings;
 import com.terraforged.core.Seed;
+import com.terraforged.core.settings.TerrainSettings;
 import com.terraforged.world.heightmap.Levels;
 import me.dags.noise.Module;
 import me.dags.noise.Source;

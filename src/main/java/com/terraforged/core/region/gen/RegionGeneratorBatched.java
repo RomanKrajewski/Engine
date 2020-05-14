@@ -1,9 +1,9 @@
 package com.terraforged.core.region.gen;
 
-import com.terraforged.core.concurrent.ObjectPool;
-import com.terraforged.core.region.Region;
 import com.terraforged.core.concurrent.Disposable;
+import com.terraforged.core.concurrent.ObjectPool;
 import com.terraforged.core.concurrent.batcher.Batcher;
+import com.terraforged.core.region.Region;
 
 public class RegionGeneratorBatched extends RegionGenerator {
 

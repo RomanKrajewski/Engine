@@ -25,8 +25,8 @@
 
 package com.terraforged.world.terrain.provider;
 
-import com.terraforged.core.cell.Populator;
 import com.terraforged.core.Seed;
+import com.terraforged.core.cell.Populator;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.heightmap.RegionConfig;
 import com.terraforged.world.terrain.LandForms;

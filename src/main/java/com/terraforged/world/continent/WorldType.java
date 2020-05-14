@@ -1,7 +1,7 @@
 package com.terraforged.world.continent;
 
-import com.terraforged.core.settings.WorldSettings;
 import com.terraforged.core.Seed;
+import com.terraforged.core.settings.WorldSettings;
 import com.terraforged.world.continent.generator.MultiContinentGenerator;
 import com.terraforged.world.continent.generator.SingleContinentGenerator;
 

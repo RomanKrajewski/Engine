@@ -25,11 +25,11 @@
 
 package com.terraforged.core.region.gen;
 
-import com.terraforged.core.region.Region;
-import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.concurrent.Disposable;
 import com.terraforged.core.concurrent.cache.Cache;
 import com.terraforged.core.concurrent.cache.CacheEntry;
+import com.terraforged.core.region.Region;
+import com.terraforged.core.region.chunk.ChunkReader;
 import me.dags.noise.util.NoiseUtil;
 
 import java.util.concurrent.TimeUnit;

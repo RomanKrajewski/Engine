@@ -26,16 +26,16 @@
 package com.terraforged.core.region;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Disposable;
+import com.terraforged.core.concurrent.batcher.Batcher;
 import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.region.chunk.ChunkBatchTask;
 import com.terraforged.core.region.chunk.ChunkGenTask;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.region.chunk.ChunkWriter;
-import com.terraforged.core.concurrent.Disposable;
-import com.terraforged.core.concurrent.batcher.Batcher;
-import com.terraforged.world.terrain.decorator.Decorator;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.Rivermap;
+import com.terraforged.world.terrain.decorator.Decorator;
 import me.dags.noise.util.NoiseUtil;
 
 import java.util.Collection;
@@ -248,8 +248,6 @@ public class Region implements Disposable {
     }
 
     public void generateArea(Heightmap heightmap, Batcher batcher, int batchSize, float offsetX, float offsetZ, float zoom) {
-        System.out.println("AREA");
-
         int jobSize = chunkSize.total / batchSize;
         int jobCount = chunkSize.total / jobSize;
         if (jobCount * jobSize < chunkSize.total) {

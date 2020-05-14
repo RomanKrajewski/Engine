@@ -25,12 +25,12 @@
 
 package com.terraforged.world.heightmap;
 
+import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.core.module.Blender;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.core.settings.WorldSettings;
-import com.terraforged.core.Seed;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.continent.Continent;
