@@ -68,6 +68,7 @@ public class SingleContinentGenerator extends AbstractContinentGenerator {
         float continentNoise = continentValue(edgeValue);
         cell.continent = cellValue(seed, cellX, cellY);
         cell.continentEdge = shapeNoise * continentNoise;
+        cell.continentEdgeRaw = shapeNoise * edgeValue;
         cell.continentX = (int) ((cellX + center.x) / frequency);
         cell.continentZ = (int) ((cellY + center.y) / frequency);
     }
