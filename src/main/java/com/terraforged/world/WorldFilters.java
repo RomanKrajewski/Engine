@@ -26,6 +26,7 @@
 package com.terraforged.world;
 
 import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.filter.BeachDetect;
 import com.terraforged.core.filter.Erosion;
 import com.terraforged.core.filter.Filterable;
@@ -53,8 +54,8 @@ public class WorldFilters {
 
     public void apply(Region region) {
         Filterable map = region.filterable();
-        try (ObjectPool.Item<Erosion> item = erosion.get()) {
-            item.getValue().apply(map, region.getRegionX(), region.getRegionZ(), settings.erosion.iterations);
+        try (Resource<Erosion> item = erosion.get()) {
+            item.get().apply(map, region.getRegionX(), region.getRegionZ(), settings.erosion.iterations);
         }
         smoothing.apply(map, region.getRegionX(), region.getRegionZ(), settings.smoothing.iterations);
         steepness.apply(map, region.getRegionX(), region.getRegionZ(), 1);

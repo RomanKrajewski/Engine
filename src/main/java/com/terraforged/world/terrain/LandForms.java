@@ -86,7 +86,7 @@ public class LandForms {
                 .warp(warpX, warpY, Source.constant(scaleH / 4F))
                 .warp(seed.next(), 256, 1, 200);
 
-        return settings.steppe.apply(groundLevel - 0.02F, 0.12 * terrainVerticalScale, module).max(ground);
+        return settings.steppe.apply(groundLevel - 0.02F, 0.08 * terrainVerticalScale, module).max(ground);
     }
 
     public Module plains(Seed seed) {
@@ -103,7 +103,7 @@ public class LandForms {
                 .warp(warpX, warpY, Source.constant(scaleH / 4F))
                 .warp(seed.next(), 256, 1, 256);
 
-        return settings.plains.apply(groundLevel - 0.035F, 0.2F * terrainVerticalScale, module).max(ground);
+        return settings.plains.apply(groundLevel - 0.02F, 0.15F * terrainVerticalScale, module).max(ground);
     }
 
     public Module plateau(Seed seed) {

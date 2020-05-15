@@ -23,9 +23,11 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.concurrent.batcher;
+package com.terraforged.core.concurrent.batch;
 
-public class SyncBatcher implements Batcher {
+import com.terraforged.core.concurrent.Resource;
+
+public class SyncBatcher implements Batcher, Resource<Batcher> {
 
     @Override
     public void size(int size) {
@@ -35,6 +37,11 @@ public class SyncBatcher implements Batcher {
     @Override
     public void submit(Runnable task) {
         task.run();
+    }
+
+    @Override
+    public Batcher get() {
+        return this;
     }
 
     @Override

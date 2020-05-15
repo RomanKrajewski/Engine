@@ -1,6 +1,7 @@
 package com.terraforged.core.concurrent.cache;
 
-import com.terraforged.core.concurrent.ThreadPool;
+import com.terraforged.core.concurrent.pool.ThreadPool;
+import com.terraforged.core.concurrent.pool.ThreadPools;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
@@ -10,7 +11,7 @@ public class Cache<V extends ExpiringEntry> implements Runnable {
     private final long expireMS;
     private final long intervalMS;
     private final SynchronizedLongMap<V> map;
-    private final ThreadPool threadPool = ThreadPool.getPool();
+    private final ThreadPool threadPool = ThreadPools.getPool();
 
     private volatile long timestamp = 0L;
 

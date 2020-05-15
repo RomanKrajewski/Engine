@@ -25,14 +25,16 @@
 
 package com.terraforged.core.region.chunk;
 
+import com.terraforged.core.concurrent.batch.BatchTask;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.Rivermap;
 
-public class ChunkGenTask implements Runnable {
+public class ChunkGenTask implements BatchTask {
 
     private final ChunkWriter chunk;
     private final Heightmap heightmap;
 
+    private BatchTask.Notifier notifier = BatchTask.NONE;
     protected Rivermap rivers = null;
 
     public ChunkGenTask(ChunkWriter chunk, Heightmap heightmap) {
@@ -41,8 +43,17 @@ public class ChunkGenTask implements Runnable {
     }
 
     @Override
+    public void setNotifier(BatchTask.Notifier notifier) {
+        this.notifier = notifier;
+    }
+
+    @Override
     public void run() {
-        driveOne(chunk, heightmap);
+        try {
+            driveOne(chunk, heightmap);
+        } finally {
+            notifier.markDone();
+        }
     }
 
     protected void driveOne(ChunkWriter chunk, Heightmap heightmap) {

@@ -41,7 +41,7 @@ public class ObjectPool<T> {
         this.supplier = supplier;
     }
 
-    public Item<T> get() {
+    public Resource<T> get() {
         synchronized (pool) {
             if (pool.size() > 0) {
                 return pool.remove(pool.size() - 1).retain();
@@ -67,7 +67,7 @@ public class ObjectPool<T> {
         return false;
     }
 
-    public static class Item<T> implements AutoCloseable {
+    public static class Item<T> implements Resource<T> {
 
         private final T value;
         private final ObjectPool<T> pool;
@@ -79,7 +79,8 @@ public class ObjectPool<T> {
             this.pool = pool;
         }
 
-        public T getValue() {
+        @Override
+        public T get() {
             return value;
         }
 

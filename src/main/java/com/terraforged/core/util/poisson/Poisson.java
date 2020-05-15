@@ -1,6 +1,7 @@
 package com.terraforged.core.util.poisson;
 
 import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.Resource;
 import me.dags.noise.util.NoiseUtil;
 import me.dags.noise.util.Vec2f;
 
@@ -36,8 +37,8 @@ public class Poisson {
     }
 
     public void visit(int chunkX, int chunkZ, PoissonContext context, Visitor visitor) {
-        try (ObjectPool.Item<Vec2f[][]> grid = pool.get()) {
-            clear(grid.getValue());
+        try (Resource<Vec2f[][]> grid = pool.get()) {
+            clear(grid.get());
             context.startX = (chunkX << 4);
             context.startZ = (chunkZ << 4);
             context.endX = context.startX + 16;
@@ -49,7 +50,7 @@ public class Poisson {
             context.random.setSeed(NoiseUtil.hash2D(context.seed, regionX, regionZ));
             int x = context.random.nextInt(regionSize);
             int z = context.random.nextInt(regionSize);
-            visit(x, z, grid.getValue(), SAMPLES, context, visitor);
+            visit(x, z, grid.get(), SAMPLES, context, visitor);
         }
     }
 

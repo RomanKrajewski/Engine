@@ -25,7 +25,7 @@
 
 package com.terraforged.core.cell;
 
-import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.Resource;
 import me.dags.noise.Module;
 
 public interface Populator extends Module {
@@ -36,9 +36,9 @@ public interface Populator extends Module {
 
     @Override
     default float getValue(float x, float z) {
-        try (ObjectPool.Item<Cell> cell = Cell.pooled()) {
-            apply(cell.getValue(), x, z);
-            return cell.getValue().value;
+        try (Resource<Cell> cell = Cell.pooled()) {
+            apply(cell.get(), x, z);
+            return cell.get().value;
         }
     }
 }

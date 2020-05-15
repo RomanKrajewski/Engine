@@ -23,13 +23,17 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.concurrent.batcher;
+package com.terraforged.core.concurrent.batch;
 
 public interface Batcher extends AutoCloseable {
 
     void size(int size);
 
     void submit(Runnable task);
+
+    default void submit(BatchTask task) {
+        submit((Runnable) task);
+    }
 
     @Override
     void close();

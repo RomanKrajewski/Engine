@@ -80,14 +80,14 @@ public class Levels {
         if (value <= water) {
             return 0F;
         }
-        return value / elevationRange;
+        return (value - water) / elevationRange;
     }
 
     public float elevation(int y) {
         if (y <= waterY) {
             return 0F;
         }
-        return scale(y) / elevationRange;
+        return scale(y - waterY) / elevationRange;
     }
 
     public float scale(int level) {

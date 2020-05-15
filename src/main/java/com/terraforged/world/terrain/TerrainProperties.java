@@ -2,6 +2,10 @@ package com.terraforged.world.terrain;
 
 public interface TerrainProperties {
 
+    default boolean isSandy() {
+        return false;
+    }
+
     default boolean isRiver() {
         return false;
     }

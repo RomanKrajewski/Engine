@@ -51,4 +51,11 @@ public class LazyFuture<T> implements Future<T> {
     public T get(long timeout, TimeUnit unit) {
         return get();
     }
+
+    public static Future<Void> adapt(Runnable runnable) {
+        return new LazyFuture<>(() -> {
+            runnable.run();
+            return null;
+        });
+    }
 }

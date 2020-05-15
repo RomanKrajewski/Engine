@@ -44,7 +44,12 @@ public class DesertDunes implements Decorator {
 
     private final Levels levels;
     private final Terrains terrains;
-    private final Terrain dunes = new Terrain("dunes", 1);
+    private final Terrain dunes = new Terrain("dunes", 1) {
+        @Override
+        public boolean isSandy() {
+            return true;
+        }
+    };
 
     public DesertDunes(GeneratorContext context) {
         this.climateMin = 0.6F;

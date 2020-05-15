@@ -23,12 +23,12 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.concurrent.batcher;
+package com.terraforged.core.concurrent.batch;
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
-public class AsyncBatcher implements Batcher {
+public class ForkJoinBatcher implements Batcher {
 
     private static final ForkJoinTask<?>[] empty = {};
 
@@ -38,7 +38,7 @@ public class AsyncBatcher implements Batcher {
     private int count = 0;
     private ForkJoinTask<?>[] tasks = empty;
 
-    public AsyncBatcher(ForkJoinPool pool) {
+    public ForkJoinBatcher(ForkJoinPool pool) {
         this.pool = pool;
     }
 

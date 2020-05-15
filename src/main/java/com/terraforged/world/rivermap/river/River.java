@@ -32,7 +32,6 @@ import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.CurveFunc;
-import me.dags.noise.func.Interpolation;
 import me.dags.noise.func.SCurve;
 import me.dags.noise.source.Line;
 import me.dags.noise.util.NoiseUtil;

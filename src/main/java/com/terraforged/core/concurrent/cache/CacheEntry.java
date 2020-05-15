@@ -1,6 +1,6 @@
 package com.terraforged.core.concurrent.cache;
 
-import com.terraforged.core.concurrent.ThreadPool;
+import com.terraforged.core.concurrent.pool.ThreadPool;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinTask;

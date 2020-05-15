@@ -26,7 +26,7 @@
 package com.terraforged.core.region.gen;
 
 import com.terraforged.core.concurrent.Disposable;
-import com.terraforged.core.concurrent.ThreadPool;
+import com.terraforged.core.concurrent.pool.ThreadPool;
 import com.terraforged.core.concurrent.cache.CacheEntry;
 import com.terraforged.core.region.Region;
 import com.terraforged.world.WorldGenerator;
@@ -159,7 +159,7 @@ public class RegionGenerator {
         }
 
         public RegionGenerator build() {
-            if (batchSize > 1) {
+            if (threadPool.supportsBatching() && batchSize > 1) {
                 return new RegionGeneratorBatched(this);
             }
             return new RegionGenerator(this);

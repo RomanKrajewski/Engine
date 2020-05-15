@@ -26,7 +26,7 @@
 package com.terraforged.world;
 
 import com.terraforged.core.Seed;
-import com.terraforged.core.concurrent.ThreadPool;
+import com.terraforged.core.concurrent.pool.ThreadPools;
 import com.terraforged.core.region.gen.RegionCache;
 import com.terraforged.core.region.gen.RegionGenerator;
 import com.terraforged.core.settings.Settings;
@@ -87,7 +87,7 @@ public class GeneratorContext {
         return RegionGenerator.builder()
                 .factory(factory)
                 .size(3, 2)
-                .pool(ThreadPool.getPool())
+                .pool(ThreadPools.getPool())
                 .build()
                 .toCache(false);
     }

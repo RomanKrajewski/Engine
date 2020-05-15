@@ -26,6 +26,7 @@
 package com.terraforged.core.cell;
 
 import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.terrain.Terrain;
 import me.dags.noise.util.NoiseUtil;
@@ -127,9 +128,9 @@ public class Cell {
         return EMPTY;
     }
 
-    public static ObjectPool.Item<Cell> pooled() {
-        ObjectPool.Item<Cell> item = POOL.get();
-        item.getValue().init();
+    public static Resource<Cell> pooled() {
+        Resource<Cell> item = POOL.get();
+        item.get().init();
         return item;
     }
 

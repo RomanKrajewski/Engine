@@ -27,7 +27,7 @@ package com.terraforged.core.region;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Disposable;
-import com.terraforged.core.concurrent.batcher.Batcher;
+import com.terraforged.core.concurrent.batch.Batcher;
 import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.region.chunk.ChunkBatchTask;
 import com.terraforged.core.region.chunk.ChunkGenTask;

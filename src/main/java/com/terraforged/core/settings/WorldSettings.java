@@ -22,7 +22,7 @@ public class WorldSettings {
     public static class Continent {
 
         @Comment("Controls how continent shapes calculated")
-        public DistanceFunc continentShape = DistanceFunc.NATURAL;
+        public DistanceFunc continentShape = DistanceFunc.EUCLIDEAN;
 
         @Range(min = 0F, max = 1F)
         @Comment("Controls the amount of ocean between continents")
