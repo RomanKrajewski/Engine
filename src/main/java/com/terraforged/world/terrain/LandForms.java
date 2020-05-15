@@ -35,15 +35,6 @@ import me.dags.noise.func.EdgeFunc;
 public class LandForms {
 
     private static final int PLAINS_H = 250;
-    private static final double PLAINS_V = 0.24;
-
-    public static final int PLATEAU_H = 500;
-    public static final double PLATEAU_V = 0.475;
-
-    private static final int HILLS_H = 500;
-    private static final double HILLS1_V = 0.6;
-    private static final double HILLS2_V = 0.55;
-
     private static final int MOUNTAINS_H = 410;
     private static final double MOUNTAINS_V = 0.7;
 
@@ -55,6 +46,7 @@ public class LandForms {
     private final float terrainVerticalScale;
     private final float groundLevel;
     private final float seaLevel;
+    private final Module ground;
 
     public LandForms(TerrainSettings settings, Levels levels) {
         this.settings = settings;
@@ -62,6 +54,7 @@ public class LandForms {
         terrainVerticalScale = settings.general.globalVerticalScale;
         groundLevel = levels.ground;
         seaLevel = levels.water;
+        ground = Source.constant(groundLevel);
     }
 
     public Module deepOcean(int seed) {
@@ -93,7 +86,7 @@ public class LandForms {
                 .warp(warpX, warpY, Source.constant(scaleH / 4F))
                 .warp(seed.next(), 256, 1, 200);
 
-        return settings.steppe.apply(groundLevel, 0.125 * terrainVerticalScale, module);
+        return settings.steppe.apply(groundLevel - 0.02F, 0.12 * terrainVerticalScale, module).max(ground);
     }
 
     public Module plains(Seed seed) {
@@ -110,7 +103,7 @@ public class LandForms {
                 .warp(warpX, warpY, Source.constant(scaleH / 4F))
                 .warp(seed.next(), 256, 1, 256);
 
-        return settings.plains.apply(groundLevel, PLAINS_V * terrainVerticalScale, module);
+        return settings.plains.apply(groundLevel - 0.035F, 0.2F * terrainVerticalScale, module).max(ground);
     }
 
     public Module plateau(Seed seed) {
@@ -127,7 +120,7 @@ public class LandForms {
         Module surface = Source.perlin(seed.next(), 20, 3).scale(0.05)
                 .warp(seed.next(), 40, 2, 20);
 
-        return settings.plateau.apply(groundLevel, PLATEAU_V * terrainVerticalScale,
+        return settings.plateau.apply(groundLevel, 0.475 * terrainVerticalScale,
                 valley
                         .mult(Source.cubic(seed.next(), 500, 1).scale(0.6).bias(0.3))
                         .add(top)
@@ -141,14 +134,14 @@ public class LandForms {
     }
 
     public Module hills1(Seed seed) {
-        return settings.hills.apply(groundLevel, HILLS1_V * terrainVerticalScale, Source.perlin(seed.next(), 200, 3)
+        return settings.hills.apply(groundLevel, 0.6F * terrainVerticalScale, Source.perlin(seed.next(), 200, 3)
                 .mult(Source.billow(seed.next(), 400, 3).alpha(0.5))
                 .warp(seed.next(), 30, 3, 20)
                 .warp(seed.next(), 400, 3, 200));
     }
 
     public Module hills2(Seed seed) {
-        return settings.hills.apply(groundLevel, HILLS2_V * terrainVerticalScale, Source.cubic(seed.next(), 128, 2)
+        return settings.hills.apply(groundLevel, 0.55F * terrainVerticalScale, Source.cubic(seed.next(), 128, 2)
                 .mult(Source.perlin(seed.next(), 32, 4).alpha(0.075))
                 .warp(seed.next(), 30, 3, 20)
                 .warp(seed.next(), 400, 3, 200)

@@ -67,8 +67,19 @@ public class DesertDunes implements Decorator {
             return false;
         }
 
+        float max = levels.water(40);
+        float min = levels.water(30);
+        if (cell.value > max) {
+            return false;
+        }
+
+        float fade = 1;
+        if (cell.value > min) {
+            fade = 1 - (cell.value - min) / (max - min);
+        }
+
         float duneHeight = module.getValue(x, y);
-        float mask = cell.biomeEdge * cell.riverMask * cell.regionEdge;
+        float mask = cell.biomeEdge * cell.riverMask * cell.regionEdge * fade;
 
         float height = duneHeight * mask;
         cell.value += height;

@@ -92,10 +92,10 @@ public class ClimateModule {
     }
 
     public void apply(Cell cell, float x, float y) {
-        apply(cell, x, y, false, true);
+        apply(cell, x, y, true);
     }
 
-    public void apply(Cell cell, float x, float y, boolean maskOnly, boolean mask) {
+    public void apply(Cell cell, float x, float y, boolean mask) {
         float ox = warpX.getValue(x, y) * warpStrength;
         float oz = warpZ.getValue(x, y) * warpStrength;
 
@@ -143,23 +143,18 @@ public class ClimateModule {
             }
         }
 
-        if (maskOnly) {
+        float biomeX = cellX + vec2f.x;
+        float biomeY = cellY + vec2f.y;
+
+        if (mask) {
             cell.biomeEdge = edgeValue(edgeDistance, edgeDistance2);
-        } else {
-            float biomeX = cellX + vec2f.x;
-            float biomeY = cellY + vec2f.y;
-
-            if (mask) {
-                cell.biomeEdge = edgeValue(edgeDistance, edgeDistance2);
-            }
-
-            cell.biome = cellValue(seed, cellX, cellY);
-            cell.moisture = moisture.getValue(biomeX, biomeY);
-            cell.temperature = temperature.getValue(biomeX, biomeY);
-            modifyMoisture(cell, biomeX / biomeFreq, biomeY / biomeFreq);
-
-            cell.biomeType = BiomeType.get(cell.temperature, cell.moisture);
         }
+
+        cell.biome = cellValue(seed, cellX, cellY);
+        cell.moisture = moisture.getValue(biomeX, biomeY);
+        cell.temperature = temperature.getValue(biomeX, biomeY);
+        modifyMoisture(cell, biomeX / biomeFreq, biomeY / biomeFreq);
+        cell.biomeType = BiomeType.get(cell.temperature, cell.moisture);
     }
 
     private void modifyMoisture(Cell cell, float x, float y) {
