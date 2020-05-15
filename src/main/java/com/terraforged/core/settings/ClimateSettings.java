@@ -12,7 +12,7 @@ public class ClimateSettings {
 
     public RangeValue temperature = new RangeValue(3, 0, 1F, 0);
 
-    public RangeValue moisture = new RangeValue(2, 0, 1F, 0);
+    public RangeValue moisture = new RangeValue(6, 2, 0, 1F, 0);
 
     public BiomeShape biomeShape = new BiomeShape();
 
@@ -46,9 +46,14 @@ public class ClimateSettings {
         }
 
         public RangeValue(int falloff, float min, float max, float bias) {
+            this(6, falloff, min, max, bias);
+        }
+
+        public RangeValue(int scale, int falloff, float min, float max, float bias) {
             this.min = min;
             this.max = max;
             this.bias = bias;
+            this.scale = scale;
             this.falloff = falloff;
         }
 

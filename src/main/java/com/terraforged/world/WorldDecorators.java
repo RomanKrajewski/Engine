@@ -1,5 +1,5 @@
 /*
- *   
+ *
  * MIT License
  *
  * Copyright (c) 2020 TerraForged
@@ -26,6 +26,7 @@
 package com.terraforged.world;
 
 import com.terraforged.world.terrain.decorator.Decorator;
+import com.terraforged.world.terrain.decorator.DesertDunes;
 import com.terraforged.world.terrain.decorator.DesertStacks;
 import com.terraforged.world.terrain.decorator.Wetlands;
 
@@ -40,6 +41,7 @@ public class WorldDecorators {
     public WorldDecorators(GeneratorContext context) {
         context = context.copy();
         List<Decorator> list = new ArrayList<>();
+        list.add(new DesertDunes(context));
         list.add(new DesertStacks(context.seed, context.levels));
         list.add(new Wetlands(context.seed, context.terrain, context.levels));
         decorators = Collections.unmodifiableList(list);

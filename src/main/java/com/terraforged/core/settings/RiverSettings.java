@@ -39,11 +39,11 @@ public class RiverSettings {
     @Comment("Controls the number of major rivers per continent")
     public int riverCount = 15;
 
-    public River primaryRivers = new River(5, 2, 8, 25, 8, 0.9F);
+    public River primaryRivers = new River(5, 2, 8, 20, 8, 0.95F);
 
-    public River secondaryRiver = new River(4, 1, 6, 15, 5, 0.9F);
+    public River secondaryRiver = new River(4, 1, 6, 14, 5, 0.95F);
 
-    public River tertiaryRivers = new River(3, 0, 4, 10, 4, 0.9F);
+    public River tertiaryRivers = new River(3, 0, 4, 8, 4, 0.95F);
 
     public Lake lake = new Lake();
 

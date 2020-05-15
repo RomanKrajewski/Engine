@@ -91,7 +91,11 @@ public class ClimateModule {
                 .warp(seed.next(), tempScale, 1, tempScale);
     }
 
-    public void apply(Cell cell, float x, float y, boolean mask) {
+    public void apply(Cell cell, float x, float y) {
+        apply(cell, x, y, false, true);
+    }
+
+    public void apply(Cell cell, float x, float y, boolean maskOnly, boolean mask) {
         float ox = warpX.getValue(x, y) * warpStrength;
         float oz = warpZ.getValue(x, y) * warpStrength;
 
@@ -139,14 +143,17 @@ public class ClimateModule {
             }
         }
 
-        if (mask) {
+        if (maskOnly) {
             cell.biomeEdge = edgeValue(edgeDistance, edgeDistance2);
         } else {
             float biomeX = cellX + vec2f.x;
             float biomeY = cellY + vec2f.y;
 
+            if (mask) {
+                cell.biomeEdge = edgeValue(edgeDistance, edgeDistance2);
+            }
+
             cell.biome = cellValue(seed, cellX, cellY);
-            cell.biomeEdge = edgeValue(edgeDistance, edgeDistance2);
             cell.moisture = moisture.getValue(biomeX, biomeY);
             cell.temperature = temperature.getValue(biomeX, biomeY);
             modifyMoisture(cell, biomeX / biomeFreq, biomeY / biomeFreq);
@@ -177,6 +184,9 @@ public class ClimateModule {
         EdgeFunc edge = EdgeFunc.DISTANCE_2_DIV;
         float value = edge.apply(distance, distance2);
         value = 1 - NoiseUtil.map(value, edge.min(), edge.max(), edge.range());
+        if (true) {
+            return value;
+        }
         if (value > edgeClamp) {
             return 1F;
         }

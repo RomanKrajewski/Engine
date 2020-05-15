@@ -292,7 +292,9 @@ public class Region implements Disposable {
                     float x = ((chunk.getBlockX() + dx) * zoom) + translateX;
                     float z = ((chunk.getBlockZ() + dz) * zoom) + translateZ;
                     for (Decorator decorator : decorators) {
-                        decorator.apply(cell, x, z);
+                        if (decorator.apply(cell, x, z)) {
+                            break;
+                        }
                     }
                 });
             }

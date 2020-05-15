@@ -80,8 +80,12 @@ public class Climate {
         return treeLine.getValue(x, z);
     }
 
-    public void apply(Cell cell, float x, float z, boolean mask) {
-        biomeNoise.apply(cell, x, z, mask);
+    public void apply(Cell cell, float x, float z) {
+        apply(cell, x, z, false, true);
+    }
+
+    public void apply(Cell cell, float x, float z, boolean maskOnly, boolean mask) {
+        biomeNoise.apply(cell, x, z, maskOnly, mask);
         modifyTemp(cell, x, z);
     }
 

@@ -5,6 +5,7 @@ import com.terraforged.core.concurrent.cache.ExpiringEntry;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.lake.Lake;
 import com.terraforged.world.rivermap.river.River;
+import me.dags.noise.Source;
 import me.dags.noise.domain.Domain;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class Rivermap implements ExpiringEntry {
         this.rivers = rivers;
         this.lakeWarp = Domain.warp(++seed, 200, 1, 400)
                 .add(Domain.warp(++seed, 50, 2, 50));
-        this.riverWarp = Domain.warp(++seed, 400, 1, 400)
+        this.riverWarp = Domain.warp(++seed, 400, 1, 350)
                 .add(Domain.warp(++seed, 80, 1, 35))
                 .add(Domain.warp(++seed, 16, 1, 2))
         ;

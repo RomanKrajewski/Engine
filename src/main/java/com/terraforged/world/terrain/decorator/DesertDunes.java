@@ -27,6 +27,7 @@ package com.terraforged.world.terrain.decorator;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.GeneratorContext;
+import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.Terrains;
@@ -43,7 +44,7 @@ public class DesertDunes implements Decorator {
 
     private final Levels levels;
     private final Terrains terrains;
-    private final Terrain dunes = new Terrain("dunes", 100);
+    private final Terrain dunes = new Terrain("dunes", 1);
 
     public DesertDunes(GeneratorContext context) {
         this.climateMin = 0.6F;
@@ -58,18 +59,18 @@ public class DesertDunes implements Decorator {
 
     @Override
     public boolean apply(Cell cell, float x, float y) {
-        float temp = cell.temperature;
-        float moisture = 1 - cell.moisture;
-        float climate = temp * moisture;
-        if (climate < climateMin) {
+        if (BiomeType.DESERT != cell.biomeType) {
+            return false;
+        }
+
+        if (cell.terrainType != terrains.plains && cell.terrainType != terrains.steppe) {
             return false;
         }
 
         float duneHeight = module.getValue(x, y);
-        float climateMask = climate > climateMax ? 1F : (climate - climateMin) / climateRange;
-        float regionMask = cell.mask(0.4F, 0.5F, 0,0.8F);
+        float mask = cell.biomeEdge * cell.riverMask * cell.regionEdge;
 
-        float height = duneHeight * climateMask * regionMask;
+        float height = duneHeight * mask;
         cell.value += height;
         cell.terrainType = dunes;
 

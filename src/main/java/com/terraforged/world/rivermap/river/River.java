@@ -32,6 +32,7 @@ import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.CurveFunc;
+import me.dags.noise.func.Interpolation;
 import me.dags.noise.func.SCurve;
 import me.dags.noise.source.Line;
 import me.dags.noise.util.NoiseUtil;
@@ -139,8 +140,9 @@ public class River extends TerrainPopulator implements Comparable<River> {
             return;
         }
 
+        float mouthModifier = getMouthModifier(cell);
         float widthModifier = banks.getWidthModifier(x, z);
-        float banksAlpha = banks.getValue(x, z, MIN_WIDTH2, widthModifier);
+        float banksAlpha = banks.getValue(x, z, MIN_WIDTH2, widthModifier / mouthModifier);
         if (banksAlpha == 0) {
             return;
         }
@@ -187,6 +189,9 @@ public class River extends TerrainPopulator implements Comparable<River> {
         // lerp the position's height to the riverbed height (ie the riverbank slopes)
         if (cell.value > bedHeight) {
             cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
+            if (cell.value < bedHeight) {
+                cell.value = bedHeight;
+            }
             tag(cell, terrains.riverBanks);
             return true;
         }
@@ -198,6 +203,10 @@ public class River extends TerrainPopulator implements Comparable<River> {
         tag(cell, terrains.river);
     }
 
+    private float getMouthModifier(Cell cell) {
+        float modifier = NoiseUtil.map(cell.continentEdgeRaw, 0F, 0.5F, 0.5F);
+        return modifier * modifier;
+    }
 
     private void tag(Cell cell, Terrain tag) {
         cell.terrainType = tag;

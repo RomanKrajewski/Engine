@@ -31,6 +31,7 @@ import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
+import me.dags.noise.util.NoiseUtil;
 
 public class DesertStacks implements Decorator {
 
@@ -45,10 +46,9 @@ public class DesertStacks implements Decorator {
         Module shape = Source.perlin(seed.next(), 25, 1).clamp(0.6, 1).map(0, 1)
                 .mult(Source.perlin(seed.next(), 8, 1).alpha(0.1));
 
-        Module top = Source.perlin(seed.next(), 4, 1).alpha(0.25);
+        Module top = Source.perlin(seed.next(), 4, 2).alpha(0.35);
 
-        Module scale = Source.perlin(seed.next(), 400, 1)
-                .clamp(levels.scale(20), levels.scale(35));
+        Module scale = Source.perlin(seed.next(), 400, 1).scale(0.5);
 
         Module stack = (x, y) -> {
             float value = shape.getValue(x, y);
@@ -75,7 +75,7 @@ public class DesertStacks implements Decorator {
         }
 
         float value = module.getValue(x, y);
-        value *= cell.biomeEdge;
+        value *= cell.biomeEdge * NoiseUtil.map(cell.riverMask,0, 0.0005F, 0.0005F);
         cell.value += value;
 
         return value > levels.unit;
