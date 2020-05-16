@@ -31,7 +31,7 @@ import com.terraforged.core.region.gen.RegionCache;
 import com.terraforged.core.region.gen.RegionGenerator;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import com.terraforged.world.terrain.provider.StandardTerrainProvider;
 import com.terraforged.world.terrain.provider.TerrainProviderFactory;
 
@@ -41,17 +41,17 @@ public class GeneratorContext {
 
     public final Seed seed;
     public final Levels levels;
-    public final Terrains terrain;
+    public final TerrainTypes terrain;
     public final Settings settings;
     public final RegionCache cache;
     public final WorldGeneratorFactory factory;
     public final TerrainProviderFactory terrainFactory;
 
-    public GeneratorContext(Terrains terrain, Settings settings) {
+    public GeneratorContext(TerrainTypes terrain, Settings settings) {
         this(terrain, settings, StandardTerrainProvider::new, GeneratorContext::createCache);
     }
 
-    public <T extends Settings> GeneratorContext(Terrains terrain, T settings, TerrainProviderFactory terrainFactory, Function<WorldGeneratorFactory, RegionCache> cache) {
+    public <T extends Settings> GeneratorContext(TerrainTypes terrain, T settings, TerrainProviderFactory terrainFactory, Function<WorldGeneratorFactory, RegionCache> cache) {
         this.terrain = terrain;
         this.settings = settings;
         this.seed = new Seed(settings.world.seed);
@@ -79,7 +79,7 @@ public class GeneratorContext {
         return new GeneratorContext(this);
     }
 
-    public static GeneratorContext createNoCache(Terrains terrain, Settings settings) {
+    public static GeneratorContext createNoCache(TerrainTypes terrain, Settings settings) {
         return new GeneratorContext(terrain, settings, StandardTerrainProvider::new, s -> null);
     }
 

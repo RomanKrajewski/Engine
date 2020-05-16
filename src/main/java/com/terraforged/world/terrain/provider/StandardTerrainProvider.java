@@ -30,6 +30,7 @@ import com.terraforged.core.cell.Populator;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.heightmap.RegionConfig;
 import com.terraforged.world.terrain.LandForms;
+import com.terraforged.world.terrain.MixedTerarin;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.TerrainPopulator;
 import com.terraforged.world.terrain.special.VolcanoPopulator;
@@ -117,10 +118,8 @@ public class StandardTerrainProvider implements TerrainProvider {
     }
 
     private static TerrainPopulator combine(TerrainPopulator tp1, TerrainPopulator tp2, Seed seed, int scale) {
-        float weight = Math.min(tp1.getType().getWeight(), tp2.getType().getWeight());
+        Terrain type = new MixedTerarin(tp1.getType(), tp2.getType());
 
-        String name = tp1.getType().getName() + "-" + tp2.getType().getName();
-        Terrain type = new Terrain(name, weight);
         Module combined = Source.perlin(seed.next(), scale, 1)
                 .warp(seed.next(), scale / 2, 2, scale / 2D)
                 .blend(tp1.getSource(), tp2.getSource(), 0.5, 0.25)

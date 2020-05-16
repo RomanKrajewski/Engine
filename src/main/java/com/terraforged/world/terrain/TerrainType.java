@@ -1,8 +1,12 @@
 package com.terraforged.world.terrain;
 
-public interface TerrainProperties {
+public interface TerrainType {
 
-    default boolean isSandy() {
+    default boolean isFlat() {
+        return false;
+    }
+
+    default boolean isDesert() {
         return false;
     }
 
@@ -16,6 +20,14 @@ public interface TerrainProperties {
 
     default boolean isDeepOcean() {
         return false;
+    }
+
+    default boolean isCoast() {
+        return false;
+    }
+
+    default boolean overridesRiver() {
+        return isDeepOcean() || isShallowOcean() || isCoast();
     }
 
     default boolean isLake() {

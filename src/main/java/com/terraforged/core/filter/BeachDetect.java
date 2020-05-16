@@ -2,16 +2,16 @@ package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.WorldHeightmap;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 
 public class BeachDetect implements Filter, Filter.Visitor {
 
-    private final Terrains terrains;
+    private final TerrainTypes terrains;
     private final float grad2;
     private final int radius = 8;
     private final int diameter = radius + 1 + radius;
 
-    public BeachDetect(Terrains terrains) {
+    public BeachDetect(TerrainTypes terrains) {
         this.terrains = terrains;
         float delta = (8F / 256F) / diameter;
         this.grad2 = delta * delta;

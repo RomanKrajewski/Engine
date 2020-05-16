@@ -29,7 +29,7 @@ import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.util.NoiseUtil;
@@ -42,7 +42,7 @@ public class Wetlands implements Decorator {
 
     private final Terrain wetlands;
 
-    public Wetlands(Seed seed, Terrains terrain, Levels levels) {
+    public Wetlands(Seed seed, TerrainTypes terrain, Levels levels) {
         this.wetlands = terrain.wetlands;
         this.poolBase = levels.water(-3);
         this.bankHeight = levels.water(2);

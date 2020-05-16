@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Terrains {
+public class TerrainTypes {
 
     public final Terrain ocean;
     public final Terrain deepOcean;
@@ -41,6 +41,7 @@ public class Terrains {
     public final Terrain river;
     public final Terrain riverBanks;
     public final Terrain wetlands;
+    public final Terrain desert;
     public final Terrain badlands;
     public final Terrain steppe;
     public final Terrain plains;
@@ -53,7 +54,7 @@ public class Terrains {
     public final Terrain volcanoPipe;
     public final List<Terrain> index;
 
-    private Terrains(Mutable mutable) {
+    private TerrainTypes(Mutable mutable) {
         List<Terrain> index = new ArrayList<>();
         Collections.addAll(
                 index,
@@ -66,6 +67,7 @@ public class Terrains {
                 torridonian = mutable.torridonian,
                 riverBanks = mutable.riverbanks,
                 wetlands = mutable.wetlands,
+                desert = mutable.desert,
                 badlands = mutable.badlands,
                 plateau = mutable.plateau,
                 steppe = mutable.steppe,
@@ -79,19 +81,7 @@ public class Terrains {
         this.index = Collections.unmodifiableList(index);
     }
 
-    public boolean overridesRiver(Terrain terrain) {
-        return isOcean(terrain) || terrain == coast;
-    }
-
-    public boolean isOcean(Terrain terrain) {
-        return terrain == ocean || terrain == deepOcean;
-    }
-
-    public boolean isRiver(Terrain terrain) {
-        return terrain == river || terrain == riverBanks;
-    }
-
-    public static Terrains create(Settings settings) {
+    public static TerrainTypes create(Settings settings) {
         Mutable terrain = new Mutable();
         terrain.ocean = Terrain.ocean(settings);
         terrain.deepOcean = Terrain.deepOcean(settings);
@@ -101,6 +91,7 @@ public class Terrains {
         terrain.river = Terrain.river(settings);
         terrain.riverbanks = Terrain.riverBank(settings);
         terrain.wetlands = Terrain.wetlands(settings);
+        terrain.desert = Terrain.desert(settings);
         terrain.badlands = Terrain.badlands(settings);
         terrain.plateau = Terrain.plateau(settings);
         terrain.steppe = Terrain.steppe(settings);
@@ -115,6 +106,7 @@ public class Terrains {
     }
 
     public static final class Mutable {
+
         public Terrain ocean = Terrain.NONE;
         public Terrain deepOcean = Terrain.NONE;
         public Terrain coast = Terrain.NONE;
@@ -123,6 +115,7 @@ public class Terrains {
         public Terrain river = Terrain.NONE;
         public Terrain riverbanks = Terrain.NONE;
         public Terrain wetlands = Terrain.NONE;
+        public Terrain desert = Terrain.NONE;
         public Terrain badlands = Terrain.NONE;
         public Terrain plateau = Terrain.NONE;
         public Terrain steppe = Terrain.NONE;
@@ -133,8 +126,9 @@ public class Terrains {
         public Terrain mountains = Terrain.NONE;
         public Terrain volcanoes = Terrain.NONE;
         public Terrain volcanoPipe = Terrain.NONE;
-        public Terrains create() {
-            return new Terrains(this);
+
+        public TerrainTypes create() {
+            return new TerrainTypes(this);
         }
     }
 }

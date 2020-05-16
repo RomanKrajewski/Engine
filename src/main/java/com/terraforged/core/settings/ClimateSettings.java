@@ -10,7 +10,7 @@ import me.dags.noise.util.NoiseUtil;
 @Serializable
 public class ClimateSettings {
 
-    public RangeValue temperature = new RangeValue(3, 0, 1F, 0);
+    public RangeValue temperature = new RangeValue(3, 0, 1F, 0.1F);
 
     public RangeValue moisture = new RangeValue(6, 2, 0, 1F, 0);
 

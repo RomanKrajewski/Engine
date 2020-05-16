@@ -31,7 +31,7 @@ import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.heightmap.RegionConfig;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.TerrainPopulator;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.EdgeFunc;
@@ -52,7 +52,7 @@ public class VolcanoPopulator extends TerrainPopulator {
     private final Terrain inner;
     private final Terrain outer;
 
-    public VolcanoPopulator(Seed seed, RegionConfig region, Levels levels, Terrains terrains) {
+    public VolcanoPopulator(Seed seed, RegionConfig region, Levels levels, TerrainTypes terrains) {
         super(Source.ZERO, terrains.volcano);
         float midpoint = 0.3F;
         float range = 0.3F;

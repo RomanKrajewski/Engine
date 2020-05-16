@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class Terrain implements TerrainProperties {
+public class Terrain implements TerrainType {
 
     private static final Map<String, Terrain> register = Collections.synchronizedMap(new HashMap<>());
 
@@ -171,12 +171,31 @@ public class Terrain implements TerrainProperties {
         };
     }
 
+    public static Terrain desert(Settings settings) {
+        return new Terrain("desert", 5) {
+            @Override
+            public boolean isDesert() {
+                return true;
+            }
+        };
+    }
+
     public static Terrain steppe(Settings settings) {
-        return new Terrain("steppe", settings.terrain.steppe.weight);
+        return new Terrain("steppe", settings.terrain.steppe.weight) {
+            @Override
+            public boolean isFlat() {
+                return true;
+            }
+        };
     }
 
     public static Terrain plains(Settings settings) {
-        return new Terrain("plains", settings.terrain.plains.weight);
+        return new Terrain("plains", settings.terrain.plains.weight) {
+            @Override
+            public boolean isFlat() {
+                return true;
+            }
+        };
     }
 
     public static Terrain plateau(Settings settings) {
@@ -184,7 +203,17 @@ public class Terrain implements TerrainProperties {
     }
 
     public static Terrain badlands(Settings settings) {
-        return new Terrain("badlands", settings.terrain.badlands.weight);
+        return new Terrain("badlands", settings.terrain.badlands.weight) {
+            @Override
+            public boolean isDesert() {
+                return true;
+            }
+
+            @Override
+            public boolean isFlat() {
+                return true;
+            }
+        };
     }
 
     public static Terrain hills(Settings settings) {

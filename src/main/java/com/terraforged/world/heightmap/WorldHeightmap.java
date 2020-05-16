@@ -39,7 +39,7 @@ import com.terraforged.world.continent.ContinentLerper3;
 import com.terraforged.world.rivermap.RiverCache;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.TerrainPopulator;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import com.terraforged.world.terrain.provider.TerrainProvider;
 import com.terraforged.world.terrain.region.RegionLerper;
 import com.terraforged.world.terrain.region.RegionModule;
@@ -59,7 +59,7 @@ public class WorldHeightmap implements Heightmap {
     public static final float INLAND_VALUE = 0.55F;
 
     private final Levels levels;
-    private final Terrains terrain;
+    private final TerrainTypes terrain;
     private final Settings settings;
 
     private final Continent continentGenerator;

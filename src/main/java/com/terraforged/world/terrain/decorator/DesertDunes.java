@@ -29,8 +29,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.CellFunc;
@@ -38,28 +37,15 @@ import me.dags.noise.func.CellFunc;
 public class DesertDunes implements Decorator {
 
     private final Module module;
-    private final float climateMin;
-    private final float climateMax;
-    private final float climateRange;
-
     private final Levels levels;
-    private final Terrains terrains;
-    private final Terrain dunes = new Terrain("dunes", 1) {
-        @Override
-        public boolean isSandy() {
-            return true;
-        }
-    };
+    private final TerrainTypes terrains;
 
     public DesertDunes(GeneratorContext context) {
-        this.climateMin = 0.6F;
-        this.climateMax = 0.85F;
-        this.climateRange = climateMax - climateMin;
         this.levels = context.levels;
         this.terrains = context.terrain;
         this.module = Source.cell(context.seed.next(), 80, CellFunc.DISTANCE)
                 .warp(context.seed.next(), 70, 1, 70)
-                .scale(30 / 255D);
+                .scale(context.levels.scale(35));
     }
 
     @Override
@@ -68,7 +54,7 @@ public class DesertDunes implements Decorator {
             return false;
         }
 
-        if (cell.terrainType != terrains.plains && cell.terrainType != terrains.steppe) {
+        if (!cell.terrainType.isFlat()) {
             return false;
         }
 
@@ -88,7 +74,7 @@ public class DesertDunes implements Decorator {
 
         float height = duneHeight * mask;
         cell.value += height;
-        cell.terrainType = dunes;
+        cell.terrainType = terrains.desert;
 
         return height >= levels.unit;
     }

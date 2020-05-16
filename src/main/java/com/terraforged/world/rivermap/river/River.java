@@ -28,7 +28,7 @@ package com.terraforged.world.rivermap.river;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.TerrainPopulator;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.CurveFunc;
@@ -62,13 +62,13 @@ public class River extends TerrainPopulator implements Comparable<River> {
     public final RiverConfig config;
     public final RiverBounds bounds;
 
-    private final Terrains terrains;
+    private final TerrainTypes terrains;
 
     private final float depthFadeBias;
     private final float continentValleyModifier;
     private final float continentRiverModifier;
 
-    public River(RiverBounds bounds, RiverConfig config, Settings settings, Terrains terrains) {
+    public River(RiverBounds bounds, RiverConfig config, Settings settings, TerrainTypes terrains) {
         super(Source.ZERO, terrains.river);
         Module in = Source.constant(settings.fadeIn);
         Module out = Source.constant(settings.fadeOut);
@@ -111,8 +111,8 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
     @Override
     public void tag(Cell cell, float x, float z) {
-        if (!terrains.overridesRiver(cell.terrainType)) {
-//            cell.tag = terrains.river;
+        if (!cell.terrainType.overridesRiver()) {
+            cell.terrainType = terrains.river;
         }
     }
 
