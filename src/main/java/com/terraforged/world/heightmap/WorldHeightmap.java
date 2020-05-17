@@ -182,20 +182,7 @@ public class WorldHeightmap implements Heightmap {
     @Override
     public void applyClimate(Cell cell, float x, float z) {
         // apply climate data
-        climate.apply(cell, x, z, true);
-        if (cell.value <= levels.water) {
-            if (cell.terrainType == terrain.coast) {
-                cell.terrainType = terrain.ocean;
-            }
-        } else  {
-            int range = settings.climate.biomeEdgeShape.strength;
-            float dx = climate.getOffsetX(x, z, range);
-            float dz = climate.getOffsetZ(x, z, range);
-            float px = x + dx;
-            float pz = z + dz;
-            tag(cell, px, pz);
-            climate.apply(cell, px, pz, false);
-        }
+        climate.apply(cell, x, z);
     }
 
     @Override

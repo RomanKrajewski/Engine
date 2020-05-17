@@ -28,9 +28,13 @@ package com.terraforged.world.climate;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.Continent;
+import com.terraforged.world.heightmap.Levels;
+import com.terraforged.world.terrain.TerrainTypes;
 import me.dags.noise.Module;
+import me.dags.noise.Noise;
 import me.dags.noise.Source;
 import me.dags.noise.source.Rand;
+import me.dags.noise.util.NoiseUtil;
 
 public class Climate {
 
@@ -43,20 +47,19 @@ public class Climate {
     private final float temperatureModifier = 0.05F;
 
     private final Rand rand;
-    private final Module treeLine;
     private final Module offsetX;
     private final Module offsetY;
+    private final int offsetDistance;
+    private final Levels levels;
+    private final TerrainTypes terrains;
 
     private final ClimateModule biomeNoise;
 
     public Climate(Continent continent, GeneratorContext context) {
         this.biomeNoise = new ClimateModule(continent, context);
-
-        this.treeLine = Source.perlin(context.seed.next(), context.settings.climate.biomeShape.biomeSize * 8, 1)
-                .scale(context.levels.scale(50)) // 50 units worth of variance
-                .bias(context.levels.water(40)) // start at-least 40 units above ground level
-                .clamp(0, 1);
-
+        this.levels = context.levels;
+        this.terrains = context.terrain;
+        this.offsetDistance = context.settings.climate.biomeEdgeShape.strength;
         this.rand = new Rand(Source.builder().seed(context.seed.next()));
         this.offsetX = context.settings.climate.biomeEdgeShape.build(context.seed.next());
         this.offsetY = context.settings.climate.biomeEdgeShape.build(context.seed.next());
@@ -68,20 +71,33 @@ public class Climate {
         return rand;
     }
 
-    public float getOffsetX(float x, float z, int distance) {
+    public float getOffsetX(float x, float z, float distance) {
         return offsetX.getValue(x, z) * distance;
     }
 
-    public float getOffsetZ(float x, float z, int distance) {
+    public float getOffsetZ(float x, float z, float distance) {
         return offsetY.getValue(x, z) * distance;
     }
 
-    public float getTreeLine(float x, float z) {
-        return treeLine.getValue(x, z);
-    }
+    public void apply(Cell cell, float x, float z) {
+        biomeNoise.apply(cell, x, z, true);
 
-    public void apply(Cell cell, float x, float z, boolean mask) {
-        biomeNoise.apply(cell, x, z, mask);
+        float edgeBlend = 0.4F;
+
+        if (cell.value <= levels.water) {
+            if (cell.terrainType == terrains.coast) {
+                cell.terrainType = terrains.ocean;
+            }
+        } else if (cell.biomeEdge < edgeBlend) {
+            float modifier = 1 - NoiseUtil.map(cell.biomeEdge, 0, edgeBlend, edgeBlend);
+            float distance = offsetDistance * modifier;
+            float dx = getOffsetX(x, z, distance);
+            float dz = getOffsetZ(x, z, distance);
+            x += dx;
+            z += dz;
+            biomeNoise.apply(cell, x, z, false);
+        }
+
         modifyTemp(cell, x, z);
     }
 
