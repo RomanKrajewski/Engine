@@ -127,8 +127,8 @@ public class WorldHeightmap implements Heightmap {
                 mountainShape,
                 terrain,
                 mountains,
-                0.0F,
-                0.9F,
+                0.25F,
+                0.8F,
                 0.6F
         );
 

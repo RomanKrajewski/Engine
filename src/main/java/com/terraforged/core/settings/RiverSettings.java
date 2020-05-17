@@ -37,7 +37,7 @@ public class RiverSettings {
      */
     @Range(min = 0, max = 30)
     @Comment("Controls the number of major rivers per continent")
-    public int riverCount = 15;
+    public int riverCount = 10;
 
     public River primaryRivers = new River(5, 2, 8, 20, 8, 0.95F);
 

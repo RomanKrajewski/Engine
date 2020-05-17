@@ -6,10 +6,6 @@ public interface TerrainType {
         return false;
     }
 
-    default boolean isDesert() {
-        return false;
-    }
-
     default boolean isRiver() {
         return false;
     }

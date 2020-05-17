@@ -35,14 +35,14 @@ import me.dags.noise.Module;
 public class TerrainSettings {
 
     public General general = new General();
-    public Terrain steppe = new Terrain(5F, 1F, 1F);
-    public Terrain plains = new Terrain(5F, 1F, 1F);
+    public Terrain steppe = new Terrain(3F, 1F, 1F);
+    public Terrain plains = new Terrain(3F, 1F, 1F);
     public Terrain hills = new Terrain(2F, 1F, 1F);
     public Terrain dales = new Terrain(2F, 1F, 1F);
     public Terrain plateau = new Terrain(2F, 1F, 1F);
     public Terrain badlands = new Terrain(2F, 1F, 1F);
     public Terrain torridonian = new Terrain(0.5F, 1F, 1F);
-    public Terrain mountains = new Terrain(0.5F, 1F, 1F);
+    public Terrain mountains = new Terrain(2F, 1F, 1F);
     public Terrain volcano = new Terrain(1F, 1F, 1F);
 
     @Serializable
@@ -50,7 +50,7 @@ public class TerrainSettings {
 
         @Range(min = 125, max = 5000)
         @Comment("Controls the size of terrain regions")
-        public int terrainRegionSize = 1000;
+        public int terrainRegionSize = 500;
 
         @Range(min = 0, max = 1)
         @Comment("Globally controls the vertical scaling of terrain")

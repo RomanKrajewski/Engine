@@ -173,10 +173,7 @@ public class Terrain implements TerrainType {
 
     public static Terrain desert(Settings settings) {
         return new Terrain("desert", 5) {
-            @Override
-            public boolean isDesert() {
-                return true;
-            }
+
         };
     }
 
@@ -205,10 +202,14 @@ public class Terrain implements TerrainType {
     public static Terrain badlands(Settings settings) {
         return new Terrain("badlands", settings.terrain.badlands.weight) {
             @Override
-            public boolean isDesert() {
+            public boolean isFlat() {
                 return true;
             }
+        };
+    }
 
+    public static Terrain canyons(Settings settings) {
+        return new Terrain("badlands", settings.terrain.badlands.weight) {
             @Override
             public boolean isFlat() {
                 return true;

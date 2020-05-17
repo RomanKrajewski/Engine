@@ -43,6 +43,7 @@ public class TerrainTypes {
     public final Terrain wetlands;
     public final Terrain desert;
     public final Terrain badlands;
+    public final Terrain canyons;
     public final Terrain steppe;
     public final Terrain plains;
     public final Terrain plateau;
@@ -69,6 +70,7 @@ public class TerrainTypes {
                 wetlands = mutable.wetlands,
                 desert = mutable.desert,
                 badlands = mutable.badlands,
+                canyons = mutable.canyons,
                 plateau = mutable.plateau,
                 steppe = mutable.steppe,
                 plains = mutable.plains,
@@ -93,6 +95,7 @@ public class TerrainTypes {
         terrain.wetlands = Terrain.wetlands(settings);
         terrain.desert = Terrain.desert(settings);
         terrain.badlands = Terrain.badlands(settings);
+        terrain.canyons = Terrain.canyons(settings);
         terrain.plateau = Terrain.plateau(settings);
         terrain.steppe = Terrain.steppe(settings);
         terrain.plains = Terrain.plains(settings);
@@ -117,6 +120,7 @@ public class TerrainTypes {
         public Terrain wetlands = Terrain.NONE;
         public Terrain desert = Terrain.NONE;
         public Terrain badlands = Terrain.NONE;
+        public Terrain canyons = Terrain.NONE;
         public Terrain plateau = Terrain.NONE;
         public Terrain steppe = Terrain.NONE;
         public Terrain plains = Terrain.NONE;

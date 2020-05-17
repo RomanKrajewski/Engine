@@ -54,10 +54,6 @@ public class DesertDunes implements Decorator {
             return false;
         }
 
-        if (!cell.terrainType.isFlat()) {
-            return false;
-        }
-
         float max = levels.water(40);
         float min = levels.water(30);
         if (cell.value > max) {
