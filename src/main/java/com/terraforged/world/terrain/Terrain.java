@@ -208,15 +208,6 @@ public class Terrain implements TerrainType {
         };
     }
 
-    public static Terrain canyons(Settings settings) {
-        return new Terrain("badlands", settings.terrain.badlands.weight) {
-            @Override
-            public boolean isFlat() {
-                return true;
-            }
-        };
-    }
-
     public static Terrain hills(Settings settings) {
         return new Terrain("hills", settings.terrain.hills.weight);
     }

@@ -1,6 +1,5 @@
 package com.terraforged.core.concurrent.pool;
 
-import com.terraforged.core.concurrent.ObjectPool;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.batch.Batcher;
 import com.terraforged.core.concurrent.batch.TaskBatcher;

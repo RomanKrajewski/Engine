@@ -26,6 +26,7 @@
 package com.terraforged.world.geology;
 
 import com.terraforged.core.Seed;
+import com.terraforged.core.concurrent.Resource;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.util.NoiseUtil;
@@ -45,9 +46,10 @@ public class Strata<T> {
     }
 
     public boolean downwards(final int x, final int y, final int z, final Stratum.Visitor<T> visitor) {
-        DepthBuffer buffer = new DepthBuffer();
-        initBuffer(buffer, x, z);
-        return downwards(x, y, z, buffer, visitor);
+        try (Resource<DepthBuffer> buffer = DepthBuffer.get()) {
+            initBuffer(buffer.get(), x, z);
+            return downwards(x, y, z, buffer.get(), visitor);
+        }
     }
 
     public boolean downwards(final int x, final int y, final int z, final DepthBuffer buffer, Stratum.Visitor<T> visitor) {
