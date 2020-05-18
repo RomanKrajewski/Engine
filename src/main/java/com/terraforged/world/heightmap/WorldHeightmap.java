@@ -182,7 +182,7 @@ public class WorldHeightmap implements Heightmap {
     @Override
     public void applyClimate(Cell cell, float x, float z) {
         // apply climate data
-        climate.apply(cell, x, z);
+        climate.apply(cell, x, z, this);
     }
 
     @Override

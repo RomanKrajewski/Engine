@@ -257,12 +257,18 @@ public class Erosion implements Filter {
     }
 
     private void deposit(Cell cell, float amount) {
+        if (cell.erosionMask) {
+            return;
+        }
         float change = modifier.modify(cell, amount);
         cell.value += change;
         cell.sediment += change;
     }
 
     private void erode(Cell cell, float amount) {
+        if (cell.erosionMask) {
+            return;
+        }
         float change = modifier.modify(cell, amount);
         cell.value -= change;
         cell.erosion -= change;

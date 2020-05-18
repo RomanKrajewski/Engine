@@ -26,12 +26,13 @@
 package com.terraforged.world.climate;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.Continent;
 import com.terraforged.world.heightmap.Levels;
+import com.terraforged.world.heightmap.WorldHeightmap;
 import com.terraforged.world.terrain.TerrainTypes;
 import me.dags.noise.Module;
-import me.dags.noise.Noise;
 import me.dags.noise.Source;
 import me.dags.noise.source.Rand;
 import me.dags.noise.util.NoiseUtil;
@@ -79,7 +80,7 @@ public class Climate {
         return offsetY.getValue(x, z) * distance;
     }
 
-    public void apply(Cell cell, float x, float z) {
+    public void apply(Cell cell, float x, float z, WorldHeightmap heightmap) {
         biomeNoise.apply(cell, x, z, true);
 
         float edgeBlend = 0.4F;
@@ -96,6 +97,10 @@ public class Climate {
             x += dx;
             z += dz;
             biomeNoise.apply(cell, x, z, false);
+            try (Resource<Cell> lookup = Cell.pooled()) {
+                heightmap.tag(lookup.get(), x, z);
+                cell.terrainType = lookup.get().terrainType;
+            }
         }
 
         modifyTemp(cell, x, z);

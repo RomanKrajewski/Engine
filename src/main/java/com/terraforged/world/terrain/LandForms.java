@@ -208,7 +208,7 @@ public class LandForms {
 
     public Module badlands(Seed seed) {
         Module mask = Source.perlin(seed.next(), 800, 1).clamp(0.35, 0.65).map(0, 1);
-        Module hills = Source.ridge(seed.next(), 500, 4)
+        Module hills = Source.ridge(seed.next(), 200, 4)
                 .warp(seed.next(), 400, 2, 100)
                 .mult(mask);
 
@@ -220,37 +220,13 @@ public class LandForms {
         Module highFreq = hills.steps(10).scale(alpha).add(mod1);
         Module detail = lowFreq.add(highFreq);
 
-        Module mod2 = hills.mult(Source.perlin(seed.next(), 400, 3).scale(modulation));
+        Module mod2 = hills.mult(Source.perlin(seed.next(), 200, 3).scale(modulation));
         Module shape = hills.terrace(0.1, 1, 4, 0.01)
                 .scale(alpha)
                 .add(mod2)
                 .scale(alpha);
 
-        return settings.badlands.apply(groundLevel, 0.7, shape.mult(detail.alpha(0.5)));
-    }
-
-    public Module canyon(Seed seed) {
-        Module hills = Source.ridge(seed.next(), 200, 4)
-                .warp(seed.next(), 400, 2, 100)
-                ;
-
-        double modulation = 0.4;
-        double alpha = 1 - modulation;
-        Module mod1 = hills.warp(seed.next(), 100, 1, 50).scale(modulation);
-
-        Module lowFreq = hills.steps(4).scale(alpha).add(mod1);
-        Module highFreq = hills.steps(10).scale(alpha).add(mod1);
-        Module detail = lowFreq.add(highFreq);
-
-        Module mod2 = hills.mult(Source.perlin(seed.next(), 400, 3).scale(modulation));
-        Module shape = hills.terrace(0.1, 1, 4, 0.01)
-                .scale(alpha)
-                .add(mod2)
-                .scale(alpha)
-                .boost()
-                ;
-
-        return settings.badlands.apply(groundLevel + 0.15, 0.2, shape.mult(detail.alpha(0.5)));
+        return settings.badlands.apply(groundLevel + 0.1F, 0.6, shape.mult(detail.alpha(0.5)));
     }
 
     public Module torridonian(Seed seed) {
