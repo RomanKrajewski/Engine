@@ -248,7 +248,7 @@ public class Region implements Disposable {
     }
 
     public void generateArea(Heightmap heightmap, Batcher batcher, int batchSize, float offsetX, float offsetZ, float zoom) {
-        int jobSize = chunkSize.total / batchSize;
+        int jobSize = Math.max(1, chunkSize.total / batchSize);
         int jobCount = chunkSize.total / jobSize;
         if (jobCount * jobSize < chunkSize.total) {
             jobCount += 1;

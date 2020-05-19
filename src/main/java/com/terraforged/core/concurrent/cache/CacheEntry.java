@@ -5,6 +5,7 @@ import com.terraforged.core.concurrent.pool.ThreadPool;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 public class CacheEntry<T> implements ExpiringEntry {
 
@@ -34,6 +35,10 @@ public class CacheEntry<T> implements ExpiringEntry {
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
+    }
+
+    public <V> CacheEntry<V> then(ThreadPool executor, Function<T, V> function) {
+        return supplyAsync(() -> function.apply(get()), executor);
     }
 
     public static <T> CacheEntry<T> supply(Future<T> task) {

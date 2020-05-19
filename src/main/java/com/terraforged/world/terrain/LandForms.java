@@ -207,10 +207,11 @@ public class LandForms {
     }
 
     public Module badlands(Seed seed) {
-        Module mask = Source.perlin(seed.next(), 800, 1).clamp(0.35, 0.65).map(0, 1);
+        Module mask = Source.perlin(seed.next(), 300, 1).clamp(0.35, 0.65).map(0, 1);
         Module hills = Source.ridge(seed.next(), 200, 4)
                 .warp(seed.next(), 400, 2, 100)
-                .mult(mask);
+                .mult(mask)
+                ;
 
         double modulation = 0.4;
         double alpha = 1 - modulation;
