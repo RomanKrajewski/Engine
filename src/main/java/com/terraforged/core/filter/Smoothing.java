@@ -57,6 +57,9 @@ public class Smoothing implements Filter {
         for (int z = radius; z < maxZ; z++) {
             for (int x = radius; x < maxX; x++) {
                 Cell cell = cellMap.getCellRaw(x, z);
+                if (cell.erosionMask) {
+                    continue;
+                }
 
                 float total = 0;
                 float weights = 0;
@@ -67,12 +70,14 @@ public class Smoothing implements Filter {
                         if (dist2 > rad2) {
                             continue;
                         }
+
                         int px = x + dx;
                         int pz = z + dz;
                         Cell neighbour = cellMap.getCellRaw(px, pz);
                         if (neighbour.isAbsent()) {
                             continue;
                         }
+
                         float value = neighbour.value;
                         float weight = 1F - (dist2 / rad2);
                         total += (value * weight);

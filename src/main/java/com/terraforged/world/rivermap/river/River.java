@@ -191,6 +191,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
             if (cell.value < bedHeight) {
                 cell.value = bedHeight;
             }
+            cell.erosionMask = true;
             tag(cell, terrains.riverBanks);
             return true;
         }

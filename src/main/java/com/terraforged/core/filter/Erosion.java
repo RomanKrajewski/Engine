@@ -27,13 +27,11 @@ package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.Size;
-import com.terraforged.core.settings.Settings;
 import com.terraforged.world.GeneratorContext;
-import com.terraforged.world.heightmap.Levels;
 import me.dags.noise.util.NoiseUtil;
 
 import java.util.Random;
-import java.util.function.Supplier;
+import java.util.function.IntFunction;
 
 /*
  * This class in an adaption of the work by Sebastian Lague which is also licensed under MIT.
@@ -66,45 +64,41 @@ import java.util.function.Supplier;
  */
 public class Erosion implements Filter {
 
-    private int erosionRadius = 3;
-    private float inertia = 0.05f;
-    private float sedimentCapacityFactor = 4;
-    private float minSedimentCapacity = 0.01f;
-    private float erodeSpeed = 0.3f;
-    private float depositSpeed = 0.3f;
-    private float evaporateSpeed = 0.01f;
-    private float gravity = 8;
-    private int maxDropletLifetime = 30;
-    private float initialWaterVolume = 1;
-    private float initialSpeed = 1;
-    private final TerrainPos gradient = new TerrainPos();
-    private int[][] erosionBrushIndices = new int[0][];
-    private float[][] erosionBrushWeights = new float[0][];
+    private static final int erosionRadius = 3;
+    private static final float inertia = .05f; // At zero, water will instantly change direction to flow downhill. At 1, water will never change direction.
+    private static final float sedimentCapacityFactor = 4; // Multiplier for how much sediment a droplet can carry
+    private static final float minSedimentCapacity = .01f; // Used to prevent carry capacity getting too close to zero on flatter terrain
+    private static final float evaporateSpeed = .01f;
+    private static final float gravity = 4;
+    private static final int maxDropletLifetime = 30;
+    private static final float initialWaterVolume = 1;
+    private static final float initialSpeed = 1;
 
+    private final float erodeSpeed;
+    private final float depositSpeed;
+    private final int[][] erosionBrushIndices;
+    private final float[][] erosionBrushWeights;
+
+    private final int mapSize;
     private final Modifier modifier;
-    private final Random random = new Random();
 
-    public Erosion(Settings settings, Levels levels) {
-        erodeSpeed = settings.filters.erosion.erosionRate;
-        depositSpeed = settings.filters.erosion.depositeRate;
-        modifier = Modifier.range(levels.ground, levels.ground(15));
-    }
-
-    public Erosion(float erodeSpeed, float depositSpeed, Modifier modifier) {
+    public Erosion(int mapSize, float erodeSpeed, float depositSpeed, Modifier modifier) {
+        this.mapSize = mapSize;
         this.erodeSpeed = erodeSpeed;
         this.depositSpeed = depositSpeed;
         this.modifier = modifier;
+        this.erosionBrushIndices = new int[mapSize * mapSize][];
+        this.erosionBrushWeights = new float[mapSize * mapSize][];
+        initBrushes(mapSize, erosionRadius);
+    }
+
+    public int getSize() {
+        return mapSize;
     }
 
     @Override
     public void apply(Filterable map, int seedX, int seedZ, int iterations) {
-        if (erosionBrushIndices.length != map.getSize().total) {
-            init(map.getSize().total, erosionRadius);
-        }
-
-        applyMain(map, seedX, seedZ, iterations, random);
-
-//        applyNeighbours(map, seedX, seedZ, iterations, random);
+        applyMain(map, seedX, seedZ, iterations, new Random());
     }
 
     private int nextCoord(Size size, Random random) {
@@ -112,106 +106,104 @@ public class Erosion implements Filter {
     }
 
     private void applyMain(Filterable map, int seedX, int seedZ, int iterations, Random random) {
+        final int size = map.getSize().total;
+        final Cell[] cells = map.getBacking();
+
         random.setSeed(NoiseUtil.seed(seedX, seedZ));
         while (iterations-- > 0) {
-            int posX = nextCoord(map.getSize(), random);
-            int posZ = nextCoord(map.getSize(), random);
-            apply(map.getBacking(), posX, posZ, map.getSize().total);
-        }
-    }
+            float posX = nextCoord(map.getSize(), random);
+            float posY = nextCoord(map.getSize(), random);
 
-    private void apply(Cell[] cells, float posX, float posY, int size) {
-        float dirX = 0;
-        float dirY = 0;
-        float speed = initialSpeed;
-        float water = initialWaterVolume;
-        float sediment = 0;
+            float dirX = 0;
+            float dirY = 0;
+            float speed = initialSpeed;
+            float water = initialWaterVolume;
+            float sediment = 0;
+            TerrainPos gradient1 = new TerrainPos();
+            TerrainPos gradient2 = new TerrainPos();
 
-        for (int lifetime = 0; lifetime < maxDropletLifetime; lifetime++) {
-            int nodeX = (int) posX;
-            int nodeY = (int) posY;
-            int dropletIndex = nodeY * size + nodeX;
-            // Calculate droplet's offset inside the cell (0,0) = at NW node, (1,1) = at SE node
-            float cellOffsetX = posX - nodeX;
-            float cellOffsetY = posY - nodeY;
+            for (int lifetime = 0; lifetime < maxDropletLifetime; lifetime++) {
+                int nodeX = (int) posX;
+                int nodeY = (int) posY;
+                int dropletIndex = nodeY * size + nodeX;
+                // Calculate droplet's offset inside the cell (0,0) = at NW node, (1,1) = at SE node
+                float cellOffsetX = posX - nodeX;
+                float cellOffsetY = posY - nodeY;
 
-            // Calculate droplet's height and direction of flow with bilinear interpolation of surrounding heights
-            gradient.update(cells, size, posX, posY);
+                // Calculate droplet's height and direction of flow with bilinear interpolation of surrounding heights
+                gradient1.at(cells, size, posX, posY);
 
-            // Update the droplet's direction and position (move position 1 unit regardless of speed)
-            dirX = (dirX * inertia - gradient.gradientX * (1 - inertia));
-            dirY = (dirY * inertia - gradient.gradientY * (1 - inertia));
+                // Update the droplet's direction and position (move position 1 unit regardless of speed)
+                dirX = (dirX * inertia - gradient1.gradientX * (1 - inertia));
+                dirY = (dirY * inertia - gradient1.gradientY * (1 - inertia));
 
-            // Normalize direction
-            float len = (float) Math.sqrt(dirX * dirX + dirY * dirY);
-            if (Float.isNaN(len)) {
-                len = 0;
-            }
+                // Normalize direction
+                float len = (float) Math.sqrt(dirX * dirX + dirY * dirY);
+                if (Float.isNaN(len)) {
+                    len = 0;
+                }
 
-            if (len != 0) {
-                dirX /= len;
-                dirY /= len;
-            }
+                if (len != 0) {
+                    dirX /= len;
+                    dirY /= len;
+                }
 
-            posX += dirX;
-            posY += dirY;
+                posX += dirX;
+                posY += dirY;
 
-            // Stop simulating droplet if it's not moving or has flowed over edge of map
-            if ((dirX == 0 && dirY == 0) || posX < 0 || posX >= size - 1 || posY < 0 || posY >= size - 1) {
-                break;
-            }
+                // Stop simulating droplet if it's not moving or has flowed over edge of map
+                if ((dirX == 0 && dirY == 0) || posX < 0 || posX >= size - 1 || posY < 0 || posY >= size - 1) {
+                    break;
+                }
 
-            // Find the droplet's new height and calculate the deltaHeight
-            float oldHeight = gradient.height;
-            float newHeight = gradient.update(cells, size, posX, posY).height;
-            float deltaHeight = newHeight - oldHeight;
+                // Find the droplet's new height and calculate the deltaHeight
+                float newHeight = gradient2.at(cells, size, posX, posY).height;
+                float deltaHeight = newHeight - gradient1.height;
 
-            // Calculate the droplet's sediment capacity (higher when moving fast down a slope and contains lots of water)
-            float sedimentCapacity = Math.max(-deltaHeight * speed * water * sedimentCapacityFactor, minSedimentCapacity);
+                // Calculate the droplet's sediment capacity (higher when moving fast down a slope and contains lots of water)
+                float sedimentCapacity = Math.max(-deltaHeight * speed * water * sedimentCapacityFactor, minSedimentCapacity);
 
-            // If carrying more sediment than capacity, or if flowing uphill:
-            if (sediment > sedimentCapacity || deltaHeight > 0) {
-                // If moving uphill (deltaHeight > 0) try fill up to the current height, otherwise deposit a fraction of the excess sediment
-                float amountToDeposit = (deltaHeight > 0) ? Math.min(deltaHeight, sediment) : (sediment - sedimentCapacity) * depositSpeed;
-                sediment -= amountToDeposit;
+                // If carrying more sediment than capacity, or if flowing uphill:
+                if (sediment > sedimentCapacity || deltaHeight > 0) {
+                    // If moving uphill (deltaHeight > 0) try fill up to the current height, otherwise deposit a fraction of the excess sediment
+                    float amountToDeposit = (deltaHeight > 0) ? Math.min(deltaHeight, sediment) : (sediment - sedimentCapacity) * depositSpeed;
+                    sediment -= amountToDeposit;
 
-                // Add the sediment to the four nodes of the current cell using bilinear interpolation
-                // Deposition is not distributed over a radius (like erosion) so that it can fill small pits
-                deposit(cells[dropletIndex], amountToDeposit * (1 - cellOffsetX) * (1 - cellOffsetY));
-                deposit(cells[dropletIndex + 1], amountToDeposit * cellOffsetX * (1 - cellOffsetY));
-                deposit(cells[dropletIndex + size], amountToDeposit * (1 - cellOffsetX) * cellOffsetY);
-                deposit(cells[dropletIndex + size + 1], amountToDeposit * cellOffsetX * cellOffsetY);
-            } else {
-                // Erode a fraction of the droplet's current carry capacity.
-                // Clamp the erosion to the change in height so that it doesn't dig a hole in the terrain behind the droplet
-                float amountToErode = Math.min((sedimentCapacity - sediment) * erodeSpeed, -deltaHeight);
+                    // Add the sediment to the four nodes of the current cell using bilinear interpolation
+                    // Deposition is not distributed over a radius (like erosion) so that it can fill small pits
+                    deposit(cells[dropletIndex], amountToDeposit * (1 - cellOffsetX) * (1 - cellOffsetY));
+                    deposit(cells[dropletIndex + 1], amountToDeposit * cellOffsetX * (1 - cellOffsetY));
+                    deposit(cells[dropletIndex + size], amountToDeposit * (1 - cellOffsetX) * cellOffsetY);
+                    deposit(cells[dropletIndex + size + 1], amountToDeposit * cellOffsetX * cellOffsetY);
+                } else {
+                    // Erode a fraction of the droplet's current carry capacity.
+                    // Clamp the erosion to the change in height so that it doesn't dig a hole in the terrain behind the droplet
+                    float amountToErode = Math.min((sedimentCapacity - sediment) * erodeSpeed, -deltaHeight);
 
-                // Use erosion brush to erode from all nodes inside the droplet's erosion radius
-                for (int brushPointIndex = 0; brushPointIndex < erosionBrushIndices[dropletIndex].length; brushPointIndex++) {
-                    int nodeIndex = erosionBrushIndices[dropletIndex][brushPointIndex];
-                    Cell cell = cells[nodeIndex];
-                    float brushWeight = erosionBrushWeights[dropletIndex][brushPointIndex];
-                    float weighedErodeAmount = amountToErode * brushWeight;
-                    float deltaSediment = Math.min(cell.value, weighedErodeAmount);//cell.value < weighedErodeAmount) ? cell.value : weighedErodeAmount;
-                    erode(cell, deltaSediment);
-                    sediment += deltaSediment;
+                    // Use erosion brush to erode from all nodes inside the droplet's erosion radius
+                    for (int brushPointIndex = 0; brushPointIndex < erosionBrushIndices[dropletIndex].length; brushPointIndex++) {
+                        int nodeIndex = erosionBrushIndices[dropletIndex][brushPointIndex];
+                        Cell cell = cells[nodeIndex];
+                        float brushWeight = erosionBrushWeights[dropletIndex][brushPointIndex];
+                        float weighedErodeAmount = amountToErode * brushWeight;
+                        float deltaSediment = (cell.value < weighedErodeAmount) ? cell.value : weighedErodeAmount;
+                        erode(cell, deltaSediment);
+                        sediment += deltaSediment;
+                    }
+                }
+
+                // Update droplet's speed and water content
+                speed = (float) Math.sqrt(speed * speed + deltaHeight * gravity);
+                water *= (1 - evaporateSpeed);
+
+                if (Float.isNaN(speed)) {
+                    speed = 0;
                 }
             }
-
-            // Update droplet's speed and water content
-            speed = (float) Math.sqrt(speed * speed + deltaHeight * gravity);
-            water *= (1 - evaporateSpeed);
-
-            if (Float.isNaN(speed)) {
-                speed = 0;
-            }
         }
     }
 
-    private void init(int size, int radius) {
-        erosionBrushIndices = new int[size * size][];
-        erosionBrushWeights = new float[size * size][];
-
+    private void initBrushes(int size, int radius) {
         int[] xOffsets = new int[radius * radius * 4];
         int[] yOffsets = new int[radius * radius * 4];
         float[] weights = new float[radius * radius * 4];
@@ -257,21 +249,19 @@ public class Erosion implements Filter {
     }
 
     private void deposit(Cell cell, float amount) {
-        if (cell.erosionMask) {
-            return;
+        if (!cell.erosionMask) {
+            float change = modifier.modify(cell, amount);
+            cell.value += change;
+            cell.sediment += change;
         }
-        float change = modifier.modify(cell, amount);
-        cell.value += change;
-        cell.sediment += change;
     }
 
     private void erode(Cell cell, float amount) {
-        if (cell.erosionMask) {
-            return;
+        if (!cell.erosionMask) {
+            float change = modifier.modify(cell, amount);
+            cell.value -= change;
+            cell.erosion -= change;
         }
-        float change = modifier.modify(cell, amount);
-        cell.value -= change;
-        cell.erosion -= change;
     }
 
     private static class TerrainPos {
@@ -279,7 +269,7 @@ public class Erosion implements Filter {
         private float gradientX;
         private float gradientY;
 
-        private TerrainPos update(Cell[] nodes, int mapSize, float posX, float posY) {
+        private TerrainPos at(Cell[] nodes, int mapSize, float posX, float posY) {
             int coordX = (int) posX;
             int coordY = (int) posY;
 
@@ -303,25 +293,25 @@ public class Erosion implements Filter {
         }
     }
 
-    private static class ErosionSupplier implements Supplier<Erosion> {
+    private static class Factory implements IntFunction<Erosion> {
 
         private final float erosionRate;
         private final float depositRate;
         private final Modifier modifier;
 
-        private ErosionSupplier(Settings settings, Levels levels) {
-            erosionRate = settings.filters.erosion.erosionRate;
-            depositRate = settings.filters.erosion.depositeRate;
-            modifier = Modifier.range(levels.ground, levels.ground(15));
+        private Factory(GeneratorContext context) {
+            this.erosionRate = context.settings.filters.erosion.erosionRate;
+            this.depositRate = context.settings.filters.erosion.depositeRate;
+            this.modifier = Modifier.range(context.levels.ground, context.levels.ground(15));
         }
 
         @Override
-        public Erosion get() {
-            return new Erosion(erosionRate, depositRate, modifier);
+        public Erosion apply(int size) {
+            return new Erosion(size, erosionRate, depositRate, modifier);
         }
     }
 
-    public static Supplier<Erosion> supplier(GeneratorContext context) {
-        return new ErosionSupplier(context.settings, context.levels);
+    public static IntFunction<Erosion> factory(GeneratorContext context) {
+        return new Factory(context);
     }
 }

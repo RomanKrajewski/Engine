@@ -26,7 +26,7 @@ public class WorldSettings {
 
         @Range(min = 0F, max = 1F)
         @Comment("Controls the amount of ocean between continents")
-        public float oceanScale = 0.45F;
+        public float oceanScale = 0.8F;
 
         @Range(min = 100, max = 10000)
         @Comment("Controls the size of continents")

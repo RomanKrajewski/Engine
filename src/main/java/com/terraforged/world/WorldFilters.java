@@ -25,15 +25,16 @@
 
 package com.terraforged.world;
 
-import com.terraforged.core.concurrent.ObjectPool;
-import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.filter.BeachDetect;
 import com.terraforged.core.filter.Erosion;
 import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.filter.Smoothing;
 import com.terraforged.core.filter.Steepness;
 import com.terraforged.core.region.Region;
+import com.terraforged.core.region.Size;
 import com.terraforged.core.settings.FilterSettings;
+
+import java.util.function.IntFunction;
 
 public class WorldFilters {
 
@@ -41,7 +42,10 @@ public class WorldFilters {
     private final Steepness steepness;
     private final BeachDetect beach;
     private final FilterSettings settings;
-    private final ObjectPool<Erosion> erosion;
+    private final IntFunction<Erosion> erosionFactory;
+    private final Object lock = new Object();
+
+    private Erosion erosion = null;
 
     public WorldFilters(GeneratorContext context) {
         context = context.copy();
@@ -49,16 +53,23 @@ public class WorldFilters {
         this.beach = new BeachDetect(context.terrain);
         this.smoothing = new Smoothing(context.settings, context.levels);
         this.steepness = new Steepness(1, 10F, context.terrain, context.levels);
-        this.erosion = new ObjectPool<>(5, Erosion.supplier(context));
+        this.erosionFactory = Erosion.factory(context);
     }
 
     public void apply(Region region) {
         Filterable map = region.filterable();
-        try (Resource<Erosion> item = erosion.get()) {
-            item.get().apply(map, region.getRegionX(), region.getRegionZ(), settings.erosion.iterations);
-        }
+        getErosion(map.getSize()).apply(map, region.getRegionX(), region.getRegionZ(), settings.erosion.iterations);
         smoothing.apply(map, region.getRegionX(), region.getRegionZ(), settings.smoothing.iterations);
         steepness.apply(map, region.getRegionX(), region.getRegionZ(), 1);
         beach.apply(map, region.getRegionX(), region.getRegionZ(), 1);
+    }
+
+    private Erosion getErosion(Size size) {
+        synchronized (lock) {
+            if (erosion == null || erosion.getSize() != size.total) {
+                erosion = erosionFactory.apply(size.total);
+            }
+        }
+        return erosion;
     }
 }
