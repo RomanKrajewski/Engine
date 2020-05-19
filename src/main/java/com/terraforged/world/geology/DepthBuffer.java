@@ -1,6 +1,11 @@
 package com.terraforged.world.geology;
 
+import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.Resource;
+
 public class DepthBuffer {
+
+    private static final ObjectPool<DepthBuffer> pool = new ObjectPool<>(5, DepthBuffer::new);
 
     private float sum;
     private float[] buffer;
@@ -27,5 +32,9 @@ public class DepthBuffer {
     public void set(int index, float value) {
         sum += value;
         buffer[index] = value;
+    }
+
+    public static Resource<DepthBuffer> get() {
+        return pool.get();
     }
 }

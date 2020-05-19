@@ -1,7 +1,6 @@
 package com.terraforged.core.region.gen;
 
 import com.terraforged.core.concurrent.Disposable;
-import com.terraforged.core.concurrent.ObjectPool;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.batch.Batcher;
 import com.terraforged.core.region.Region;
