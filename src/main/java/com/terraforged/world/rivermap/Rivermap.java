@@ -3,6 +3,7 @@ package com.terraforged.world.rivermap;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.cache.ExpiringEntry;
 import com.terraforged.world.heightmap.Heightmap;
+import com.terraforged.world.rivermap.gen.GenWarp;
 import com.terraforged.world.rivermap.lake.Lake;
 import com.terraforged.world.rivermap.river.River;
 import me.dags.noise.domain.Domain;
@@ -19,17 +20,13 @@ public class Rivermap implements ExpiringEntry {
     private final List<River> rivers;
     private final long timestamp = System.currentTimeMillis();
 
-    public Rivermap(int x, int z, int seed, List<River> rivers, List<Lake> lakes) {
+    public Rivermap(int x, int z, GenWarp warp, List<River> rivers, List<Lake> lakes) {
         this.x = x;
         this.z = z;
         this.lakes = lakes;
         this.rivers = rivers;
-        this.lakeWarp = Domain.warp(++seed, 200, 1, 400)
-                .add(Domain.warp(++seed, 50, 2, 50));
-        this.riverWarp = Domain.warp(++seed, 400, 1, 350)
-                .add(Domain.warp(++seed, 80, 1, 35))
-                .add(Domain.warp(++seed, 16, 1, 2))
-        ;
+        this.lakeWarp = warp.lake;
+        this.riverWarp = warp.river;
     }
 
     public void apply(Cell cell, float x, float z) {
