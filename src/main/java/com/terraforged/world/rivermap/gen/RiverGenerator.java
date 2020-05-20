@@ -171,7 +171,7 @@ public class RiverGenerator {
                 float angle = parentAngle + change;
                 float dx = NoiseUtil.sin(angle);
                 float dz = NoiseUtil.cos(angle);
-                float length = config.length * offset * 0.75F;
+                float length = config.length * offset * 0.5F;
 
                 Vec2f v1 = parent.bounds.pos(offset);
 

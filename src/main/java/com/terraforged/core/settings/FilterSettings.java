@@ -41,15 +41,15 @@ public class FilterSettings {
 
         @Range(min = 1000, max = 50000)
         @Comment("Controls the number of erosion iterations")
-        public int iterations = 12000;
+        public int iterations = 8000;
 
         @Range(min = 0F, max = 1F)
         @Comment("Controls how quickly material dissolves (during erosion)")
-        public float erosionRate = 0.8F;
+        public float erosionRate = 0.3F;
 
         @Range(min = 0F, max = 1F)
         @Comment("Controls how quickly material is deposited (during erosion)")
-        public float depositeRate = 0.8F;
+        public float depositeRate = 0.3F;
     }
 
     @Serializable

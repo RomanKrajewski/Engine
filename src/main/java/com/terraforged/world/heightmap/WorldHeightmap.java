@@ -127,9 +127,9 @@ public class WorldHeightmap implements Heightmap {
                 mountainShape,
                 terrain,
                 mountains,
-                0.25F,
+                0.3F,
                 0.8F,
-                0.6F
+                0.575F
         );
 
         // uses the continent noise to blend between deep ocean, to ocean, to coast
