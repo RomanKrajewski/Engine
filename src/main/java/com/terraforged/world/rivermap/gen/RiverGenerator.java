@@ -47,7 +47,6 @@ public class RiverGenerator {
     private static final Variance LAKE_POSITION = Variance.of(0.5, 0.4);
 
     private final int count;
-    private final float length;
     private final LakeConfig lake;
     private final RiverConfig primary;
     private final RiverConfig secondary;
@@ -61,8 +60,6 @@ public class RiverGenerator {
         this.levels = context.levels;
 
         count = context.settings.rivers.riverCount;
-
-        length = context.settings.world.continent.continentScale;
 
         primary = RiverConfig.builder(context.levels)
                 .bankHeight(context.settings.rivers.primaryRivers.minBankHeight, context.settings.rivers.primaryRivers.maxBankHeight)
@@ -102,19 +99,20 @@ public class RiverGenerator {
 
     public Rivermap compute(int x, int z, long id) {
         Random random = new Random(id);
+        GenWarp warp = new GenWarp((int) id);
         List<Lake> lakes = new LinkedList<>();
         List<River> rivers = new LinkedList<>();
-        List<GenRiver> rootRivers = generateRoots(x, z, random, rivers, lakes);
+        List<GenRiver> rootRivers = generateRoots(x, z, random, warp, rivers, lakes);
         Collections.shuffle(rootRivers, random);
         for (GenRiver root : rootRivers) {
-            generateForks(root.river, root.angle, MAIN_SPACING, secondary, random, rivers, lakes);
+            generateForks(root.river, root.angle, MAIN_SPACING, secondary, random, warp, rivers, lakes);
         }
-        generateAdditionalLakes(x, z, random, rootRivers, rivers, lakes);
+        generateAdditionalLakes(x, z, random, warp, rootRivers, rivers, lakes);
         rivers.sort(Collections.reverseOrder());
-        return new Rivermap(x, z, (int) id, rivers, lakes);
+        return new Rivermap(x, z, warp, rivers, lakes);
     }
 
-    private List<GenRiver> generateRoots(int x, int z, Random random, List<River> rivers, List<Lake> lakes) {
+    private List<GenRiver> generateRoots(int x, int z, Random random, GenWarp warp, List<River> rivers, List<Lake> lakes) {
         MutableVeci pos = new MutableVeci(x, z);
         float start = random.nextFloat();
         float spacing = NoiseUtil.PI2 / count;
@@ -157,12 +155,12 @@ public class RiverGenerator {
             roots.add(new GenRiver(river, angle, dx, dz, length));
             rivers.add(river);
 
-            addLake(river, random, lakes);
+            addLake(river, random, warp, lakes);
         }
         return roots;
     }
 
-    private void generateForks(River parent, float parentAngle, Variance spacing, RiverConfig config, Random random, List<River> rivers, List<Lake> lakes) {
+    private void generateForks(River parent, float parentAngle, Variance spacing, RiverConfig config, Random random, GenWarp warp, List<River> rivers, List<Lake> lakes) {
         int direction = random.nextBoolean() ? 1 : -1;
         for (float offset = 0.3F; offset < 0.8F; offset += spacing.next(random)) {
             for (boolean attempt = true; attempt; attempt = false) {
@@ -201,10 +199,10 @@ public class RiverGenerator {
                 rivers.add(fork);
             }
         }
-        addLake(parent, random, lakes);
+        addLake(parent, random, warp, lakes);
     }
 
-    private void generateAdditionalLakes(int x, int z, Random random, List<GenRiver> roots, List<River> rivers, List<Lake> lakes) {
+    private void generateAdditionalLakes(int x, int z, Random random, GenWarp warp, List<GenRiver> roots, List<River> rivers, List<Lake> lakes) {
         Collections.sort(roots);
 
         float size = 175;
@@ -229,11 +227,13 @@ public class RiverGenerator {
         }
     }
 
-    private void addLake(River river, Random random, List<Lake> lakes) {
+    private void addLake(River river, Random random, GenWarp warp, List<Lake> lakes) {
         if (random.nextFloat() <= lake.chance) {
             float lakeSize = lake.sizeMin + random.nextFloat() * lake.sizeMax;
-            Vec2f center = river.bounds.pos(0);
-            lakes.add(new Lake(center, lakeSize, 1, lake, terrain));
+            Vec2f center = river.bounds.pos(0.04F);
+            float x1 = warp.river.getX(center.x, center.y);
+            float z1 = warp.river.getY(center.x, center.y);
+            lakes.add(new Lake(new Vec2f(x1, z1), lakeSize, 1, lake, terrain));
         }
     }
 
