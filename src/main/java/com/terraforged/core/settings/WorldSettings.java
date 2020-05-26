@@ -12,7 +12,7 @@ public class WorldSettings {
     public transient long seed = 0L;
 
     @Comment("Controls the continent generator type")
-    public WorldType worldType = WorldType.SINGLE_CONTINENT;
+    public WorldType worldType = WorldType.NORMAL;
 
     public Continent continent = new Continent();
 

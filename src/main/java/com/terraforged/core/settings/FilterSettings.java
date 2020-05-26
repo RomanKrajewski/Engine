@@ -45,11 +45,38 @@ public class FilterSettings {
 
         @Range(min = 0F, max = 1F)
         @Comment("Controls how quickly material dissolves (during erosion)")
-        public float erosionRate = 0.3F;
+        public float erosionRate = 0.5F;
 
         @Range(min = 0F, max = 1F)
         @Comment("Controls how quickly material is deposited (during erosion)")
-        public float depositeRate = 0.3F;
+        public float depositeRate = 0.5F;
+
+        @Range(min = 1, max = 50)
+        @Comment("Controls the number of iterations that a single water droplet is simulated for")
+        public int dropletLifetime = 25;
+
+        @Range(min = 0F, max = 1F)
+        @Comment("Controls the starting volume of water that a simulated water droplet carries")
+        public float dropletVolume = 0.75F;
+
+        @Range(min = 0.1F, max = 1F)
+        @Comment("Controls the starting velocity of the simulated water droplet")
+        public float dropletVelocity = 0.5F;
+
+        public Erosion() {
+
+        }
+
+        public Erosion copy() {
+            Erosion erosion = new Erosion();
+            erosion.iterations = iterations;
+            erosion.erosionRate = erosionRate;
+            erosion.depositeRate = depositeRate;
+            erosion.dropletLifetime = dropletLifetime;
+            erosion.dropletVolume = dropletVolume;
+            erosion.dropletVelocity = dropletVelocity;
+            return erosion;
+        }
     }
 
     @Serializable

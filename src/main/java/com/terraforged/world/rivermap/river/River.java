@@ -190,9 +190,8 @@ public class River extends TerrainPopulator implements Comparable<River> {
             cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
             if (cell.value < bedHeight) {
                 cell.value = bedHeight;
+                cell.erosionMask = true;
             }
-            cell.erosionMask = true;
-            tag(cell, terrains.riverBanks);
             return true;
         }
         return false;
@@ -200,6 +199,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
     private void carveBed(Cell cell, float bedHeight, float bankHeight) {
         cell.value = bedHeight;
+        cell.erosionMask = true;
         tag(cell, terrains.river);
     }
 

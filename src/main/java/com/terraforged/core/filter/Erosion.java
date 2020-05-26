@@ -27,6 +27,7 @@ package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.Size;
+import com.terraforged.core.settings.FilterSettings;
 import com.terraforged.world.GeneratorContext;
 import me.dags.noise.util.NoiseUtil;
 
@@ -65,28 +66,31 @@ import java.util.function.IntFunction;
 public class Erosion implements Filter {
 
     private static final int erosionRadius = 3;
-    private static final float inertia = .05f; // At zero, water will instantly change direction to flow downhill. At 1, water will never change direction.
+    private static final float inertia = 0.05f; // At zero, water will instantly change direction to flow downhill. At 1, water will never change direction.
     private static final float sedimentCapacityFactor = 4; // Multiplier for how much sediment a droplet can carry
-    private static final float minSedimentCapacity = .01f; // Used to prevent carry capacity getting too close to zero on flatter terrain
-    private static final float evaporateSpeed = .01f;
-    private static final float gravity = 4;
-    private static final int maxDropletLifetime = 30;
-    private static final float initialWaterVolume = 1;
-    private static final float initialSpeed = 1;
+    private static final float minSedimentCapacity = 0.01f; // Used to prevent carry capacity getting too close to zero on flatter terrain
+    private static final float evaporateSpeed = 0.01f;
+    private static final float gravity = 3;
 
     private final float erodeSpeed;
     private final float depositSpeed;
+    private final float initialSpeed;
+    private final float initialWaterVolume;
+    private final int maxDropletLifetime;
     private final int[][] erosionBrushIndices;
     private final float[][] erosionBrushWeights;
 
     private final int mapSize;
     private final Modifier modifier;
 
-    public Erosion(int mapSize, float erodeSpeed, float depositSpeed, Modifier modifier) {
+    public Erosion(int mapSize, FilterSettings.Erosion settings, Modifier modifier) {
         this.mapSize = mapSize;
-        this.erodeSpeed = erodeSpeed;
-        this.depositSpeed = depositSpeed;
         this.modifier = modifier;
+        this.erodeSpeed = settings.erosionRate;
+        this.depositSpeed = settings.depositeRate;
+        this.initialSpeed = settings.dropletVelocity;
+        this.initialWaterVolume = settings.dropletVolume;
+        this.maxDropletLifetime = settings.dropletLifetime;
         this.erosionBrushIndices = new int[mapSize * mapSize][];
         this.erosionBrushWeights = new float[mapSize * mapSize][];
         initBrushes(mapSize, erosionRadius);
@@ -295,19 +299,17 @@ public class Erosion implements Filter {
 
     private static class Factory implements IntFunction<Erosion> {
 
-        private final float erosionRate;
-        private final float depositRate;
         private final Modifier modifier;
+        private final FilterSettings.Erosion settings;
 
         private Factory(GeneratorContext context) {
-            this.erosionRate = context.settings.filters.erosion.erosionRate;
-            this.depositRate = context.settings.filters.erosion.depositeRate;
+            this.settings = context.settings.filters.erosion.copy();
             this.modifier = Modifier.range(context.levels.ground, context.levels.ground(15));
         }
 
         @Override
         public Erosion apply(int size) {
-            return new Erosion(size, erosionRate, depositRate, modifier);
+            return new Erosion(size, settings, modifier);
         }
     }
 
