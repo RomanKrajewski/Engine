@@ -57,11 +57,11 @@ public class FilterSettings {
 
         @Range(min = 0F, max = 1F)
         @Comment("Controls the starting volume of water that a simulated water droplet carries")
-        public float dropletVolume = 0.75F;
+        public float dropletVolume = 0.6F;
 
         @Range(min = 0.1F, max = 1F)
         @Comment("Controls the starting velocity of the simulated water droplet")
-        public float dropletVelocity = 0.5F;
+        public float dropletVelocity = 0.6F;
 
         public Erosion() {
 
