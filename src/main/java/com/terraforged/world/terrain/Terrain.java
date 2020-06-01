@@ -29,31 +29,31 @@ import com.terraforged.core.settings.Settings;
 import com.terraforged.world.heightmap.Levels;
 import me.dags.noise.util.NoiseUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
-public class Terrain implements TerrainType {
+public class Terrain implements ITerrain.Delegate {
 
     private static final Map<String, Terrain> register = Collections.synchronizedMap(new HashMap<>());
-
-    public static final int ID_START = 10;
-    public static final Terrain NONE = new Terrain("none", -1);
+    public static final Terrain NONE = new Terrain("none", -1, TerrainType.NONE);
 
     private final String name;
     private final float weight;
+    private final TerrainType type;
 
-    public Terrain(String name) {
-        this(name, 1F);
+    public Terrain(String name, TerrainType type) {
+        this(name, 1F, type);
     }
 
-    public Terrain(String name, double weight) {
+    public Terrain(String name, double weight, TerrainType type) {
         this.name = name;
         this.weight = (float) weight;
+        this.type = type;
         Terrain.register.put(name, this);
+    }
+
+    @Override
+    public TerrainType getType() {
+        return type;
     }
 
     public float getMax(float noise) {
@@ -78,7 +78,7 @@ public class Terrain implements TerrainType {
     }
 
     public static Terrain ocean(Settings settings) {
-        return new Terrain("ocean", 0) {
+        return new Terrain("ocean", 0, TerrainType.SHALLOW_OCEAN) {
 
             private final float max = new Levels(settings.world).water;
 
@@ -86,16 +86,11 @@ public class Terrain implements TerrainType {
             public float getMax(float noise) {
                 return max;
             }
-
-            @Override
-            public boolean isShallowOcean() {
-                return true;
-            }
         };
     }
 
     public static Terrain deepOcean(Settings settings) {
-        return new Terrain("deep_ocean", 1) {
+        return new Terrain("deep_ocean", 1, TerrainType.DEEP_OCEAN) {
 
             private final float max = new Levels(settings.world).water / 2F;
 
@@ -103,16 +98,11 @@ public class Terrain implements TerrainType {
             public float getMax(float noise) {
                 return max;
             }
-
-            @Override
-            public boolean isDeepOcean() {
-                return true;
-            }
         };
     }
 
     public static Terrain coast(Settings settings) {
-        return new Terrain("coast", 2) {
+        return new Terrain("coast", 2, TerrainType.COAST) {
 
             private final float max = new Levels(settings.world).ground(1);
 
@@ -124,7 +114,7 @@ public class Terrain implements TerrainType {
     }
 
     public static Terrain beach(Settings settings) {
-        return new Terrain("beach", 2) {
+        return new Terrain("beach", 2, TerrainType.COAST) {
 
             private final float max = new Levels(settings.world).ground(1);
 
@@ -136,100 +126,63 @@ public class Terrain implements TerrainType {
     }
 
     public static Terrain lake(Settings settings) {
-        return new Terrain("lake", 3) {
-            @Override
-            public boolean isLake() {
-                return true;
-            }
-        };
+        return new Terrain("lake", 3, TerrainType.LAKE);
     }
 
     public static Terrain river(Settings settings) {
-        return new Terrain("river", 3) {
-            @Override
-            public boolean isRiver() {
-                return true;
-            }
-        };
+        return new Terrain("river", 3, TerrainType.RIVER);
     }
 
     public static Terrain riverBank(Settings settings) {
-        return new Terrain("river_banks", 4) {
-            @Override
-            public boolean isRiver() {
-                return true;
-            }
-        };
+        return new Terrain("river_banks", 4, TerrainType.RIVER);
     }
 
     public static Terrain wetlands(Settings settings) {
-        return new Terrain("wetlands", 5) {
-            @Override
-            public boolean isWetland() {
-                return true;
-            }
-        };
+        return new Terrain("wetlands", 5, TerrainType.WETLAND);
     }
 
     public static Terrain desert(Settings settings) {
-        return new Terrain("desert", 5) {
-
-        };
+        return new Terrain("desert", 5, TerrainType.FLATLAND);
     }
 
     public static Terrain steppe(Settings settings) {
-        return new Terrain("steppe", settings.terrain.steppe.weight) {
-            @Override
-            public boolean isFlat() {
-                return true;
-            }
-        };
+        return new Terrain("steppe", settings.terrain.steppe.weight, TerrainType.FLATLAND);
     }
 
     public static Terrain plains(Settings settings) {
-        return new Terrain("plains", settings.terrain.plains.weight) {
-            @Override
-            public boolean isFlat() {
-                return true;
-            }
-        };
-    }
-
-    public static Terrain plateau(Settings settings) {
-        return new Terrain("plateau", settings.terrain.plateau.weight);
+        return new Terrain("plains", settings.terrain.plains.weight, TerrainType.FLATLAND);
     }
 
     public static Terrain badlands(Settings settings) {
-        return new Terrain("badlands", settings.terrain.badlands.weight) {
-            @Override
-            public boolean isFlat() {
-                return true;
-            }
-        };
+        return new Terrain("badlands", settings.terrain.badlands.weight, TerrainType.FLATLAND);
+    }
+
+    public static Terrain plateau(Settings settings) {
+        return new Terrain("plateau", settings.terrain.plateau.weight, TerrainType.LOWLAND);
     }
 
     public static Terrain hills(Settings settings) {
-        return new Terrain("hills", settings.terrain.hills.weight);
+        return new Terrain("hills", settings.terrain.hills.weight, TerrainType.LOWLAND);
     }
 
     public static Terrain dales(Settings settings) {
-        return new Terrain("dales", settings.terrain.dales.weight);
+        return new Terrain("dales", settings.terrain.dales.weight, TerrainType.LOWLAND);
     }
 
     public static Terrain torridonian(Settings settings) {
-        return new Terrain("torridonian_fells", settings.terrain.torridonian.weight);
+        return new Terrain("torridonian_fells", settings.terrain.torridonian.weight, TerrainType.HIGHLAND);
     }
 
     public static Terrain mountains(Settings settings) {
-        return new Terrain("mountains", settings.terrain.mountains.weight);
+        return new Terrain("mountains", settings.terrain.mountains.weight, TerrainType.HIGHLAND);
     }
 
     public static Terrain volcano(Settings settings) {
-        return new Terrain("volcano", settings.terrain.volcano.weight);
+        return new Terrain("volcano", settings.terrain.volcano.weight, TerrainType.HIGHLAND);
     }
 
     public static Terrain volcanoPipe(Settings settings) {
-        return new Terrain("volcano_pipe", settings.terrain.volcano.weight);
+        return new Terrain("volcano_pipe", settings.terrain.volcano.weight, TerrainType.HIGHLAND);
     }
 
     public static Optional<Terrain> get(String name) {

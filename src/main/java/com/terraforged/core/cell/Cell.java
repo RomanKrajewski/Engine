@@ -25,7 +25,7 @@
 
 package com.terraforged.core.cell;
 
-import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.terrain.Terrain;
@@ -67,7 +67,7 @@ public class Cell {
     public float sediment;
     public BiomeType biomeType = BiomeType.GRASSLAND;
 
-    public Terrain terrainType = null;
+    public Terrain terrain = null;
 
     public void copy(Cell other) {
         value = other.value;
@@ -93,12 +93,12 @@ public class Cell {
         sediment = other.sediment;
         biomeType = other.biomeType;
 
-        terrainType = other.terrainType;
+        terrain = other.terrain;
     }
 
-    private void init() {
+    public void reset() {
         biomeType = BiomeType.GRASSLAND;
-        terrainType = null;
+        terrain = null;
         biomeEdge = 1F;
         riverMask = 1F;
         erosionMask = false;
@@ -130,7 +130,7 @@ public class Cell {
 
     public static Resource<Cell> pooled() {
         Resource<Cell> item = POOL.get();
-        item.get().init();
+        item.get().reset();
         return item;
     }
 

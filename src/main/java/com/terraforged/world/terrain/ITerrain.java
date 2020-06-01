@@ -1,0 +1,89 @@
+package com.terraforged.world.terrain;
+
+public interface ITerrain {
+
+    default boolean isFlat() {
+        return false;
+    }
+
+    default boolean isRiver() {
+        return false;
+    }
+
+    default boolean isShallowOcean() {
+        return false;
+    }
+
+    default boolean isDeepOcean() {
+        return false;
+    }
+
+    default boolean isCoast() {
+        return false;
+    }
+
+    default boolean isSubmerged() {
+        return isDeepOcean() || isShallowOcean() || isRiver() || isLake();
+    }
+
+    default boolean isOverground() {
+        return false;
+    }
+
+    default boolean overridesRiver() {
+        return isDeepOcean() || isShallowOcean() || isCoast();
+    }
+
+    default boolean isLake() {
+        return false;
+    }
+
+    default boolean isWetland() {
+        return false;
+    }
+
+    interface Delegate extends ITerrain {
+
+        TerrainType getType();
+
+        @Override
+        default boolean isFlat() {
+            return getType().isFlat();
+        }
+
+        @Override
+        default boolean isRiver() {
+            return getType().isRiver();
+        }
+
+        @Override
+        default boolean isShallowOcean() {
+            return getType().isShallowOcean();
+        }
+
+        @Override
+        default boolean isDeepOcean() {
+            return getType().isDeepOcean();
+        }
+
+        @Override
+        default boolean isCoast() {
+            return getType().isCoast();
+        }
+
+        @Override
+        default boolean overridesRiver() {
+            return getType().overridesRiver();
+        }
+
+        @Override
+        default boolean isLake() {
+            return getType().isLake();
+        }
+
+        @Override
+        default boolean isWetland() {
+            return getType().isWetland();
+        }
+    }
+}

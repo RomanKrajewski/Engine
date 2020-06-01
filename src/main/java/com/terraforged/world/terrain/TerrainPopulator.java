@@ -50,12 +50,12 @@ public class TerrainPopulator implements Populator {
     @Override
     public void apply(Cell cell, float x, float z) {
         cell.value = source.getValue(x, z);
-        cell.terrainType = type;
+        cell.terrain = type;
     }
 
     @Override
     public void tag(Cell cell, float x, float y) {
-        cell.terrainType = type;
+        cell.terrain = type;
     }
 
     public static Module clamp(Module module) {

@@ -24,6 +24,11 @@ public class TaskBatcher implements Batcher, BatchTask.Notifier, Resource<Batche
     }
 
     @Override
+    public boolean isOpen() {
+        return submitted > 0;
+    }
+
+    @Override
     public void markDone() {
         if (count.incrementAndGet() >= size) {
             synchronized (lock) {

@@ -31,7 +31,7 @@ import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.heightmap.RegionConfig;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.TerrainPopulator;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.EdgeFunc;
@@ -52,7 +52,7 @@ public class VolcanoPopulator extends TerrainPopulator {
     private final Terrain inner;
     private final Terrain outer;
 
-    public VolcanoPopulator(Seed seed, RegionConfig region, Levels levels, TerrainTypes terrains) {
+    public VolcanoPopulator(Seed seed, RegionConfig region, Levels levels, Terrains terrains) {
         super(Source.ZERO, terrains.volcano);
         float midpoint = 0.3F;
         float range = 0.3F;
@@ -102,17 +102,17 @@ public class VolcanoPopulator extends TerrainPopulator {
 
             // calculate height inside volcano
             if (alpha > throat_value) {
-                cell.terrainType = inner;
+                cell.terrain = inner;
             }
 
             value = maxHeight - ((maxHeight / 5F) * alpha);
         } else if (value < blendLower) {
             value += lowlands.getValue(x, z);
-            cell.terrainType = outer;
+            cell.terrain = outer;
         } else if (value < blendUpper) {
             float alpha = 1 - ((value - blendLower) / blendRange);
             value += (lowlands.getValue(x, z) * alpha);
-            cell.terrainType = outer;
+            cell.terrain = outer;
         }
 
         cell.value = bias + value;
@@ -133,12 +133,12 @@ public class VolcanoPopulator extends TerrainPopulator {
 
             // calculate height inside volcano
             if (alpha > throat_value) {
-                cell.terrainType = inner;
+                cell.terrain = inner;
             } else {
-                cell.terrainType = outer;
+                cell.terrain = outer;
             }
         } else {
-            cell.terrainType = outer;
+            cell.terrain = outer;
         }
     }
 }

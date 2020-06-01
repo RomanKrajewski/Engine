@@ -45,6 +45,11 @@ public class SyncBatcher implements Batcher, Resource<Batcher> {
     }
 
     @Override
+    public boolean isOpen() {
+        return false;
+    }
+
+    @Override
     public void close() {
 
     }

@@ -28,7 +28,7 @@ package com.terraforged.world.rivermap.river;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.TerrainPopulator;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.CurveFunc;
@@ -62,13 +62,13 @@ public class River extends TerrainPopulator implements Comparable<River> {
     public final RiverConfig config;
     public final RiverBounds bounds;
 
-    private final TerrainTypes terrains;
+    private final Terrains terrains;
 
     private final float depthFadeBias;
     private final float continentValleyModifier;
     private final float continentRiverModifier;
 
-    public River(RiverBounds bounds, RiverConfig config, Settings settings, TerrainTypes terrains) {
+    public River(RiverBounds bounds, RiverConfig config, Settings settings, Terrains terrains) {
         super(Source.ZERO, terrains.river);
         Module in = Source.constant(settings.fadeIn);
         Module out = Source.constant(settings.fadeOut);
@@ -111,8 +111,8 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
     @Override
     public void tag(Cell cell, float x, float z) {
-        if (!cell.terrainType.overridesRiver()) {
-            cell.terrainType = terrains.river;
+        if (!cell.terrain.overridesRiver()) {
+            cell.terrain = terrains.river;
         }
     }
 
@@ -209,25 +209,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
     }
 
     private void tag(Cell cell, Terrain tag) {
-        cell.terrainType = tag;
-    }
-
-    public static boolean validStart(float value) {
-        return value > (70F / 256F);
-    }
-
-    public static boolean validEnd(float value) {
-        return value < (60F / 256F);
-    }
-
-    public static float getValleyWidth(Random random, float min, float variance) {
-        return River.VALLEY_WIDTH * (min + (random.nextFloat() * variance));
-    }
-
-    private static float getBedHeightStepped(float bedHeight, float mod) {
-        float steps = 5;
-        float step = ((int) (mod * steps)) / steps;
-        return bedHeight + step * 0.2F;
+        cell.terrain = tag;
     }
 
     public static class Settings {

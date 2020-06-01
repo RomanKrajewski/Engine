@@ -5,7 +5,7 @@ public class MixedTerarin extends Terrain {
     private final boolean flat;
 
     public MixedTerarin(Terrain a, Terrain b) {
-        super(a.getName() + "-" + b.getName(), Math.min(a.getWeight(), b.getWeight()));
+        super(a.getName() + "-" + b.getName(), Math.min(a.getWeight(), b.getWeight()), a.getType().getDominant(b.getType()));
         flat = a.isFlat() && b.isFlat();
     }
 

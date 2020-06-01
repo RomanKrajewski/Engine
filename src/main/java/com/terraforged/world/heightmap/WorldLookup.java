@@ -56,8 +56,8 @@ public class WorldLookup {
         heightmap.apply(cell, x, z);
 
         // approximation - actual beaches depend on steepness but that's too expensive to calculate
-        if (cell.terrainType == context.terrain.coast && cell.value > waterLevel && cell.value <= beachLevel) {
-            cell.terrainType = context.terrain.beach;
+        if (cell.terrain == context.terrain.coast && cell.value > waterLevel && cell.value <= beachLevel) {
+            cell.terrain = context.terrain.beach;
         }
 
         for (Decorator decorator : decorators.getDecorators()) {

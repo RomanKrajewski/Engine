@@ -1,8 +1,8 @@
 package com.terraforged.core.render;
 
 import com.terraforged.core.concurrent.cache.CacheEntry;
-import com.terraforged.core.concurrent.pool.ThreadPool;
-import com.terraforged.core.concurrent.pool.ThreadPools;
+import com.terraforged.core.concurrent.thread.ThreadPool;
+import com.terraforged.core.concurrent.thread.ThreadPools;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.region.gen.RegionGenerator;
 
@@ -106,6 +106,7 @@ public class RenderWorld {
                 float x = rx * regionSize.size * w;
                 float z = rz * regionSize.size * h;
                 context.translate(x, z, 0);
+                renderer.render(region);
                 region.getMesh().draw();
                 context.popMatrix();
             }

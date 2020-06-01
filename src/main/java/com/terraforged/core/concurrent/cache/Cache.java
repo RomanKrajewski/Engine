@@ -1,7 +1,7 @@
 package com.terraforged.core.concurrent.cache;
 
-import com.terraforged.core.concurrent.pool.ThreadPool;
-import com.terraforged.core.concurrent.pool.ThreadPools;
+import com.terraforged.core.concurrent.thread.ThreadPool;
+import com.terraforged.core.concurrent.thread.ThreadPools;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
@@ -46,6 +46,12 @@ public class Cache<V extends ExpiringEntry> implements Runnable {
     @Override
     public void run() {
         final long now = timestamp;
-        map.removeIf(val -> now - val.getTimestamp() > expireMS);
+        map.removeIf(val -> {
+            if (now - val.getTimestamp() > expireMS) {
+                val.close();
+                return true;
+            }
+            return false;
+        });
     }
 }

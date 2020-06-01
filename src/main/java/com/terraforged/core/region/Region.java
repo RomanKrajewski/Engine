@@ -27,7 +27,10 @@ package com.terraforged.core.region;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Disposable;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.batch.Batcher;
+import com.terraforged.core.concurrent.cache.SafeCloseable;
+import com.terraforged.core.concurrent.pool.ArrayPool;
 import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.region.chunk.ChunkBatchTask;
 import com.terraforged.core.region.chunk.ChunkGenTask;
@@ -38,11 +41,12 @@ import com.terraforged.world.rivermap.Rivermap;
 import com.terraforged.world.terrain.decorator.Decorator;
 import me.dags.noise.util.NoiseUtil;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class Region implements Disposable {
+public class Region implements Disposable, SafeCloseable {
 
     private final int regionX;
     private final int regionZ;
@@ -56,11 +60,14 @@ public class Region implements Disposable {
     private final Cell[] blocks;
     private final GenChunk[] chunks;
     private final int disposableChunks;
+    private final Resource<Cell[]> cellResource;
+    private final Resource<GenChunk[]> chunkResource;
     private final Disposable.Listener<Region> disposalListener;
     private final AtomicInteger disposedChunks = new AtomicInteger();
 
     public Region(int regionX, int regionZ, int size, int borderChunks) {
-        this(regionX, regionZ, size, borderChunks, region -> {});
+        this(regionX, regionZ, size, borderChunks, region -> {
+        });
     }
 
     public Region(int regionX, int regionZ, int size, int borderChunks, Disposable.Listener<Region> disposalListener) {
@@ -75,8 +82,28 @@ public class Region implements Disposable {
         this.blockSize = Size.blocks(size, borderChunks);
         this.disposalListener = disposalListener;
         this.disposableChunks = chunkSize.size * chunkSize.size;
+        this.cellResource = Resource.empty();
+        this.chunkResource = Resource.empty();
         this.blocks = new Cell[blockSize.total * blockSize.total];
         this.chunks = new GenChunk[chunkSize.total * chunkSize.total];
+    }
+
+    public Region(int regionX, int regionZ, int size, int borderChunks, ArrayPool<Cell> cells, ArrayPool<GenChunk> chunks, Disposable.Listener<Region> disposalListener) {
+        this.regionX = regionX;
+        this.regionZ = regionZ;
+        this.chunkX = regionX << size;
+        this.chunkZ = regionZ << size;
+        this.blockX = Size.chunkToBlock(chunkX);
+        this.blockZ = Size.chunkToBlock(chunkZ);
+        this.border = borderChunks;
+        this.chunkSize = Size.chunks(size, borderChunks);
+        this.blockSize = Size.blocks(size, borderChunks);
+        this.disposalListener = disposalListener;
+        this.disposableChunks = chunkSize.size * chunkSize.size;
+        this.cellResource = cells.get(blockSize.total * blockSize.total);
+        this.chunkResource = chunks.get(chunkSize.total * chunkSize.total);
+        this.blocks = cellResource.get();
+        this.chunks = chunkResource.get();
     }
 
     @Override
@@ -85,7 +112,25 @@ public class Region implements Disposable {
         if (disposed < disposableChunks) {
             return;
         }
+        close();
         disposalListener.onDispose(this);
+    }
+
+    @Override
+    public void close() {
+        if (cellResource.isOpen()) {
+            for (Cell cell : blocks) {
+                if (cell != null) {
+                    cell.reset();
+                }
+            }
+            cellResource.close();
+            System.out.println("Closed Cells");
+        }
+        if (chunkResource.isOpen()) {
+            Arrays.fill(chunks, null);
+            chunkResource.close();
+        }
     }
 
     public long getRegionId() {
@@ -368,7 +413,7 @@ public class Region implements Disposable {
         return cell;
     }
 
-    private class GenChunk implements ChunkReader, ChunkWriter {
+    public class GenChunk implements ChunkReader, ChunkWriter {
 
         private final int chunkX;
         private final int chunkZ;
@@ -447,7 +492,7 @@ public class Region implements Disposable {
         @Override
         public Cell getCellRaw(int x, int z) {
             int index = blockSize.indexOf(x, z);
-            if (index < 0 || index >= blocks.length) {
+            if (index < 0 || index >= blockSize.maxIndex) {
                 return Cell.empty();
             }
             return blocks[index];

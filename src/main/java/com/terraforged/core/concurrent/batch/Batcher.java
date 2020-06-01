@@ -25,7 +25,9 @@
 
 package com.terraforged.core.concurrent.batch;
 
-public interface Batcher extends AutoCloseable {
+import com.terraforged.core.concurrent.cache.SafeCloseable;
+
+public interface Batcher extends SafeCloseable {
 
     void size(int size);
 
@@ -34,7 +36,4 @@ public interface Batcher extends AutoCloseable {
     default void submit(BatchTask task) {
         submit((Runnable) task);
     }
-
-    @Override
-    void close();
 }

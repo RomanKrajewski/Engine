@@ -78,7 +78,7 @@ public class ContinentLerper3 implements Populator {
 
             lower.apply(cell, x, y);
             float lowerVal = cell.value;
-            Terrain lowerType = cell.terrainType;
+            Terrain lowerType = cell.terrain;
 
             middle.apply(cell, x, y);
             float upperVal = cell.value;
@@ -110,7 +110,7 @@ public class ContinentLerper3 implements Populator {
 
         if (select < midpoint) {
             lower.tag(cell, x, y);
-            if (cell.value > cell.terrainType.getMax(climate.getRand().getValue(x, y))) {
+            if (cell.value > cell.terrain.getMax(climate.getRand().getValue(x, y))) {
                 upper.tag(cell, x, y);
             }
         } else {

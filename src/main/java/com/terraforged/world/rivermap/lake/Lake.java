@@ -28,7 +28,7 @@ package com.terraforged.world.rivermap.lake;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.rivermap.river.River;
 import com.terraforged.world.terrain.TerrainPopulator;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.Source;
 import me.dags.noise.util.NoiseUtil;
 import me.dags.noise.util.Vec2f;
@@ -43,9 +43,9 @@ public class Lake extends TerrainPopulator {
     protected final float bankAlphaRange;
     protected final Vec2f center;
     protected final LakeConfig config;
-    protected final TerrainTypes terrains;
+    protected final Terrains terrains;
 
-    public Lake(Vec2f center, float radius, float multiplier, LakeConfig config, TerrainTypes terrains) {
+    public Lake(Vec2f center, float radius, float multiplier, LakeConfig config, Terrains terrains) {
         super(Source.ZERO, terrains.lake);
         float lake = radius * multiplier;
         float valley = River.VALLEY_WIDTH * multiplier;
@@ -95,7 +95,7 @@ public class Lake extends TerrainPopulator {
     }
 
     protected void tag(Cell cell) {
-        cell.terrainType = terrains.lake;
+        cell.terrain = terrains.lake;
     }
 
     protected float getDistance2(float x, float z) {

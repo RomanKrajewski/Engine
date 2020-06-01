@@ -31,7 +31,7 @@ import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.Continent;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.heightmap.WorldHeightmap;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.source.Rand;
@@ -52,7 +52,7 @@ public class Climate {
     private final Module offsetY;
     private final int offsetDistance;
     private final Levels levels;
-    private final TerrainTypes terrains;
+    private final Terrains terrains;
 
     private final ClimateModule biomeNoise;
 
@@ -86,8 +86,8 @@ public class Climate {
         float edgeBlend = 0.4F;
 
         if (cell.value <= levels.water) {
-            if (cell.terrainType == terrains.coast) {
-                cell.terrainType = terrains.ocean;
+            if (cell.terrain == terrains.coast) {
+                cell.terrain = terrains.ocean;
             }
         } else if (cell.biomeEdge < edgeBlend) {
             float modifier = 1 - NoiseUtil.map(cell.biomeEdge, 0, edgeBlend, edgeBlend);
@@ -99,7 +99,7 @@ public class Climate {
             biomeNoise.apply(cell, x, z, false);
             try (Resource<Cell> lookup = Cell.pooled()) {
                 heightmap.tag(lookup.get(), x, z);
-                cell.terrainType = lookup.get().terrainType;
+                cell.terrain = lookup.get().terrain;
             }
         }
 

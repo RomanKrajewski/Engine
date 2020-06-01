@@ -1,36 +1,130 @@
 package com.terraforged.world.terrain;
 
-public interface TerrainType {
+public enum TerrainType implements ITerrain {
+    NONE,
+    DEEP_OCEAN {
+        @Override
+        public boolean isDeepOcean() {
+            return true;
+        }
 
-    default boolean isFlat() {
-        return false;
-    }
+        @Override
+        public boolean overridesRiver() {
+            return true;
+        }
 
-    default boolean isRiver() {
-        return false;
-    }
+        @Override
+        public boolean isSubmerged() {
+            return true;
+        }
+    },
+    SHALLOW_OCEAN {
+        @Override
+        public boolean isShallowOcean() {
+            return true;
+        }
 
-    default boolean isShallowOcean() {
-        return false;
-    }
+        @Override
+        public boolean isSubmerged() {
+            return true;
+        }
 
-    default boolean isDeepOcean() {
-        return false;
-    }
+        @Override
+        public boolean overridesRiver() {
+            return true;
+        }
+    },
+    COAST {
+        @Override
+        public boolean isCoast() {
+            return true;
+        }
 
-    default boolean isCoast() {
-        return false;
-    }
+        @Override
+        public boolean isOverground() {
+            return true;
+        }
 
-    default boolean overridesRiver() {
-        return isDeepOcean() || isShallowOcean() || isCoast();
-    }
+        @Override
+        public boolean overridesRiver() {
+            return true;
+        }
+    },
+    BEACH {
+        @Override
+        public boolean isCoast() {
+            return true;
+        }
 
-    default boolean isLake() {
-        return false;
-    }
+        @Override
+        public boolean isOverground() {
+            return true;
+        }
 
-    default boolean isWetland() {
-        return false;
+        @Override
+        public boolean overridesRiver() {
+            return true;
+        }
+    },
+    RIVER {
+        @Override
+        public boolean isRiver() {
+            return true;
+        }
+
+        @Override
+        public boolean isSubmerged() {
+            return true;
+        }
+    },
+    LAKE {
+        @Override
+        public boolean isLake() {
+            return true;
+        }
+
+        @Override
+        public boolean isSubmerged() {
+            return true;
+        }
+    },
+    WETLAND {
+        @Override
+        public boolean isWetland() {
+            return true;
+        }
+    },
+    FLATLAND {
+        @Override
+        public boolean isFlat() {
+            return true;
+        }
+
+        @Override
+        public boolean isOverground() {
+            return true;
+        }
+    },
+    LOWLAND {
+        @Override
+        public boolean isOverground() {
+            return true;
+        }
+    },
+    HIGHLAND {
+        @Override
+        public boolean isOverground() {
+            return true;
+        }
+    },
+    ;
+
+
+
+    public TerrainType getDominant(TerrainType other) {
+        if (ordinal() > other.ordinal()) {
+            return this;
+        }
+        return other;
     }
 }

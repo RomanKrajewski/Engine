@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TerrainTypes {
+public class Terrains {
 
     public final Terrain ocean;
     public final Terrain deepOcean;
@@ -54,7 +54,7 @@ public class TerrainTypes {
     public final Terrain volcanoPipe;
     public final List<Terrain> index;
 
-    private TerrainTypes(Mutable mutable) {
+    private Terrains(Mutable mutable) {
         List<Terrain> index = new ArrayList<>();
         Collections.addAll(
                 index,
@@ -81,7 +81,7 @@ public class TerrainTypes {
         this.index = Collections.unmodifiableList(index);
     }
 
-    public static TerrainTypes create(Settings settings) {
+    public static Terrains create(Settings settings) {
         Mutable terrain = new Mutable();
         terrain.ocean = Terrain.ocean(settings);
         terrain.deepOcean = Terrain.deepOcean(settings);
@@ -127,8 +127,8 @@ public class TerrainTypes {
         public Terrain volcanoes = Terrain.NONE;
         public Terrain volcanoPipe = Terrain.NONE;
 
-        public TerrainTypes create() {
-            return new TerrainTypes(this);
+        public Terrains create() {
+            return new Terrains(this);
         }
     }
 }

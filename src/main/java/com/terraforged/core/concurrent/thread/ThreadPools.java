@@ -1,4 +1,4 @@
-package com.terraforged.core.concurrent.pool;
+package com.terraforged.core.concurrent.thread;
 
 public class ThreadPools {
 

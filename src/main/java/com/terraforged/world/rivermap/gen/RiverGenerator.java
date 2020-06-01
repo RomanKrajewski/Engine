@@ -11,7 +11,7 @@ import com.terraforged.world.rivermap.lake.LakeConfig;
 import com.terraforged.world.rivermap.river.River;
 import com.terraforged.world.rivermap.river.RiverBounds;
 import com.terraforged.world.rivermap.river.RiverConfig;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.util.NoiseUtil;
 import me.dags.noise.util.Vec2f;
 
@@ -51,7 +51,7 @@ public class RiverGenerator {
     private final RiverConfig primary;
     private final RiverConfig secondary;
     private final RiverConfig tertiary;
-    private final TerrainTypes terrain;
+    private final Terrains terrain;
     private final Heightmap heightmap;
     private final Levels levels;
 

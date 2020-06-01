@@ -30,6 +30,7 @@ public class Size {
     public final int size;
     public final int total;
     public final int border;
+    public final int maxIndex;
     private final int mask;
 
     public Size(int size, int border) {
@@ -37,6 +38,7 @@ public class Size {
         this.mask = size - 1;
         this.border = border;
         this.total = size + (2 * border);
+        this.maxIndex = total * total;
     }
 
     public int mask(int i) {

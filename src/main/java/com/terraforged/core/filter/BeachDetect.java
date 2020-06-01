@@ -2,16 +2,16 @@ package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.WorldHeightmap;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 
 public class BeachDetect implements Filter, Filter.Visitor {
 
-    private final TerrainTypes terrains;
+    private final Terrains terrains;
     private final float grad2;
     private final int radius = 8;
     private final int diameter = radius + 1 + radius;
 
-    public BeachDetect(TerrainTypes terrains) {
+    public BeachDetect(Terrains terrains) {
         this.terrains = terrains;
         float delta = (8F / 256F) / diameter;
         this.grad2 = delta * delta;
@@ -24,7 +24,7 @@ public class BeachDetect implements Filter, Filter.Visitor {
 
     @Override
     public void visit(Filterable cellMap, Cell cell, int dx, int dz) {
-        if (cell.terrainType == terrains.coast) {
+        if (cell.terrain == terrains.coast) {
             if (cell.continentEdge < WorldHeightmap.BEACH_VALUE) {
                 Cell n = cellMap.getCellRaw(dx, dz - radius);
                 Cell s = cellMap.getCellRaw(dx, dz + radius);
@@ -34,7 +34,7 @@ public class BeachDetect implements Filter, Filter.Visitor {
                 float gz = grad(n, s, cell);
                 float d2 = (gx * gx + gz * gz);
                 if (d2 < grad2) {
-                    cell.terrainType = terrains.beach;
+                    cell.terrain = terrains.beach;
                 }
             }
         }

@@ -29,7 +29,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.CellFunc;
@@ -38,7 +38,7 @@ public class DesertDunes implements Decorator {
 
     private final Module module;
     private final Levels levels;
-    private final TerrainTypes terrains;
+    private final Terrains terrains;
 
     public DesertDunes(GeneratorContext context) {
         this.levels = context.levels;
@@ -70,7 +70,7 @@ public class DesertDunes implements Decorator {
 
         float height = duneHeight * mask;
         cell.value += height;
-        cell.terrainType = terrains.desert;
+        cell.terrain = terrains.desert;
 
         return height >= levels.unit;
     }

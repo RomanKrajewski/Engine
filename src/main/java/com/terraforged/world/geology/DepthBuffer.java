@@ -1,6 +1,6 @@
 package com.terraforged.world.geology;
 
-import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.core.concurrent.Resource;
 
 public class DepthBuffer {

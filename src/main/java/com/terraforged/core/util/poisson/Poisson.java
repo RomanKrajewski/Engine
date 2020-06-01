@@ -1,6 +1,6 @@
 package com.terraforged.core.util.poisson;
 
-import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.core.concurrent.Resource;
 import me.dags.noise.util.NoiseUtil;
 import me.dags.noise.util.Vec2f;

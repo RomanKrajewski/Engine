@@ -23,13 +23,18 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.concurrent;
+package com.terraforged.core.concurrent.pool;
+
+import com.terraforged.core.concurrent.Resource;
+import com.terraforged.core.concurrent.cache.SafeCloseable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class ObjectPool<T> {
+
+    private transient long misses = 0L;
 
     private final int capacity;
     private final List<Item<T>> pool;
@@ -46,8 +51,13 @@ public class ObjectPool<T> {
             if (pool.size() > 0) {
                 return pool.remove(pool.size() - 1).retain();
             }
+            misses++;
         }
         return new Item<>(supplier.get(), this);
+    }
+
+    public long getMisses() {
+        return Math.max(0, misses - capacity);
     }
 
     public int size() {
@@ -84,6 +94,19 @@ public class ObjectPool<T> {
             return value;
         }
 
+        @Override
+        public boolean isOpen() {
+            return !released;
+        }
+
+        @Override
+        public void close() {
+            if (value instanceof SafeCloseable) {
+                ((SafeCloseable) value).close();
+            }
+            release();
+        }
+
         public void release() {
             if (!released) {
                 released = true;
@@ -94,18 +117,6 @@ public class ObjectPool<T> {
         private Item<T> retain() {
             released = false;
             return this;
-        }
-
-        @Override
-        public void close() {
-            if (value instanceof AutoCloseable) {
-                try {
-                    ((AutoCloseable) value).close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            release();
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.terraforged.core.concurrent.pool;
+package com.terraforged.core.concurrent.thread;
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;

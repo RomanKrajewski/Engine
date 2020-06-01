@@ -1,6 +1,6 @@
 package com.terraforged.core.concurrent.cache;
 
-import com.terraforged.core.concurrent.pool.ThreadPool;
+import com.terraforged.core.concurrent.thread.ThreadPool;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinTask;
@@ -10,6 +10,7 @@ import java.util.function.Function;
 public class CacheEntry<T> implements ExpiringEntry {
 
     private volatile long timestamp;
+    private volatile T value = null;
     private final Future<T> task;
 
     public CacheEntry(Future<T> task) {
@@ -22,16 +23,23 @@ public class CacheEntry<T> implements ExpiringEntry {
         return timestamp;
     }
 
+    @Override
+    public void close() {
+        if (value instanceof SafeCloseable) {
+            ((SafeCloseable) value).close();
+        }
+    }
+
     public boolean isDone() {
         return task.isDone();
     }
 
     public T get() {
         if (task instanceof ForkJoinTask) {
-            return ((ForkJoinTask<T>) task).join();
+            return value = ((ForkJoinTask<T>) task).join();
         }
         try {
-            return task.get();
+            return value = task.get();
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }

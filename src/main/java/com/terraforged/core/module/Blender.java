@@ -83,14 +83,14 @@ public class Blender extends Select implements Populator {
         lower.apply(cell, x, y);
 
         float lowerVal = cell.value;
-        Terrain lowerType = cell.terrainType;
+        Terrain lowerType = cell.terrain;
 
         upper.apply(cell, x, y);
         float upperVal = cell.value;
 
         cell.value = NoiseUtil.lerp(lowerVal, upperVal, alpha);
         if (select < midpoint) {
-            cell.terrainType = lowerType;
+            cell.terrain = lowerType;
         }
     }
 

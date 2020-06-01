@@ -1,5 +1,8 @@
 package com.terraforged.core.util.metric;
 
+import com.terraforged.core.concurrent.cache.SafeCloseable;
+import com.terraforged.core.concurrent.pool.ObjectPool;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -7,6 +10,7 @@ public class Metric {
 
     private final AtomicLong hits = new AtomicLong();
     private final AtomicLong nanos = new AtomicLong();
+    private final ObjectPool<Timer> pool = new ObjectPool<>(4, Timer::new);
 
     public long hits() {
         return hits.get();
@@ -24,18 +28,31 @@ public class Metric {
     }
 
     public Timer timer() {
-        return new Timer();
+        return pool.get().get().punchIn();
     }
 
-    public class Timer implements AutoCloseable {
+    public class Timer implements SafeCloseable {
 
-        private final long start = System.nanoTime();
+        private long start = -1;
+
+        public Timer punchIn() {
+            start = System.nanoTime();
+            return this;
+        }
+
+        public Timer punchOut() {
+            if (start > -1) {
+                long duration = System.nanoTime() - start;
+                nanos.addAndGet(duration);
+                hits.incrementAndGet();
+                start = -1;
+            }
+            return this;
+        }
 
         @Override
         public void close() {
-            long duration = System.nanoTime() - start;
-            nanos.addAndGet(duration);
-            hits.incrementAndGet();
+            punchOut();
         }
     }
 }
