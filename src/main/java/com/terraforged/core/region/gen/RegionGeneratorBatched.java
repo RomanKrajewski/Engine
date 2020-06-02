@@ -11,18 +11,9 @@ public class RegionGeneratorBatched extends RegionGenerator {
         super(builder);
     }
 
-    private RegionGeneratorBatched(RegionGenerator from, Disposable.Listener<Region> listener) {
-        super(from, listener);
-    }
-
-    @Override
-    public RegionGenerator withListener(Disposable.Listener<Region> listener) {
-        return new RegionGeneratorBatched(this, listener);
-    }
-
     @Override
     public Region generateRegion(int regionX, int regionZ) {
-        Region region = createRegion(regionX, regionZ, factor, border, disposalListener);
+        Region region = createRegion(regionX, regionZ, factor, border);
         try (Resource<Batcher> batcher = threadPool.batcher()) {
             region.generateArea(generator.getHeightmap(), batcher.get(), batchSize);
         }
@@ -32,7 +23,7 @@ public class RegionGeneratorBatched extends RegionGenerator {
 
     @Override
     public Region generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
-        Region region = createRegion(0, 0, factor, border, disposalListener);
+        Region region = createRegion(0, 0, factor, border);
         try (Resource<Batcher> batcher = threadPool.batcher()) {
             region.generateArea(generator.getHeightmap(), batcher.get(), batchSize, centerX, centerZ, zoom);
         }

@@ -41,8 +41,8 @@ public class RegionCache implements Disposable.Listener<Region> {
     private final Cache<CacheEntry<Region>> cache;
 
     public RegionCache(boolean queueNeighbours, RegionGenerator generator) {
+        this.generator = generator;
         this.queuing = queueNeighbours;
-        this.generator = generator.withListener(this);
         this.cache = new Cache<>(60, 30, TimeUnit.SECONDS);
     }
 

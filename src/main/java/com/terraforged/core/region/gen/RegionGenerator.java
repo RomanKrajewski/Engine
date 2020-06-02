@@ -25,10 +25,7 @@
 
 package com.terraforged.core.region.gen;
 
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.Disposable;
 import com.terraforged.core.concurrent.cache.CacheEntry;
-import com.terraforged.core.concurrent.pool.ArrayPool;
 import com.terraforged.core.concurrent.thread.ThreadPool;
 import com.terraforged.core.region.Region;
 import com.terraforged.world.WorldGenerator;
@@ -41,38 +38,17 @@ public class RegionGenerator {
     protected final int batchSize;
     protected final ThreadPool threadPool;
     protected final WorldGenerator generator;
-    protected final ArrayPool<Cell> cellArrayPool;
-    protected final ArrayPool<Region.GenChunk> chunkArrayPool;
-    protected final Disposable.Listener<Region> disposalListener;
 
     protected RegionGenerator(Builder builder) {
         this.factor = builder.factor;
         this.border = builder.border;
         this.batchSize = builder.batchSize;
         this.threadPool = builder.threadPool;
-        this.disposalListener = region -> {};
         this.generator = builder.factory.get();
-        this.cellArrayPool = ArrayPool.of(10, Cell[]::new);
-        this.chunkArrayPool = ArrayPool.of(10, Region.GenChunk[]::new);
-    }
-
-    protected RegionGenerator(RegionGenerator from, Disposable.Listener<Region> listener) {
-        this.factor = from.factor;
-        this.border = from.border;
-        this.batchSize = from.batchSize;
-        this.threadPool = from.threadPool;
-        this.disposalListener = listener;
-        this.generator = from.generator;
-        this.cellArrayPool = from.cellArrayPool;
-        this.chunkArrayPool = from.chunkArrayPool;
     }
 
     public int chunkToRegion(int i) {
         return i >> factor;
-    }
-
-    public RegionGenerator withListener(Disposable.Listener<Region> listener) {
-        return new RegionGenerator(this, listener);
     }
 
     public RegionCache toCache() {
@@ -100,21 +76,21 @@ public class RegionGenerator {
     }
 
     public Region generateRegion(int regionX, int regionZ) {
-        Region region = createRegion(regionX, regionZ, factor, border, disposalListener);
+        Region region = createRegion(regionX, regionZ, factor, border);
         region.generate(generator.getHeightmap());
         postProcess(region);
         return region;
     }
 
     public Region generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
-        Region region = createRegion(0, 0, factor, border, disposalListener);
+        Region region = createRegion(0, 0, factor, border);
         region.generate(generator.getHeightmap(), centerX, centerZ, zoom);
         postProcess(region, centerX, centerZ, zoom, filter);
         return region;
     }
 
-    protected Region createRegion(int regionX, int regionZ, int size, int borderChunks, Disposable.Listener<Region> disposalListener) {
-        return new Region(regionX, regionZ, size, borderChunks, cellArrayPool, chunkArrayPool, disposalListener);
+    protected Region createRegion(int regionX, int regionZ, int size, int borderChunks) {
+        return new Region(regionX, regionZ, size, borderChunks);
     }
 
     protected void postProcess(Region region) {

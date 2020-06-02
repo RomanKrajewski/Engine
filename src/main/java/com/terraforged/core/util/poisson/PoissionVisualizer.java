@@ -1,5 +1,7 @@
 package com.terraforged.core.util.poisson;
 
+import me.dags.noise.Source;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -9,7 +11,7 @@ public class PoissionVisualizer {
 
     public static void main(String[] args) {
         int size = 512;
-        int radius = 6;
+        int radius = 5;
 
         int chunkSize = 16;
         int chunks = size / chunkSize;
@@ -17,7 +19,7 @@ public class PoissionVisualizer {
         BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
         Poisson poisson = new Poisson(radius);
         PoissonContext context = new PoissonContext(213, new Random());
-//        context.density = Source.simplex(213, 100, 1).scale(2).bias(0);
+        context.density = Source.simplex(213, 200, 2).clamp(0.25, 0.75).map(0, 1);
 
         long time = 0L;
         long count = 0L;
@@ -42,7 +44,7 @@ public class PoissionVisualizer {
 
         double total = time / 1000000D;
         double avg = total / count;
-        System.out.printf("Total time: %.3f, Average Per Chunk: %.3f\n", total, avg);
+        System.out.printf("Total time: %.3fms, Average Per Chunk: %.3fms\n", total, avg);
 
         JFrame frame = new JFrame();
         frame.add(new JLabel(new ImageIcon(image)));

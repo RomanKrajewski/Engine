@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
+import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
@@ -20,6 +21,15 @@ public class SynchronizedLongMap<V> {
     public void remove(long key) {
         synchronized (lock) {
             map.remove(key);
+        }
+    }
+
+    public void remove(long key, Consumer<V> consumer) {
+        synchronized (lock) {
+            V v = map.remove(key);
+            if (v != null) {
+                consumer.accept(v);
+            }
         }
     }
 

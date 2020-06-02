@@ -22,7 +22,7 @@ public class Cache<V extends ExpiringEntry> implements Runnable {
     }
 
     public void remove(long key) {
-        map.remove(key);
+        map.remove(key, V::close);
     }
 
     public V get(long key) {

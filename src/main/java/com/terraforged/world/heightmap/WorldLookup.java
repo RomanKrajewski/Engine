@@ -1,6 +1,7 @@
 package com.terraforged.world.heightmap;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.region.Region;
 import com.terraforged.core.region.gen.RegionCache;
 import com.terraforged.world.GeneratorContext;
@@ -26,10 +27,10 @@ public class WorldLookup {
         this.beachLevel = context.levels.water(5);
     }
 
-    public Cell getCell(int x, int z) {
-        Cell cell = new Cell();
-        applyCell(cell, x, z);
-        return cell;
+    public Resource<Cell> getCell(int x, int z) {
+        Resource<Cell> resource = Cell.pooled();
+        applyCell(resource.get(), x, z);
+        return resource;
     }
 
     public void applyCell(Cell cell, int x, int z) {
@@ -46,8 +47,8 @@ public class WorldLookup {
             Cell c = region.getCell(x, z);
             if (c != null) {
                 cell.copy(c);
-                return true;
             }
+            return cell.terrain != null;
         }
         return false;
     }

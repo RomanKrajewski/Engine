@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 public class ArrayPool<T> {
 
+    private volatile long time = 0;
     private volatile long misses = 0;
 
     private final int capacity;
@@ -25,14 +26,25 @@ public class ArrayPool<T> {
         synchronized (pool) {
             if (pool.size() > 0) {
                 ArrayPool.Item<T> resource = pool.get(pool.size() - 1);
-                if (resource.get().length > size) {
+                if (resource.get().length >= size) {
                     return resource.retain();
                 }
-            } else {
-                misses++;
             }
+            misses++;
         }
         return new ArrayPool.Item<>(constructor.apply(size), this);
+    }
+
+    public void stats() {
+        long now = System.currentTimeMillis();
+        if (now - time > 1000) {
+            time = now;
+            long misses = getMisses();
+            if (misses > 0) {
+                this.misses = capacity;
+                System.out.println("Misses=" + misses);
+            }
+        }
     }
 
     public long getMisses() {
@@ -81,10 +93,6 @@ public class ArrayPool<T> {
 
         @Override
         public void close() {
-            release();
-        }
-
-        public void release() {
             if (!released) {
                 released = true;
                 released = pool.restore(this);

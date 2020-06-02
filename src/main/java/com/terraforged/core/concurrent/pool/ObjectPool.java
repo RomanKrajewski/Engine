@@ -104,10 +104,6 @@ public class ObjectPool<T> {
             if (value instanceof SafeCloseable) {
                 ((SafeCloseable) value).close();
             }
-            release();
-        }
-
-        public void release() {
             if (!released) {
                 released = true;
                 released = pool.restore(this);

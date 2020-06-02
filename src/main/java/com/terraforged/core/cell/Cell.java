@@ -33,6 +33,8 @@ import me.dags.noise.util.NoiseUtil;
 
 public class Cell {
 
+    private static final Cell blank = new Cell();
+
     private static final Cell EMPTY = new Cell() {
         @Override
         public boolean isAbsent() {
@@ -40,7 +42,7 @@ public class Cell {
         }
     };
 
-    private static final ObjectPool<Cell> POOL = new ObjectPool<>(100, Cell::new);
+    private static final ObjectPool<Cell> POOL = new ObjectPool<>(500, Cell::new);
 
     public int continentX;
     public int continentZ;
@@ -97,11 +99,7 @@ public class Cell {
     }
 
     public void reset() {
-        biomeType = BiomeType.GRASSLAND;
-        terrain = null;
-        biomeEdge = 1F;
-        riverMask = 1F;
-        erosionMask = false;
+        copy(blank);
     }
 
     public float continentMask(float min, float max) {
