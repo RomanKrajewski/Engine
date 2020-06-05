@@ -1,9 +1,9 @@
 package com.terraforged.core.concurrent.thread;
 
-import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.batch.Batcher;
 import com.terraforged.core.concurrent.batch.ForkJoinBatcher;
+import com.terraforged.core.concurrent.pool.ObjectPool;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;

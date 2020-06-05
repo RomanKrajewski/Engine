@@ -51,7 +51,7 @@ public class Levels {
     private final float elevationRange;
 
     public Levels(WorldSettings settings) {
-        this(settings.levels.worldHeight, settings.levels.seaLevel);
+        this(settings.properties.worldHeight, settings.properties.seaLevel);
     }
 
     public Levels(int height, int seaLevel) {

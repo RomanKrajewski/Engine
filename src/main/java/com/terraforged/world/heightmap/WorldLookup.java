@@ -3,6 +3,7 @@ package com.terraforged.world.heightmap;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.region.Region;
+import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.region.gen.RegionCache;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.WorldDecorators;
@@ -25,6 +26,13 @@ public class WorldLookup {
         this.decorators = factory.getDecorators();
         this.waterLevel = context.levels.water;
         this.beachLevel = context.levels.water(5);
+    }
+
+    public Resource<Cell> get(int x, int z) {
+        ChunkReader chunk = cache.getChunk(x >> 4, z >> 4);
+        Resource<Cell> cell = Cell.pooled();
+        cell.get().copy(chunk.getCell(x & 15, z & 15));
+        return cell;
     }
 
     public Resource<Cell> getCell(int x, int z) {

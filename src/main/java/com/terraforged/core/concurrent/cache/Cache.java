@@ -16,9 +16,13 @@ public class Cache<V extends ExpiringEntry> implements Runnable {
     private volatile long timestamp = 0L;
 
     public Cache(long expireTime, long interval, TimeUnit unit) {
+        this(200, expireTime, interval, unit);
+    }
+
+    public Cache(int capacity, long expireTime, long interval, TimeUnit unit) {
         this.expireMS = unit.toMillis(expireTime);
         this.intervalMS = unit.toMillis(interval);
-        this.map = new SynchronizedLongMap<>(100);
+        this.map = new SynchronizedLongMap<>(capacity);
     }
 
     public void remove(long key) {

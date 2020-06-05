@@ -1,5 +1,5 @@
 /*
- *   
+ *
  * MIT License
  *
  * Copyright (c) 2020 TerraForged
@@ -30,18 +30,22 @@ import com.terraforged.core.concurrent.cache.Cache;
 import com.terraforged.core.concurrent.cache.CacheEntry;
 import com.terraforged.core.region.Region;
 import com.terraforged.core.region.chunk.ChunkReader;
-import me.dags.noise.util.NoiseUtil;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.LongFunction;
 
 public class RegionCache implements Disposable.Listener<Region> {
 
     private final boolean queuing;
     private final RegionGenerator generator;
     private final Cache<CacheEntry<Region>> cache;
+    private final LongFunction<CacheEntry<Region>> syncGetter;
+    private final LongFunction<CacheEntry<Region>> asyncGetter;
 
     public RegionCache(boolean queueNeighbours, RegionGenerator generator) {
         this.generator = generator;
+        this.syncGetter = syncGetter();
+        this.asyncGetter = asyncGetter();
         this.queuing = queueNeighbours;
         this.cache = new Cache<>(60, 30, TimeUnit.SECONDS);
     }
@@ -71,8 +75,7 @@ public class RegionCache implements Disposable.Listener<Region> {
     }
 
     public Region getIfPresent(int regionX, int regionZ) {
-        long id = NoiseUtil.seed(regionX, regionZ);
-        CacheEntry<Region> entry = cache.get(id);
+        CacheEntry<Region> entry = cache.get(getId(regionX, regionZ));
         if (entry == null || !entry.isDone()) {
             return null;
         }
@@ -80,13 +83,19 @@ public class RegionCache implements Disposable.Listener<Region> {
     }
 
     public CacheEntry<Region> getEntry(int regionX, int regionZ) {
-        long id = NoiseUtil.seed(regionX, regionZ);
-        return cache.computeIfAbsent(id, l -> generator.getSync(regionX, regionZ));
+        return cache.computeIfAbsent(getId(regionX, regionZ), syncGetter);
     }
 
     public void queueRegion(int regionX, int regionZ) {
-        long id = NoiseUtil.seed(regionX, regionZ);
-        cache.computeIfAbsent(id, l -> generator.getAsync(regionX, regionZ));
+        cache.computeIfAbsent(getId(regionX, regionZ), asyncGetter);
+    }
+
+    private LongFunction<CacheEntry<Region>> syncGetter() {
+        return id -> generator.getSync((int) id, (int) (id >> 32));
+    }
+
+    private LongFunction<CacheEntry<Region>> asyncGetter() {
+        return id -> generator.getAsync((int) id, (int) (id >> 32));
     }
 
     private void queueNeighbours(int rx, int rz) {
@@ -98,5 +107,9 @@ public class RegionCache implements Disposable.Listener<Region> {
                 queueRegion(rx + dx, rz + dz);
             }
         }
+    }
+
+    public static long getId(int regionX, int regionZ) {
+        return (long) regionX & 4294967295L | ((long) regionZ & 4294967295L) << 32;
     }
 }

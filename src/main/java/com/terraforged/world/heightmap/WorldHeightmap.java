@@ -119,7 +119,7 @@ public class WorldHeightmap implements Heightmap {
         Populator mountains = register(terrainProvider.getLandforms().mountains(seed), context.terrain.mountains);
 
         // controls what's ocean and what's land
-        continentGenerator = world.worldType.create(seed, world);
+        continentGenerator = world.continent.continentMode.create(seed, world);
         climate = new Climate(continentGenerator, context);
 
         // blends between normal terrain and mountain chains

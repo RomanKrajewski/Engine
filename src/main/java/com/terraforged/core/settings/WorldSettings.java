@@ -3,7 +3,8 @@ package com.terraforged.core.settings;
 import com.terraforged.core.serialization.annotation.Comment;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
-import com.terraforged.world.continent.WorldType;
+import com.terraforged.world.continent.ContinentMode;
+import com.terraforged.world.continent.SpawnType;
 import me.dags.noise.func.DistanceFunc;
 
 @Serializable
@@ -11,17 +12,17 @@ public class WorldSettings {
 
     public transient long seed = 0L;
 
-    @Comment("Controls the continent generator type")
-    public WorldType worldType = WorldType.NORMAL;
-
     public Continent continent = new Continent();
 
-    public Levels levels = new Levels();
+    public Properties properties = new Properties();
 
     @Serializable
     public static class Continent {
 
-        @Comment("Controls how continent shapes calculated")
+        @Comment("Controls the continent generator type")
+        public ContinentMode continentMode = ContinentMode.MULTI;
+
+        @Comment("Controls how continent shapes are calculated")
         public DistanceFunc continentShape = DistanceFunc.EUCLIDEAN;
 
         @Range(min = 0F, max = 1F)
@@ -34,7 +35,10 @@ public class WorldSettings {
     }
 
     @Serializable
-    public static class Levels {
+    public static class Properties {
+
+        @Comment("Set whether spawn should be close to x=0,z=0 or the centre of the nearest continent")
+        public SpawnType spawnType = SpawnType.CONTINENT_CENTER;
 
         @Range(min = 0, max = 256)
         @Comment("Controls the world height")

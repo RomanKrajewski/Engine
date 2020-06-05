@@ -85,5 +85,15 @@ public interface ITerrain {
         default boolean isWetland() {
             return getType().isWetland();
         }
+
+        @Override
+        default boolean isOverground() {
+            return getType().isOverground();
+        }
+
+        @Override
+        default boolean isSubmerged() {
+            return getType().isSubmerged();
+        }
     }
 }
