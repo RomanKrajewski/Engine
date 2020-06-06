@@ -39,7 +39,6 @@ import com.terraforged.core.region.gen.RegionResources;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.Rivermap;
 import com.terraforged.world.terrain.decorator.Decorator;
-import me.dags.noise.util.NoiseUtil;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,12 +57,21 @@ public class Region implements Disposable, SafeCloseable {
     private final int chunkCount;
     private final Size blockSize;
     private final Size chunkSize;
-    private final Resource<Cell[]> blockResource;
-    private final Resource<GenChunk[]> chunkResource;
     private final Cell[] blocks;
     private final GenChunk[] chunks;
-    private final AtomicInteger lock = new AtomicInteger();
+
+    // keeps reference to the pooled resources so they can be released once the region has been disposed
+    private final Resource<Cell[]> blockResource;
+    private final Resource<GenChunk[]> chunkResource;
+
+    // keeps track of 'open/active' chunks (ie chunks that are being read from)
+    private final AtomicInteger active = new AtomicInteger();
+
+    // keeps track of 'disposed' chunks (ie chunks that we do not expect to read from again)
+    // once all chunks have been disposed the disposal listener is notified
     private final AtomicInteger disposed = new AtomicInteger();
+
+    // basically the RegionCache
     private final Disposable.Listener<Region> listener;
 
     public Region(int regionX, int regionZ, int size, int borderChunks, RegionResources resources, Listener<Region> listener) {
@@ -84,17 +92,27 @@ public class Region implements Disposable, SafeCloseable {
         this.chunks = chunkResource.get();
     }
 
+    /**
+     * Called when a chunk from this region has been disposed
+     */
     @Override
     public void dispose() {
+        // should be called once per chunk (excluding border chunks).
+        // once the chunk count has been hit we can dispose
         if (disposed.incrementAndGet() >= chunkCount) {
             listener.onDispose(this);
         }
     }
 
+    /**
+     * Called when removed from the region cache
+     */
     @Override
     public void close() {
-        if (lock.compareAndSet(0, -1)) {
+        // only dispose resources if there are no chunks actively being used
+        if (active.compareAndSet(0, -1)) {
             if (blockResource.isOpen()) {
+                // cells can be reused
                 for (Cell cell : blocks) {
                     if (cell != null) {
                         cell.reset();
@@ -104,6 +122,7 @@ public class Region implements Disposable, SafeCloseable {
             }
 
             if (chunkResource.isOpen()) {
+                // chunks must be null'd
                 Arrays.fill(chunks, null);
                 chunkResource.close();
             }
@@ -111,7 +130,7 @@ public class Region implements Disposable, SafeCloseable {
     }
 
     public long getRegionId() {
-        return NoiseUtil.seed(getRegionX(), getRegionZ());
+        return getRegionId(getRegionX(), getRegionZ());
     }
 
     public int getRegionX() {
@@ -166,7 +185,7 @@ public class Region implements Disposable, SafeCloseable {
         return blocks[index];
     }
 
-    public ChunkWriter genChunk(int chunkX, int chunkZ) {
+    public ChunkWriter getChunkWriter(int chunkX, int chunkZ) {
         int index = chunkSize.indexOf(chunkX, chunkZ);
         return computeChunk(index, chunkX, chunkZ);
     }
@@ -175,7 +194,7 @@ public class Region implements Disposable, SafeCloseable {
         int relChunkX = chunkSize.border + chunkSize.mask(chunkX);
         int relChunkZ = chunkSize.border + chunkSize.mask(chunkZ);
         int index = chunkSize.indexOf(relChunkX, relChunkZ);
-        return chunks[index].lock();
+        return chunks[index].open();
     }
 
     public void generate(Consumer<ChunkWriter> consumer) {
@@ -323,18 +342,6 @@ public class Region implements Disposable, SafeCloseable {
         }
     }
 
-    public void iterate(Consumer<ChunkReader> consumer) {
-        for (int cz = 0; cz < chunkSize.size; cz++) {
-            int chunkZ = chunkSize.border + cz;
-            for (int cx = 0; cx < chunkSize.size; cx++) {
-                int chunkX = chunkSize.border + cx;
-                int index = chunkSize.indexOf(chunkX, chunkZ);
-                GenChunk chunk = chunks[index];
-                consumer.accept(chunk);
-            }
-        }
-    }
-
     public void iterate(Cell.Visitor visitor) {
         for (int dz = 0; dz < blockSize.size; dz++) {
             int z = blockSize.border + dz;
@@ -343,31 +350,6 @@ public class Region implements Disposable, SafeCloseable {
                 int index = blockSize.indexOf(x, z);
                 Cell cell = blocks[index];
                 visitor.visit(cell, dx, dz);
-            }
-        }
-    }
-
-    public void visit(int minX, int minZ, int maxX, int maxZ, Cell.Visitor visitor) {
-        int regionMinX = getBlockX();
-        int regionMinZ = getBlockZ();
-        if (maxX < regionMinX || maxZ < regionMinZ) {
-            return;
-        }
-
-        int regionMaxX = getBlockX() + getBlockSize().size - 1;
-        int regionMaxZ = getBlockZ() + getBlockSize().size - 1;
-        if (minX > regionMaxX || maxZ > regionMaxZ) {
-            return;
-        }
-
-        minX = Math.max(minX, regionMinX);
-        minZ = Math.max(minZ, regionMinZ);
-        maxX = Math.min(maxX, regionMaxX);
-        maxZ = Math.min(maxZ, regionMaxZ);
-
-        for (int z = minZ; z <= maxX; z++) {
-            for (int x = minX; x <= maxZ; x++) {
-                visitor.visit(getCell(x, z), x, z);
             }
         }
     }
@@ -412,22 +394,19 @@ public class Region implements Disposable, SafeCloseable {
             this.blockZ = chunkZ << 4;
         }
 
-        @Override
-        public void dispose() {
-            Region.this.dispose();
+        public GenChunk open() {
+            active.getAndIncrement();
+            return this;
         }
 
         @Override
         public void close() {
-            lock.decrementAndGet();
+            active.decrementAndGet();
         }
 
-        public GenChunk lock() {
-            int i = lock.getAndIncrement();
-            if (i < 0) {
-                new RuntimeException().printStackTrace();
-            }
-            return this;
+        @Override
+        public void dispose() {
+            Region.this.dispose();
         }
 
         @Override
@@ -487,5 +466,9 @@ public class Region implements Disposable, SafeCloseable {
             }
             return blocks[index];
         }
+    }
+
+    public static long getRegionId(int regionX, int regionZ) {
+        return (long) regionX & 4294967295L | ((long) regionZ & 4294967295L) << 32;
     }
 }

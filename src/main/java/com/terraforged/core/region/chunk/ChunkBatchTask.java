@@ -50,7 +50,7 @@ public class ChunkBatchTask implements BatchTask {
                     continue;
                 }
                 try {
-                    driveOne(region.genChunk(cx, cz), heightmap);
+                    driveOne(region.getChunkWriter(cx, cz), heightmap);
                 } catch (Throwable t) {
                     t.printStackTrace();
                 }

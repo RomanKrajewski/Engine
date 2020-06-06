@@ -63,7 +63,7 @@ public class RegionCache implements Disposable.Listener<Region> {
     public ChunkReader getChunk(int chunkX, int chunkZ) {
         int regionX = generator.chunkToRegion(chunkX);
         int regionZ = generator.chunkToRegion(chunkZ);
-        long regionId = getId(regionX, regionZ);
+        long regionId = Region.getRegionId(regionX, regionZ);
         return cache.map(regionId, syncGetter, entry -> entry.get().getChunk(chunkX, chunkZ));
     }
 
@@ -76,7 +76,7 @@ public class RegionCache implements Disposable.Listener<Region> {
     }
 
     public Region getIfPresent(int regionX, int regionZ) {
-        CacheEntry<Region> entry = cache.get(getId(regionX, regionZ));
+        CacheEntry<Region> entry = cache.get(Region.getRegionId(regionX, regionZ));
         if (entry == null || !entry.isDone()) {
             return null;
         }
@@ -84,11 +84,11 @@ public class RegionCache implements Disposable.Listener<Region> {
     }
 
     public CacheEntry<Region> getEntry(int regionX, int regionZ) {
-        return cache.computeIfAbsent(getId(regionX, regionZ), syncGetter);
+        return cache.computeIfAbsent(Region.getRegionId(regionX, regionZ), syncGetter);
     }
 
     public void queueRegion(int regionX, int regionZ) {
-        cache.computeIfAbsent(getId(regionX, regionZ), asyncGetter);
+        cache.computeIfAbsent(Region.getRegionId(regionX, regionZ), asyncGetter);
     }
 
     private LongFunction<CacheEntry<Region>> syncGetter() {
@@ -108,9 +108,5 @@ public class RegionCache implements Disposable.Listener<Region> {
                 queueRegion(rx + dx, rz + dz);
             }
         }
-    }
-
-    public static long getId(int regionX, int regionZ) {
-        return (long) regionX & 4294967295L | ((long) regionZ & 4294967295L) << 32;
     }
 }
