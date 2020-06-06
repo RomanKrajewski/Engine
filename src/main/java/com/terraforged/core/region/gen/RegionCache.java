@@ -48,6 +48,7 @@ public class RegionCache implements Disposable.Listener<Region> {
         this.asyncGetter = asyncGetter();
         this.queuing = queueNeighbours;
         this.cache = new Cache<>(60, 30, TimeUnit.SECONDS);
+        generator.setListener(this);
     }
 
     @Override
@@ -62,8 +63,8 @@ public class RegionCache implements Disposable.Listener<Region> {
     public ChunkReader getChunk(int chunkX, int chunkZ) {
         int regionX = generator.chunkToRegion(chunkX);
         int regionZ = generator.chunkToRegion(chunkZ);
-        Region region = getRegion(regionX, regionZ);
-        return region.getChunk(chunkX, chunkZ);
+        long regionId = getId(regionX, regionZ);
+        return cache.map(regionId, syncGetter, entry -> entry.get().getChunk(chunkX, chunkZ));
     }
 
     public Region getRegion(int regionX, int regionZ) {

@@ -26,21 +26,27 @@
 package com.terraforged.core.region;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Disposable;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.batch.Batcher;
+import com.terraforged.core.concurrent.cache.SafeCloseable;
 import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.region.chunk.ChunkBatchTask;
 import com.terraforged.core.region.chunk.ChunkGenTask;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.region.chunk.ChunkWriter;
+import com.terraforged.core.region.gen.RegionResources;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.Rivermap;
 import com.terraforged.world.terrain.decorator.Decorator;
 import me.dags.noise.util.NoiseUtil;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class Region {
+public class Region implements Disposable, SafeCloseable {
 
     private final int regionX;
     private final int regionZ;
@@ -49,15 +55,21 @@ public class Region {
     private final int blockX;
     private final int blockZ;
     private final int border;
+    private final int chunkCount;
     private final Size blockSize;
     private final Size chunkSize;
+    private final Resource<Cell[]> blockResource;
+    private final Resource<GenChunk[]> chunkResource;
     private final Cell[] blocks;
     private final GenChunk[] chunks;
-    private final int disposableChunks;
+    private final AtomicInteger lock = new AtomicInteger();
+    private final AtomicInteger disposed = new AtomicInteger();
+    private final Disposable.Listener<Region> listener;
 
-    public Region(int regionX, int regionZ, int size, int borderChunks) {
+    public Region(int regionX, int regionZ, int size, int borderChunks, RegionResources resources, Listener<Region> listener) {
         this.regionX = regionX;
         this.regionZ = regionZ;
+        this.listener = listener;
         this.chunkX = regionX << size;
         this.chunkZ = regionZ << size;
         this.blockX = Size.chunkToBlock(chunkX);
@@ -65,9 +77,37 @@ public class Region {
         this.border = borderChunks;
         this.chunkSize = Size.chunks(size, borderChunks);
         this.blockSize = Size.blocks(size, borderChunks);
-        this.disposableChunks = chunkSize.size * chunkSize.size;
-        this.blocks = new Cell[blockSize.total * blockSize.total];
-        this.chunks = new GenChunk[chunkSize.total * chunkSize.total];
+        this.chunkCount = chunkSize.size * chunkSize.size;
+        this.blockResource = resources.blocks.get(blockSize.arraySize);
+        this.chunkResource = resources.chunks.get(chunkSize.arraySize);
+        this.blocks = blockResource.get();
+        this.chunks = chunkResource.get();
+    }
+
+    @Override
+    public void dispose() {
+        if (disposed.incrementAndGet() >= chunkCount) {
+            listener.onDispose(this);
+        }
+    }
+
+    @Override
+    public void close() {
+        if (lock.compareAndSet(0, -1)) {
+            if (blockResource.isOpen()) {
+                for (Cell cell : blocks) {
+                    if (cell != null) {
+                        cell.reset();
+                    }
+                }
+                blockResource.close();
+            }
+
+            if (chunkResource.isOpen()) {
+                Arrays.fill(chunks, null);
+                chunkResource.close();
+            }
+        }
     }
 
     public long getRegionId() {
@@ -135,7 +175,7 @@ public class Region {
         int relChunkX = chunkSize.border + chunkSize.mask(chunkX);
         int relChunkZ = chunkSize.border + chunkSize.mask(chunkZ);
         int index = chunkSize.indexOf(relChunkX, relChunkZ);
-        return chunks[index];
+        return chunks[index].lock();
     }
 
     public void generate(Consumer<ChunkWriter> consumer) {
@@ -373,6 +413,24 @@ public class Region {
         }
 
         @Override
+        public void dispose() {
+            Region.this.dispose();
+        }
+
+        @Override
+        public void close() {
+            lock.decrementAndGet();
+        }
+
+        public GenChunk lock() {
+            int i = lock.getAndIncrement();
+            if (i < 0) {
+                new RuntimeException().printStackTrace();
+            }
+            return this;
+        }
+
+        @Override
         public int getChunkX() {
             return chunkX;
         }
@@ -424,7 +482,7 @@ public class Region {
         @Override
         public Cell getCellRaw(int x, int z) {
             int index = blockSize.indexOf(x, z);
-            if (index < 0 || index >= blockSize.maxIndex) {
+            if (index < 0 || index >= blockSize.arraySize) {
                 return Cell.empty();
             }
             return blocks[index];

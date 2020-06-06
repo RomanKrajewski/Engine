@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
@@ -15,7 +16,7 @@ public class SynchronizedLongMap<V> {
 
     public SynchronizedLongMap(int size) {
         this.map = new Long2ObjectOpenHashMap<>(size);
-        this.lock = this;
+        lock = this;
     }
 
     public void remove(long key) {
@@ -48,6 +49,12 @@ public class SynchronizedLongMap<V> {
     public V computeIfAbsent(long key, LongFunction<V> func) {
         synchronized (lock) {
             return map.computeIfAbsent(key, func);
+        }
+    }
+
+    public <T> T map(long key, LongFunction<V> func, Function<V, T> mapper) {
+        synchronized (lock) {
+            return mapper.apply(map.computeIfAbsent(key, func));
         }
     }
 

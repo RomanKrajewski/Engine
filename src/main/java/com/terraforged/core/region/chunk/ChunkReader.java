@@ -26,8 +26,10 @@
 package com.terraforged.core.region.chunk;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Disposable;
+import com.terraforged.core.concurrent.cache.SafeCloseable;
 
-public interface ChunkReader extends ChunkHolder {
+public interface ChunkReader extends ChunkHolder, SafeCloseable, Disposable {
 
     Cell getCell(int dx, int dz);
 
@@ -70,5 +72,10 @@ public interface ChunkReader extends ChunkHolder {
                 visitor.visit(getCell(dx, dz), dx, dz, context);
             }
         }
+    }
+
+    @Override
+    default void close() {
+
     }
 }

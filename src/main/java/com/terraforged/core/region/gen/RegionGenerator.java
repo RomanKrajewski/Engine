@@ -25,6 +25,7 @@
 
 package com.terraforged.core.region.gen;
 
+import com.terraforged.core.concurrent.Disposable;
 import com.terraforged.core.concurrent.cache.CacheEntry;
 import com.terraforged.core.concurrent.thread.ThreadPool;
 import com.terraforged.core.region.Region;
@@ -38,6 +39,10 @@ public class RegionGenerator {
     protected final int batchSize;
     protected final ThreadPool threadPool;
     protected final WorldGenerator generator;
+    private final RegionResources resources = new RegionResources();
+
+    private Disposable.Listener<Region> listener = r -> {
+    };
 
     protected RegionGenerator(Builder builder) {
         this.factor = builder.factor;
@@ -45,6 +50,10 @@ public class RegionGenerator {
         this.batchSize = builder.batchSize;
         this.threadPool = builder.threadPool;
         this.generator = builder.factory.get();
+    }
+
+    protected void setListener(Disposable.Listener<Region> listener) {
+        this.listener = listener;
     }
 
     public int chunkToRegion(int i) {
@@ -76,21 +85,21 @@ public class RegionGenerator {
     }
 
     public Region generateRegion(int regionX, int regionZ) {
-        Region region = createRegion(regionX, regionZ, factor, border);
+        Region region = createEmptyRegion(regionX, regionZ);
         region.generate(generator.getHeightmap());
         postProcess(region);
         return region;
     }
 
     public Region generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
-        Region region = createRegion(0, 0, factor, border);
+        Region region = createEmptyRegion(0, 0);
         region.generate(generator.getHeightmap(), centerX, centerZ, zoom);
         postProcess(region, centerX, centerZ, zoom, filter);
         return region;
     }
 
-    protected Region createRegion(int regionX, int regionZ, int size, int borderChunks) {
-        return new Region(regionX, regionZ, size, borderChunks);
+    protected Region createEmptyRegion(int regionX, int regionZ) {
+        return new Region(regionX, regionZ, factor, border, resources, listener);
     }
 
     protected void postProcess(Region region) {

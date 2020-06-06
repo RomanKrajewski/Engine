@@ -28,12 +28,10 @@ public class CacheEntry<T> implements ExpiringEntry {
 
     @Override
     public void close() {
-        if (value instanceof SafeCloseable) {
-            ((SafeCloseable) value).close();
-        } else if (value instanceof Closeable) {
+        if (value instanceof AutoCloseable) {
             try {
-                ((Closeable) value).close();
-            } catch (IOException e) {
+                ((AutoCloseable) value).close();
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }

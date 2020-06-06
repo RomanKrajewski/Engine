@@ -1,5 +1,5 @@
 /*
- *   
+ *
  * MIT License
  *
  * Copyright (c) 2020 TerraForged
@@ -34,8 +34,6 @@ import java.util.function.Supplier;
 
 public class ObjectPool<T> {
 
-    private transient long misses = 0L;
-
     private final int capacity;
     private final List<Item<T>> pool;
     private final Supplier<? extends T> supplier;
@@ -51,13 +49,8 @@ public class ObjectPool<T> {
             if (pool.size() > 0) {
                 return pool.remove(pool.size() - 1).retain();
             }
-            misses++;
         }
         return new Item<>(supplier.get(), this);
-    }
-
-    public long getMisses() {
-        return Math.max(0, misses - capacity);
     }
 
     public int size() {

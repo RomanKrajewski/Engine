@@ -9,9 +9,6 @@ import java.util.function.Supplier;
 
 public class ArrayPool<T> {
 
-    private volatile long time = 0;
-    private volatile long misses = 0;
-
     private final int capacity;
     private final IntFunction<T[]> constructor;
     private final List<ArrayPool.Item<T>> pool;
@@ -25,32 +22,13 @@ public class ArrayPool<T> {
     public Resource<T[]> get(int size) {
         synchronized (pool) {
             if (pool.size() > 0) {
-                ArrayPool.Item<T> resource = pool.get(pool.size() - 1);
+                ArrayPool.Item<T> resource = pool.remove(pool.size() - 1);
                 if (resource.get().length >= size) {
                     return resource.retain();
                 }
             }
-            misses++;
         }
         return new ArrayPool.Item<>(constructor.apply(size), this);
-    }
-
-    public void stats() {
-        long now = System.currentTimeMillis();
-        if (now - time > 1000) {
-            time = now;
-            long misses = getMisses();
-            if (misses > 0) {
-                this.misses = capacity;
-                System.out.println("Misses=" + misses);
-            }
-        }
-    }
-
-    public long getMisses() {
-        // a 'miss' occurs when we have to create a new instance because the pool is being fully utilized
-        // the pool is lazily filled so we can expect the miss count to be at least equal to the pool capacity
-        return Math.max(0, misses - capacity);
     }
 
     public int size() {

@@ -4,6 +4,7 @@ import com.terraforged.core.concurrent.thread.ThreadPool;
 import com.terraforged.core.concurrent.thread.ThreadPools;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.LongFunction;
 
 public class Cache<V extends ExpiringEntry> implements Runnable {
@@ -37,6 +38,12 @@ public class Cache<V extends ExpiringEntry> implements Runnable {
         V v = map.computeIfAbsent(key, func);
         queueUpdate();
         return v;
+    }
+
+    public <T> T map(long key, LongFunction<V> func, Function<V, T> mapper) {
+        T t = map.map(key, func, mapper);
+        queueUpdate();
+        return t;
     }
 
     private void queueUpdate() {
