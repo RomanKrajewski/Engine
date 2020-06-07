@@ -32,8 +32,6 @@ import com.terraforged.core.settings.Settings;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.continent.Continent;
-import com.terraforged.world.heightmap.Heightmap;
-import com.terraforged.world.heightmap.WorldHeightmap;
 import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
@@ -160,8 +158,8 @@ public class ClimateModule {
         float continentEdge = continent.getEdgeNoise(posX, posZ);
 
         if (mask) {
-            modifyTerrain(cell, continentEdge);
             cell.biomeEdge = edgeValue(edgeDistance, edgeDistance2);
+            modifyTerrain(cell, continentEdge);
         }
 
         modifyMoisture(cell, continentEdge);

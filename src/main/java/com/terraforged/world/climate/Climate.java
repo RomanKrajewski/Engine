@@ -84,7 +84,7 @@ public class Climate {
     public void apply(Cell cell, float x, float z, WorldHeightmap heightmap) {
         biomeNoise.apply(cell, x, z, true);
 
-        float edgeBlend = 0.0F;
+        float edgeBlend = 0.4F;
 
         if (cell.value <= levels.water) {
             if (cell.terrain == terrains.coast) {
@@ -97,12 +97,7 @@ public class Climate {
             float dz = getOffsetZ(x, z, distance);
             x += dx;
             z += dz;
-            Terrain terrain = cell.terrain;
             biomeNoise.apply(cell, x, z, false);
-            try (Resource<Cell> lookup = Cell.pooled()) {
-                heightmap.tag(lookup.get(), x, z);
-                cell.terrain = lookup.get().terrain;
-            }
         }
 
         modifyTemp(cell, x, z);
