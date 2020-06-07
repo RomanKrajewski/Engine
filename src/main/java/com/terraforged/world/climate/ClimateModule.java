@@ -168,13 +168,16 @@ public class ClimateModule {
     }
 
     private void modifyMoisture(Cell cell, float continentEdge) {
-        if (continentEdge < 0.7F) {
-            float alpha = (0.7F - continentEdge) / 0.3F;
-            float multiplier = 1F + (alpha * 0.3F);
+        float limit = 0.75F;
+        float range = 1 - limit;
+
+        if (continentEdge < limit) {
+            float alpha = (limit - continentEdge) / range;
+            float multiplier = 1F + (alpha * range);
             cell.moisture = NoiseUtil.clamp(cell.moisture * multiplier, 0, 1F);
         } else {
-            float alpha = (continentEdge - 0.7F) / 0.3F;
-            float multiplier = 1F - (alpha * 0.3F);
+            float alpha = (continentEdge - limit) / range;
+            float multiplier = 1F - (alpha * range);
             cell.moisture *= multiplier;
         }
     }

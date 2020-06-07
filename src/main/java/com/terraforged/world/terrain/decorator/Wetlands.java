@@ -46,7 +46,7 @@ public class Wetlands implements Decorator {
         this.wetlands = terrain.wetlands;
         this.poolBase = levels.water(-3);
         this.bankHeight = levels.water(2);
-        this.module = Source.perlin(seed.next(), 12, 1).clamp(0.35, 0.65).map(0, 1);
+        this.module = Source.perlin(seed.next(), 10, 1).clamp(0.35, 0.65).map(0, 1);
     }
 
     @Override
@@ -60,12 +60,12 @@ public class Wetlands implements Decorator {
             return false;
         }
 
-        float moistAlpha = getAlpha(cell.moisture, 0.7F, 1F);
+        float moistAlpha = getAlpha(cell.moisture, 0.3F, 0.7F);
         if (moistAlpha == 0) {
             return false;
         }
 
-        float biomeAlpha = getAlpha(cell.biomeEdge, 0.2F, 0.7F);
+        float biomeAlpha = getAlpha(cell.biomeEdge, 0.15F, 0.5F);
         if (biomeAlpha == 0F) {
             return false;
         }
