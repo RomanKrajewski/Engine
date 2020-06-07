@@ -33,7 +33,7 @@ public class BeachDetect implements Filter, Filter.Visitor {
                 float gx = grad(e, w, cell);
                 float gz = grad(n, s, cell);
                 float d2 = (gx * gx + gz * gz);
-                if (d2 < 0.25F) {
+                if (d2 < 0.275F) {
                     cell.terrain = terrains.beach;
                 }
             }
