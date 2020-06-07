@@ -34,6 +34,7 @@ public class LakeConfig {
     public final float chance;
     public final float sizeMin;
     public final float sizeMax;
+    public final float sizeRange;
     public final float bankMin;
     public final float bankMax;
     public final float distanceMin;
@@ -44,6 +45,7 @@ public class LakeConfig {
         chance = builder.chance;
         sizeMin = builder.sizeMin;
         sizeMax = builder.sizeMax;
+        sizeRange = sizeMax - sizeMin;
         bankMin = builder.bankMin;
         bankMax = builder.bankMax;
         distanceMin = builder.distanceMin;

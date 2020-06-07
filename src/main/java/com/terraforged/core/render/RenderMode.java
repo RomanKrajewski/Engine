@@ -11,6 +11,12 @@ public enum RenderMode {
         @Override
         public void fill(Cell cell, float height, RenderBuffer buffer, RenderSettings context) {
             Color c = cell.biomeType.getColor();
+            if (cell.terrain == context.terrain.beach) {
+                c = Color.YELLOW;
+            }
+            if (cell.terrain == context.terrain.coast) {
+                c = Color.RED;
+            }
             float[] hsb = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
             color(buffer, hsb[0] * 100, hsb[1] * 100, hsb[2] * 100, height, 0.5F, context.levels);
         }

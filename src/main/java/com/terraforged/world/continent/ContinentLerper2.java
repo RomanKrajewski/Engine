@@ -76,9 +76,6 @@ public class ContinentLerper2 implements Populator {
         float upperVal = cell.value;
 
         cell.value = NoiseUtil.lerp(lowerVal, upperVal, alpha);
-        if (select < midpoint) {
-            cell.terrain = lowerType;
-        }
     }
 
     @Override
@@ -94,10 +91,6 @@ public class ContinentLerper2 implements Populator {
             return;
         }
 
-        if (select < tagThreshold) {
-            lower.tag(cell, x, y);
-        } else {
-            upper.tag(cell, x, y);
-        }
+        upper.tag(cell, x, y);
     }
 }

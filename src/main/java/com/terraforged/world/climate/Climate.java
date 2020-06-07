@@ -31,6 +31,7 @@ import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.Continent;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.heightmap.WorldHeightmap;
+import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
@@ -83,7 +84,7 @@ public class Climate {
     public void apply(Cell cell, float x, float z, WorldHeightmap heightmap) {
         biomeNoise.apply(cell, x, z, true);
 
-        float edgeBlend = 0.4F;
+        float edgeBlend = 0.0F;
 
         if (cell.value <= levels.water) {
             if (cell.terrain == terrains.coast) {
@@ -96,6 +97,7 @@ public class Climate {
             float dz = getOffsetZ(x, z, distance);
             x += dx;
             z += dz;
+            Terrain terrain = cell.terrain;
             biomeNoise.apply(cell, x, z, false);
             try (Resource<Cell> lookup = Cell.pooled()) {
                 heightmap.tag(lookup.get(), x, z);

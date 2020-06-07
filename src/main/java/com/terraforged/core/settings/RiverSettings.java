@@ -111,7 +111,7 @@ public class RiverSettings {
 
         @Range(min = 50, max = 500)
         @Comment("The maximum size of the lake")
-        public int sizeMax = 200;
+        public int sizeMax = 150;
 
         @Range(min = 1, max = 10)
         @Comment("The minimum bank height")

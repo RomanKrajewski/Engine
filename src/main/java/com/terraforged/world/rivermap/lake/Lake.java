@@ -41,8 +41,10 @@ public class Lake extends TerrainPopulator {
     protected final float bankAlphaMin;
     protected final float bankAlphaMax;
     protected final float bankAlphaRange;
+    private final float depth;
+    private final float bankMin;
+    private final float bankMax;
     protected final Vec2f center;
-    protected final LakeConfig config;
     protected final Terrains terrains;
 
     public Lake(Vec2f center, float radius, float multiplier, LakeConfig config, Terrains terrains) {
@@ -51,7 +53,9 @@ public class Lake extends TerrainPopulator {
         float valley = River.VALLEY_WIDTH * multiplier;
         this.valley2 = valley * valley;
         this.center = center;
-        this.config = config;
+        this.depth = config.depth;
+        this.bankMin = config.bankMin;
+        this.bankMax = config.bankMax;
         this.bankAlphaMin = config.bankMin;
         this.bankAlphaMax = Math.min(1, bankAlphaMin + 0.275F);
         this.bankAlphaRange = bankAlphaMax - bankAlphaMin;
@@ -82,7 +86,7 @@ public class Lake extends TerrainPopulator {
 
         if (distance2 < lakeDistance2) {
             float depthAlpha = 1F - (distance2 / lakeDistance2);
-            float lakeDepth = Math.min(cell.value, config.depth);
+            float lakeDepth = Math.min(cell.value, depth);
             cell.value = NoiseUtil.lerp(cell.value, lakeDepth, depthAlpha);
             cell.riverMask *= (1 - depthAlpha);
             tag(cell);
@@ -98,6 +102,11 @@ public class Lake extends TerrainPopulator {
         cell.terrain = terrains.lake;
     }
 
+    public boolean overlaps(float x, float z, float radius2) {
+        float dist2 = getDistance2(x, z);
+        return dist2 < lakeDistance2 + radius2;
+    }
+
     protected float getDistance2(float x, float z) {
         float dx = center.x - x;
         float dz = center.y - z;
@@ -108,6 +117,6 @@ public class Lake extends TerrainPopulator {
         // scale bank height based on elevation of the terrain (higher terrain == taller banks)
         float bankHeightAlpha = NoiseUtil.map(cell.value, bankAlphaMin, bankAlphaMax, bankAlphaRange);
         // lerp between the min and max heights
-        return NoiseUtil.lerp(config.bankMin, config.bankMax, bankHeightAlpha);
+        return NoiseUtil.lerp(bankMin, bankMax, bankHeightAlpha);
     }
 }

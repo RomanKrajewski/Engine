@@ -29,22 +29,11 @@ public class RiverGenerator {
     // random valley width for a river fork
     private static final Variance FORK_VALLEY = Variance.of(0.4, 0.75);
 
-    // random distance from continent center to start of a main river
-    private static final Variance MAIN_START = Variance.of(0.1, 0.2);
-
-    // random distance along a river before forks can generate
-    private static final Variance FORK_START = Variance.of(0.1, 0.3);
-
     // random angle between a river and it's fork
     private static final Variance FORK_ANGLE = Variance.of(0.05, 0.1);
 
     // random spacing between forks along a given river
     private static final Variance MAIN_SPACING = Variance.of(0.05, 0.2);
-
-    private static final Variance FORK_SPACING = Variance.of(0.1, 0.3);
-
-    // random distance from continent center to position of a lake
-    private static final Variance LAKE_POSITION = Variance.of(0.5, 0.4);
 
     private final int count;
     private final LakeConfig lake;
@@ -229,8 +218,11 @@ public class RiverGenerator {
 
     private void addLake(River river, Random random, GenWarp warp, List<Lake> lakes) {
         if (random.nextFloat() <= lake.chance) {
-            float lakeSize = lake.sizeMin + random.nextFloat() * lake.sizeMax;
+            float lakeSize = lake.sizeMin + random.nextFloat() * lake.sizeRange;
             Vec2f center = river.bounds.pos(0.04F);
+            if (lakeOverlapsOther(center, lakeSize, lakes)) {
+                return;
+            }
             float x1 = warp.river.getX(center.x, center.y);
             float z1 = warp.river.getY(center.x, center.y);
             lakes.add(new Lake(new Vec2f(x1, z1), lakeSize, 1, lake, terrain));
@@ -249,6 +241,16 @@ public class RiverGenerator {
     private boolean lakeOverlaps(Vec2f lake, float size, List<River> rivers) {
         for (River other : rivers) {
             if (!other.main && other.bounds.overlaps(lake, size)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean lakeOverlapsOther(Vec2f lake, float size, List<Lake> lakes) {
+        float dist2 = size * size;
+        for (Lake other : lakes) {
+            if (other.overlaps(lake.x, lake.y, dist2)) {
                 return true;
             }
         }

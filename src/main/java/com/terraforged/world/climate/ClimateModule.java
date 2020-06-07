@@ -32,6 +32,9 @@ import com.terraforged.core.settings.Settings;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.continent.Continent;
+import com.terraforged.world.heightmap.Heightmap;
+import com.terraforged.world.heightmap.WorldHeightmap;
+import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.DistanceFunc;
@@ -55,6 +58,7 @@ public class ClimateModule {
     private final Module moisture;
     private final Module temperature;
     private final Continent continent;
+    private final Terrains terrains;
 
     public ClimateModule(Continent continent, GeneratorContext context) {
         Seed seed = context.seed;
@@ -71,6 +75,7 @@ public class ClimateModule {
         int tempScale = NoiseUtil.round(temperatureSize * biomeFreq);
         int warpScale = settings.climate.biomeShape.biomeWarpScale;
 
+        this.terrains = context.terrain;
         this.continent = continent;
         this.seed = seed.next();
         this.edgeClamp = 1F;
@@ -146,19 +151,25 @@ public class ClimateModule {
         float biomeX = cellX + vec2f.x;
         float biomeY = cellY + vec2f.y;
 
-        if (mask) {
-            cell.biomeEdge = edgeValue(edgeDistance, edgeDistance2);
-        }
-
         cell.biome = cellValue(seed, cellX, cellY);
         cell.moisture = moisture.getValue(biomeX, biomeY);
         cell.temperature = temperature.getValue(biomeX, biomeY);
-        modifyMoisture(cell, biomeX / biomeFreq, biomeY / biomeFreq);
+
+        int posX = (int) (biomeX / biomeFreq);
+        int posZ = (int) (biomeY / biomeFreq);
+        float continentEdge = continent.getEdgeNoise(posX, posZ);
+
+        if (mask) {
+            modifyTerrain(cell, continentEdge);
+            cell.biomeEdge = edgeValue(edgeDistance, edgeDistance2);
+        }
+
+        modifyMoisture(cell, continentEdge);
+
         cell.biomeType = BiomeType.get(cell.temperature, cell.moisture);
     }
 
-    private void modifyMoisture(Cell cell, float x, float y) {
-        float continentEdge = continent.getEdgeNoise(x, y);
+    private void modifyMoisture(Cell cell, float continentEdge) {
         if (continentEdge < 0.7F) {
             float alpha = (0.7F - continentEdge) / 0.3F;
             float multiplier = 1F + (alpha * 0.3F);
@@ -167,6 +178,12 @@ public class ClimateModule {
             float alpha = (continentEdge - 0.7F) / 0.3F;
             float multiplier = 1F - (alpha * 0.3F);
             cell.moisture *= multiplier;
+        }
+    }
+
+    private void modifyTerrain(Cell cell, float continentEdge) {
+        if (continentEdge <= 0.65F) {
+            cell.terrain = terrains.coast;
         }
     }
 
