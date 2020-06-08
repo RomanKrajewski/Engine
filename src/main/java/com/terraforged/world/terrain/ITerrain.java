@@ -2,6 +2,10 @@ package com.terraforged.world.terrain;
 
 public interface ITerrain {
 
+    default float erosionModifier() {
+        return 1F;
+    }
+
     default boolean isFlat() {
         return false;
     }
@@ -45,6 +49,11 @@ public interface ITerrain {
     interface Delegate extends ITerrain {
 
         TerrainType getType();
+
+        @Override
+        default float erosionModifier() {
+            return getType().erosionModifier();
+        }
 
         @Override
         default boolean isFlat() {

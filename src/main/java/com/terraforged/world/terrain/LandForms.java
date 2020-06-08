@@ -31,6 +31,7 @@ import com.terraforged.world.heightmap.Levels;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.EdgeFunc;
+import me.dags.noise.func.Interpolation;
 
 public class LandForms {
 
@@ -207,7 +208,7 @@ public class LandForms {
     }
 
     public Module badlands(Seed seed) {
-        Module mask = Source.perlin(seed.next(), 120, 2).clamp(0.35, 0.65).map(0, 1);
+        Module mask = Source.perlin(seed.next(), 200, 2).clamp(0.35, 0.65).map(0, 1);
         Module hills = Source.ridge(seed.next(), 300, 4)
                 .warp(seed.next(), 400, 2, 100)
                 .mult(mask);
@@ -216,12 +217,12 @@ public class LandForms {
         double alpha = 1 - modulation;
         Module mod1 = hills.warp(seed.next(), 100, 1, 50).scale(modulation);
 
-        Module lowFreq = hills.steps(4).scale(alpha).add(mod1);
-        Module highFreq = hills.steps(10).scale(alpha).add(mod1);
+        Module lowFreq = hills.steps(4, 0.6, 0.7).scale(alpha).add(mod1);
+        Module highFreq = hills.steps(10, 0.6, 0.7).scale(alpha).add(mod1);
         Module detail = lowFreq.add(highFreq);
 
         Module mod2 = hills.mult(Source.perlin(seed.next(), 200, 3).scale(modulation));
-        Module shape = hills.terrace(0.1, 1, 4, 0.01)
+        Module shape = hills.steps(4, 0.65, 0.75, Interpolation.CURVE3)
                 .scale(alpha)
                 .add(mod2)
                 .scale(alpha);

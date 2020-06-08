@@ -1,8 +1,10 @@
 package com.terraforged.core.render;
 
+import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.cache.CacheEntry;
 import com.terraforged.core.concurrent.thread.ThreadPool;
 import com.terraforged.core.concurrent.thread.ThreadPools;
+import com.terraforged.core.region.Region;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.region.gen.RegionGenerator;
 
@@ -42,6 +44,26 @@ public class RenderWorld {
             }
         }
         return false;
+    }
+
+    public Cell getCenter() {
+        float cx = regionCount / 2F;
+        float cz = regionCount / 2F;
+
+        int rx = (int) cx;
+        int rz = (int) cz;
+        int index = rx + regionCount * rz;
+        RenderRegion renderRegion = view[index];
+        if (renderRegion == null) {
+            return Cell.empty();
+        }
+
+        float ox = cx - rx;
+        float oz = cz - rz;
+        Region region = renderRegion.getRegion();
+        int dx = (int) (region.getBlockSize().size * ox);
+        int dz = (int) (region.getBlockSize().size * oz);
+        return region.getCell(dx, dz);
     }
 
     public void redraw() {

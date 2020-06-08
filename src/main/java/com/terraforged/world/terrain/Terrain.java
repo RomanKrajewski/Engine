@@ -159,7 +159,12 @@ public class Terrain implements ITerrain.Delegate {
     }
 
     public static Terrain badlands(Settings settings) {
-        return new Terrain("badlands", settings.terrain.badlands.weight, TerrainType.FLATLAND);
+        return new Terrain("badlands", settings.terrain.badlands.weight, TerrainType.FLATLAND) {
+            @Override
+            public float erosionModifier() {
+                return 0.15F;
+            }
+        };
     }
 
     public static Terrain plateau(Settings settings) {

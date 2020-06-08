@@ -26,13 +26,19 @@
 package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
+import me.dags.noise.util.NoiseUtil;
 
 public interface Modifier {
 
     float getModifier(float value);
 
     default float modify(Cell cell, float value) {
-        return value * getModifier(cell.value);
+        float modifier = cell.terrain.erosionModifier();
+        if (modifier != 1F) {
+            float alpha = NoiseUtil.map(cell.regionEdge, 0F, 0.15F, 0.15F);
+            modifier = NoiseUtil.lerp(1F, modifier, alpha);
+        }
+        return value * getModifier(cell.value) * modifier;
     }
 
     default Modifier invert() {
