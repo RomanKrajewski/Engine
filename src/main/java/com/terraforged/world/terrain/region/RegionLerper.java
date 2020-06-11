@@ -27,7 +27,7 @@ package com.terraforged.world.terrain.region;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.util.NoiseUtil;
 
 public class RegionLerper implements Populator {
 

@@ -1,7 +1,7 @@
 package com.terraforged.world.continent;
 
 import com.terraforged.core.cell.Populator;
-import me.dags.noise.func.DistanceFunc;
+import com.terraforged.n2d.func.DistanceFunc;
 
 public interface Continent extends Populator {
 

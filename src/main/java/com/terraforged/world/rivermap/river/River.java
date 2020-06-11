@@ -29,12 +29,12 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.TerrainPopulator;
 import com.terraforged.world.terrain.Terrains;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.func.CurveFunc;
-import me.dags.noise.func.SCurve;
-import me.dags.noise.source.Line;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.func.CurveFunc;
+import com.terraforged.n2d.func.SCurve;
+import com.terraforged.n2d.source.Line;
+import com.terraforged.n2d.util.NoiseUtil;
 
 import java.util.Random;
 
@@ -191,6 +191,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
             if (cell.value < bedHeight) {
                 cell.value = bedHeight;
                 cell.erosionMask = true;
+                tag(cell, terrains.riverBanks);
             }
             return true;
         }

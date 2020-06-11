@@ -1,7 +1,7 @@
 package com.terraforged.core.util;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,6 +1,6 @@
 package com.terraforged.core.util.poisson;
 
-import me.dags.noise.Source;
+import com.terraforged.n2d.Source;
 
 import javax.swing.*;
 import java.awt.*;

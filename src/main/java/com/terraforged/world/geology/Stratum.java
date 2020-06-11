@@ -25,8 +25,8 @@
 
 package com.terraforged.world.geology;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
 
 public class Stratum<T> {
 

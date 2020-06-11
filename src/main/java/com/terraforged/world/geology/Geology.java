@@ -25,7 +25,7 @@
 
 package com.terraforged.world.geology;
 
-import me.dags.noise.Module;
+import com.terraforged.n2d.Module;
 
 import java.util.ArrayList;
 import java.util.List;

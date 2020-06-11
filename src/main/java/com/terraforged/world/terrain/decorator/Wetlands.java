@@ -30,9 +30,9 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.Terrains;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.util.NoiseUtil;
 
 public class Wetlands implements Decorator {
 

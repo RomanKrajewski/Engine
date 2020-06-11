@@ -26,7 +26,8 @@
 package com.terraforged.world.biome;
 
 import com.terraforged.core.cell.Cell;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.n2d.util.Vec2f;
 
 import java.awt.*;
 
@@ -50,6 +51,11 @@ public enum BiomeType {
     private final Color lookup;
     private final Color color;
 
+    private float minTemp;
+    private float maxTemp;
+    private float minMoist;
+    private float maxMoist;
+
     BiomeType(int r, int g, int b, Color color) {
         this(new Color(r, g, b), color);
     }
@@ -61,6 +67,30 @@ public enum BiomeType {
 
     Color getLookup() {
         return lookup;
+    }
+
+    public float mapTemperature(float value) {
+        return (value - minTemp) / (maxTemp - minTemp);
+    }
+
+    public float mapMoisture(float value) {
+        return (value - minMoist) / (maxMoist - minMoist);
+    }
+
+    public float getMinMoisture() {
+        return minMoist;
+    }
+
+    public float getMaxMoisture() {
+        return maxMoist;
+    }
+
+    public float getMinTemperature() {
+        return minTemp;
+    }
+
+    public float getMaxTemperature() {
+        return maxTemp;
     }
 
     public Color getColor() {
@@ -87,22 +117,6 @@ public enum BiomeType {
         return getType(x, y);
     }
 
-    public static float getEdge(float temperature, float moisture) {
-        return getEdgeCurve(temperature, moisture);
-    }
-
-    public static float getEdgeLinear(float temperature, float moisture) {
-        int x = NoiseUtil.round(MAX * temperature);
-        int y = getYLinear(x, temperature, moisture);
-        return getEdge(x, y);
-    }
-
-    public static float getEdgeCurve(float temperature, float moisture) {
-        int x = NoiseUtil.round(MAX * temperature);
-        int y = getYCurve(x, temperature, moisture);
-        return getEdge(x, y);
-    }
-
     public static void apply(Cell cell) {
         applyCurve(cell);
     }
@@ -119,10 +133,6 @@ public enum BiomeType {
         return BiomeTypeLoader.getInstance().getTypeMap()[y][x];
     }
 
-    private static float getEdge(int x, int y) {
-        return BiomeTypeLoader.getInstance().getEdgeMap()[y][x];
-    }
-
     private static int getYLinear(int x, float temperature, float moisture) {
         if (moisture > temperature) {
             return x;
@@ -134,5 +144,19 @@ public enum BiomeType {
         int max = x + ((MAX - x) / 2);
         int y = NoiseUtil.round(max * moisture);
         return Math.min(x, y);
+    }
+
+    private static void init() {
+        for (BiomeType type : BiomeType.values()) {
+            Vec2f[] ranges = BiomeTypeLoader.getInstance().getRanges(type);
+            type.minTemp = ranges[0].x;
+            type.maxTemp = ranges[0].y;
+            type.minMoist = ranges[1].x;
+            type.maxMoist = ranges[1].y;
+        }
+    }
+
+    static {
+        init();
     }
 }

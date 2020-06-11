@@ -6,7 +6,7 @@ import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.gen.GenWarp;
 import com.terraforged.world.rivermap.lake.Lake;
 import com.terraforged.world.rivermap.river.River;
-import me.dags.noise.domain.Domain;
+import com.terraforged.n2d.domain.Domain;
 
 import java.util.List;
 

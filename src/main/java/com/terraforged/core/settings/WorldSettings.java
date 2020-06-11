@@ -5,7 +5,7 @@ import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
 import com.terraforged.world.continent.ContinentMode;
 import com.terraforged.world.continent.SpawnType;
-import me.dags.noise.func.DistanceFunc;
+import com.terraforged.n2d.func.DistanceFunc;
 
 @Serializable
 public class WorldSettings {

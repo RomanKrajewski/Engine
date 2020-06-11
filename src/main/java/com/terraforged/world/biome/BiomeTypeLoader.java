@@ -25,33 +25,48 @@
 
 package com.terraforged.world.biome;
 
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.n2d.util.Vec2f;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 public class BiomeTypeLoader {
 
     private static BiomeTypeLoader instance;
 
-    private final float[][] edges = new float[BiomeType.RESOLUTION][BiomeType.RESOLUTION];
     private final BiomeType[][] map = new BiomeType[BiomeType.RESOLUTION][BiomeType.RESOLUTION];
 
     public BiomeTypeLoader() {
         generateTypeMap();
-        generateEdgeMap();
     }
 
     public BiomeType[][] getTypeMap() {
         return map;
     }
 
-    public float[][] getEdgeMap() {
-        return edges;
+    public Vec2f[] getRanges(BiomeType type) {
+        float minTemp = 1F;
+        float maxTemp = 0F;
+        float minMoist = 1F;
+        float maxMoist = 0F;
+        for (int moist = 0; moist < map.length; moist++) {
+            BiomeType[] row = map[moist];
+            for (int temp = 0; temp < row.length; temp++) {
+                BiomeType t = row[temp];
+                if (t == type) {
+                    float temperature = temp / (float) (row.length - 1);
+                    float moisture = moist / (float) (map.length - 1);
+                    minTemp = Math.min(minTemp, temperature);
+                    maxTemp = Math.max(maxTemp, temperature);
+                    minMoist = Math.min(minMoist, moisture);
+                    maxMoist = Math.max(maxMoist, moisture);
+                }
+            }
+        }
+        return new Vec2f[]{new Vec2f(minTemp, maxTemp), new Vec2f(minMoist, maxMoist)};
     }
 
     private BiomeType getType(int x, int y) {
@@ -79,58 +94,6 @@ public class BiomeTypeLoader {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void generateEdgeMap() {
-        int[] distances = new int[BiomeType.values().length];
-        for (int y = 0; y < BiomeType.RESOLUTION; y++) {
-            for (int x = 0; x < BiomeType.RESOLUTION; x++) {
-                if (y > x) continue;
-                BiomeType type = getType(x, y);
-                if (type == BiomeType.ALPINE) {
-                    continue;
-                }
-                int distance2 = getEdge(x, y, type);
-                edges[y][x] = distance2;
-                distances[type.ordinal()] = Math.max(distances[type.ordinal()], distance2);
-            }
-        }
-
-        for (int y = 0; y < BiomeType.RESOLUTION; y++) {
-            for (int x = 0; x < BiomeType.RESOLUTION; x++) {
-                BiomeType type = getType(x, y);
-                int max = distances[type.ordinal()];
-                float distance = edges[y][x];
-                float value = NoiseUtil.pow(distance / max, 0.33F);
-                edges[y][x] = NoiseUtil.clamp(value, 0, 1);
-            }
-        }
-    }
-
-    private int getEdge(int cx, int cy, BiomeType type) {
-        int radius = BiomeType.RESOLUTION / 4;
-        int distance2 = Integer.MAX_VALUE;
-        int x0 = Math.max(0, cx - radius);
-        int x1 = Math.min(BiomeType.MAX, cx + radius);
-        int y0 = Math.max(0, cy - radius);
-        int y1 = Math.min(BiomeType.MAX, cy + radius);
-        for (int y = y0; y <= y1; y++) {
-            for (int x = x0; x <= x1; x++) {
-                BiomeType neighbour = getType(x, y);
-
-                if (neighbour == BiomeType.ALPINE) {
-                    continue;
-                }
-
-                if (neighbour != type) {
-                    int dist2 = dist2(cx, cy, x, y);
-                    if (dist2 < distance2) {
-                        distance2 = dist2;
-                    }
-                }
-            }
-        }
-        return distance2;
     }
 
     private static BiomeType forColor(Color color) {
@@ -169,36 +132,10 @@ public class BiomeTypeLoader {
         return dx * dx + dy * dy;
     }
 
-    private static BufferedImage generateEdgeMapImage() {
-        BufferedImage image = new BufferedImage(BiomeType.RESOLUTION, BiomeType.RESOLUTION, BufferedImage.TYPE_INT_RGB);
-        for (int y = 0; y < BiomeType.RESOLUTION; y++) {
-            for (int x = 0; x < BiomeType.RESOLUTION; x++) {
-                float temperature = x / (float) BiomeType.RESOLUTION;
-                float moisture = y / (float) BiomeType.RESOLUTION;
-                float value = BiomeType.getEdge(temperature, moisture);
-                int color = Color.HSBtoRGB(0, 0, value);
-                image.setRGB(x, image.getHeight() - 1 - y, color);
-            }
-        }
-        return image;
-    }
-
     public static BiomeTypeLoader getInstance() {
         if (instance == null) {
             instance = new BiomeTypeLoader();
         }
         return instance;
-    }
-
-    public static void main(String[] args) throws Throwable {
-        BufferedImage img = generateEdgeMapImage();
-        ImageIO.write(img, "png", new File("biomes_dist.png"));
-        JLabel label = new JLabel(new ImageIcon(img));
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(label);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
     }
 }

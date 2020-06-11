@@ -30,9 +30,9 @@ import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrains;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.func.CellFunc;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.func.CellFunc;
 
 public class DesertDunes implements Decorator {
 

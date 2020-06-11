@@ -28,10 +28,10 @@ package com.terraforged.world.terrain;
 import com.terraforged.core.Seed;
 import com.terraforged.core.settings.TerrainSettings;
 import com.terraforged.world.heightmap.Levels;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.func.EdgeFunc;
-import me.dags.noise.func.Interpolation;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.func.EdgeFunc;
+import com.terraforged.n2d.func.Interpolation;
 
 public class LandForms {
 

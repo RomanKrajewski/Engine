@@ -29,7 +29,7 @@ import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.terrain.Terrain;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.util.NoiseUtil;
 
 public class Cell {
 

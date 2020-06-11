@@ -25,7 +25,7 @@
 
 package com.terraforged.world.heightmap;
 
-import me.dags.noise.Module;
+import com.terraforged.n2d.Module;
 
 public class RegionConfig {
 

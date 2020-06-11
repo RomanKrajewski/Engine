@@ -29,9 +29,9 @@ import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.util.NoiseUtil;
 
 public class DesertStacks implements Decorator {
 

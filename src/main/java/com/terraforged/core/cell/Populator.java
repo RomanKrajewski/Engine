@@ -26,7 +26,7 @@
 package com.terraforged.core.cell;
 
 import com.terraforged.core.concurrent.Resource;
-import me.dags.noise.Module;
+import com.terraforged.n2d.Module;
 
 public interface Populator extends Module {
 

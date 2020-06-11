@@ -33,12 +33,12 @@ import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.continent.Continent;
 import com.terraforged.world.terrain.Terrains;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.func.DistanceFunc;
-import me.dags.noise.func.EdgeFunc;
-import me.dags.noise.util.NoiseUtil;
-import me.dags.noise.util.Vec2f;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.func.DistanceFunc;
+import com.terraforged.n2d.func.EdgeFunc;
+import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.n2d.util.Vec2f;
 
 public class ClimateModule {
 

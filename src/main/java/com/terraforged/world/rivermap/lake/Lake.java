@@ -29,9 +29,9 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.world.rivermap.river.River;
 import com.terraforged.world.terrain.TerrainPopulator;
 import com.terraforged.world.terrain.Terrains;
-import me.dags.noise.Source;
-import me.dags.noise.util.NoiseUtil;
-import me.dags.noise.util.Vec2f;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.n2d.util.Vec2f;
 
 public class Lake extends TerrainPopulator {
 

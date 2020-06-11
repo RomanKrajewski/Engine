@@ -33,10 +33,10 @@ import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.heightmap.WorldHeightmap;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.Terrains;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.source.Rand;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.source.Rand;
+import com.terraforged.n2d.util.NoiseUtil;
 
 public class Climate {
 

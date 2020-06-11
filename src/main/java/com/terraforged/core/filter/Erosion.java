@@ -29,7 +29,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.settings.FilterSettings;
 import com.terraforged.world.GeneratorContext;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.util.NoiseUtil;
 
 import java.util.Random;
 import java.util.function.IntFunction;

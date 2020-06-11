@@ -27,7 +27,7 @@ package com.terraforged.world.terrain;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
-import me.dags.noise.Module;
+import com.terraforged.n2d.Module;
 
 public class TerrainPopulator implements Populator {
 

@@ -34,8 +34,8 @@ import com.terraforged.world.terrain.MixedTerarin;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.TerrainPopulator;
 import com.terraforged.world.terrain.special.VolcanoPopulator;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
 
 import java.util.ArrayList;
 import java.util.HashMap;

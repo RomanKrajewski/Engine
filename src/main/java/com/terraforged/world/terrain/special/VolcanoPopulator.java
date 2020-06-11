@@ -32,9 +32,9 @@ import com.terraforged.world.heightmap.RegionConfig;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.TerrainPopulator;
 import com.terraforged.world.terrain.Terrains;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.func.EdgeFunc;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.func.EdgeFunc;
 
 public class VolcanoPopulator extends TerrainPopulator {
 

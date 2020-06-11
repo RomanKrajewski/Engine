@@ -28,8 +28,8 @@ package com.terraforged.world.continent;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.world.terrain.Terrain;
-import me.dags.noise.func.Interpolation;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.func.Interpolation;
+import com.terraforged.n2d.util.NoiseUtil;
 
 public class ContinentLerper2 implements Populator {
 

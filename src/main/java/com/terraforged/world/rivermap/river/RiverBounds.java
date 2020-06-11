@@ -25,9 +25,9 @@
 
 package com.terraforged.world.rivermap.river;
 
-import me.dags.noise.source.Line;
-import me.dags.noise.util.Vec2f;
-import me.dags.noise.util.Vec2i;
+import com.terraforged.n2d.source.Line;
+import com.terraforged.n2d.util.Vec2f;
+import com.terraforged.n2d.util.Vec2i;
 
 public class RiverBounds {
 

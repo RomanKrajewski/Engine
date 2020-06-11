@@ -29,7 +29,7 @@ import com.terraforged.core.serialization.annotation.Comment;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
 import com.terraforged.world.terrain.TerrainPopulator;
-import me.dags.noise.Module;
+import com.terraforged.n2d.Module;
 
 @Serializable
 public class TerrainSettings {

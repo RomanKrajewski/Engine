@@ -26,7 +26,7 @@
 package com.terraforged.world.heightmap;
 
 import com.terraforged.core.settings.WorldSettings;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.util.NoiseUtil;
 
 public class Levels {
 

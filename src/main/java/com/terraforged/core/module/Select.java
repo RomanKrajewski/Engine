@@ -26,7 +26,7 @@
 package com.terraforged.core.module;
 
 import com.terraforged.core.cell.Cell;
-import me.dags.noise.Module;
+import com.terraforged.n2d.Module;
 
 public class Select {
 

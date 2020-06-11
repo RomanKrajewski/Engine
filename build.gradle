@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    shade "me.dags:Noise2D:0.6.0-SNAPSHOT"
+    shade "com.terraforged:Noise2D:0.6.0-SNAPSHOT"
     compileOnly "it.unimi.dsi:fastutil:8.2.1"
 }
 

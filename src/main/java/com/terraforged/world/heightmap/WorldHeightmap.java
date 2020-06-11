@@ -44,10 +44,10 @@ import com.terraforged.world.terrain.provider.TerrainProvider;
 import com.terraforged.world.terrain.region.RegionLerper;
 import com.terraforged.world.terrain.region.RegionModule;
 import com.terraforged.world.terrain.region.RegionSelector;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.func.EdgeFunc;
-import me.dags.noise.func.Interpolation;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.func.EdgeFunc;
+import com.terraforged.n2d.func.Interpolation;
 
 public class WorldHeightmap implements Heightmap {
 

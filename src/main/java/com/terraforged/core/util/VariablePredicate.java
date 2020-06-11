@@ -28,8 +28,8 @@ package com.terraforged.core.util;
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.Levels;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
 
 import java.util.function.BiPredicate;
 

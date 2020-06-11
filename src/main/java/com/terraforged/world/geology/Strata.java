@@ -27,9 +27,9 @@ package com.terraforged.world.geology;
 
 import com.terraforged.core.Seed;
 import com.terraforged.core.concurrent.Resource;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.util.NoiseUtil;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -95,17 +95,17 @@ public class Strata<T> {
         }
     }
 
-    public static <T> Builder<T> builder(int seed, me.dags.noise.source.Builder noise) {
+    public static <T> Builder<T> builder(int seed, com.terraforged.n2d.source.Builder noise) {
         return new Builder<>(seed, noise);
     }
 
     public static class Builder<T> {
 
         private final Seed seed;
-        private final me.dags.noise.source.Builder noise;
+        private final com.terraforged.n2d.source.Builder noise;
         private final List<Stratum<T>> strata = new LinkedList<>();
 
-        public Builder(int seed, me.dags.noise.source.Builder noise) {
+        public Builder(int seed, com.terraforged.n2d.source.Builder noise) {
             this.seed = new Seed(seed);
             this.noise = noise;
         }

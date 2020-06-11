@@ -2,8 +2,8 @@ package com.terraforged.core.util.poisson;
 
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.pool.ObjectPool;
-import me.dags.noise.util.NoiseUtil;
-import me.dags.noise.util.Vec2f;
+import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.n2d.util.Vec2f;
 
 import java.util.Arrays;
 

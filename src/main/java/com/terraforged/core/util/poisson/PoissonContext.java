@@ -1,7 +1,7 @@
 package com.terraforged.core.util.poisson;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
 
 import java.util.Random;
 

@@ -3,9 +3,9 @@ package com.terraforged.core.settings;
 import com.terraforged.core.serialization.annotation.Comment;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.util.NoiseUtil;
 
 @Serializable
 public class ClimateSettings {

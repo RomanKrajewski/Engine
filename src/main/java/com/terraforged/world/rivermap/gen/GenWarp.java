@@ -1,6 +1,6 @@
 package com.terraforged.world.rivermap.gen;
 
-import me.dags.noise.domain.Domain;
+import com.terraforged.n2d.domain.Domain;
 
 public class GenWarp {
 

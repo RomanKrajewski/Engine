@@ -28,12 +28,12 @@ package com.terraforged.world.terrain.region;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.world.heightmap.RegionConfig;
-import me.dags.noise.Source;
-import me.dags.noise.domain.Domain;
-import me.dags.noise.func.DistanceFunc;
-import me.dags.noise.func.EdgeFunc;
-import me.dags.noise.util.NoiseUtil;
-import me.dags.noise.util.Vec2f;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.domain.Domain;
+import com.terraforged.n2d.func.DistanceFunc;
+import com.terraforged.n2d.func.EdgeFunc;
+import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.n2d.util.Vec2f;
 
 public class RegionModule implements Populator {
 

@@ -29,7 +29,7 @@ import com.terraforged.core.cell.Populator;
 import com.terraforged.world.terrain.LandForms;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.TerrainPopulator;
-import me.dags.noise.Module;
+import com.terraforged.n2d.Module;
 
 import java.util.List;
 
