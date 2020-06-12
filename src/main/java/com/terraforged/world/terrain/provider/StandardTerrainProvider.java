@@ -109,6 +109,13 @@ public class StandardTerrainProvider implements TerrainProvider {
         return result;
     }
 
+    public List<TerrainPopulator> getTerrainPopulators() {
+        List<TerrainPopulator> populators = new ArrayList<>();
+        populators.addAll(mixable);
+        populators.addAll(unmixable);
+        return populators;
+    }
+
     protected GeneratorContext getContext() {
         return context;
     }

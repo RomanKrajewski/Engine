@@ -47,6 +47,8 @@ public class RenderWorld {
     }
 
     public Cell getCenter() {
+        if (true) return Cell.empty();
+
         float cx = regionCount / 2F;
         float cz = regionCount / 2F;
 
@@ -93,6 +95,7 @@ public class RenderWorld {
     }
 
     public void update(float x, float y, float zoom, boolean filters) {
+        System.out.println("..");
         renderer.getSettings().zoom = zoom;
         renderer.getSettings().resolution = getResolution();
         float factor = regionCount > 1 ? (regionCount - 1F) / regionCount : 0F;
@@ -128,7 +131,7 @@ public class RenderWorld {
                 float x = rx * regionSize.size * w;
                 float z = rz * regionSize.size * h;
                 context.translate(x, z, 0);
-                renderer.render(region);
+//                renderer.render(region);
                 region.getMesh().draw();
                 context.popMatrix();
             }
