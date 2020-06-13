@@ -162,7 +162,7 @@ public class Terrain implements ITerrain.Delegate {
         return new Terrain("badlands", settings.terrain.badlands.weight, TerrainType.FLATLAND) {
             @Override
             public float erosionModifier() {
-                return 0.15F;
+                return 0.225F;
             }
         };
     }
