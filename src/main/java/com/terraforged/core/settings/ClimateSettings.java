@@ -10,9 +10,9 @@ import com.terraforged.n2d.util.NoiseUtil;
 @Serializable
 public class ClimateSettings {
 
-    public RangeValue temperature = new RangeValue(3, 0, 1F, 0.1F);
+    public RangeValue temperature = new RangeValue(3, 0, 0.98F, 0.05F);
 
-    public RangeValue moisture = new RangeValue(6, 2, 0, 1F, 0);
+    public RangeValue moisture = new RangeValue(6, 1, 0.00F, 1F, 0F);
 
     public BiomeShape biomeShape = new BiomeShape();
 
@@ -23,7 +23,7 @@ public class ClimateSettings {
 
         @Range(min = 1, max = 20)
         @Comment("The horizontal scale")
-        public int scale = 6;
+        public int scale = 7;
 
         @Range(min = 1, max = 10)
         @Comment("How quickly values transition from an extremity")
@@ -46,7 +46,7 @@ public class ClimateSettings {
         }
 
         public RangeValue(int falloff, float min, float max, float bias) {
-            this(6, falloff, min, max, bias);
+            this(7, falloff, min, max, bias);
         }
 
         public RangeValue(int scale, int falloff, float min, float max, float bias) {

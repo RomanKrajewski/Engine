@@ -9,9 +9,9 @@ group = "com.terraforged"
 configurations {
     shade
     compile.extendsFrom(shade)
-//    all {
-//        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-//    }
+    all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
 }
 
 repositories {

@@ -1,24 +1,33 @@
 package com.terraforged.core.render;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Resource;
+import com.terraforged.core.concurrent.pool.ArrayPool;
+import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.n2d.util.NoiseUtil;
 
 import java.awt.*;
+import java.util.function.IntFunction;
 
 public enum RenderMode {
     BIOME_TYPE {
         @Override
         public void fill(Cell cell, float height, RenderBuffer buffer, RenderSettings context) {
-            Color c = cell.biomeType.getColor();
-            if (cell.terrain == context.terrain.beach) {
-                c = Color.YELLOW;
+            try (Resource<HSBBuf> buf = hsbBufs.get()) {
+                float[] hsb = buf.get().hsb;
+
+                if (cell.terrain == context.terrain.beach) {
+                    hsb[0] = 0.15F;
+                    hsb[1] = 0.25F;
+                    hsb[2] = 1.00F;
+                } else {
+                    Color c = cell.biomeType.getColor();
+                    Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
+                }
+
+                color(buffer, hsb[0] * 100, hsb[1] * 100, hsb[2] * 100, height, 0.5F, context.levels);
             }
-            if (cell.terrain == context.terrain.coast) {
-                c = Color.RED;
-            }
-            float[] hsb = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
-            color(buffer, hsb[0] * 100, hsb[1] * 100, hsb[2] * 100, height, 0.5F, context.levels);
         }
     },
     ELEVATION {
@@ -121,4 +130,6 @@ public enum RenderMode {
         alpha = (1 - strength) + (alpha * strength);
         return value * alpha;
     }
+
+    private static final ObjectPool<HSBBuf> hsbBufs = new ObjectPool<>(5, HSBBuf::new);
 }

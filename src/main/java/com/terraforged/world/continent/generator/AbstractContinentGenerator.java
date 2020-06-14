@@ -16,7 +16,7 @@ import com.terraforged.n2d.util.NoiseUtil;
 public abstract class AbstractContinentGenerator implements Continent {
 
     private static final float edgeClampMin = 0.1F;
-    private static final float shapeClampMin = 0.52F;
+    private static final float shapeClampMin = 0.4F;
     private static final float shapeClampMax = 0.6F;
     private static final float shapeRange = shapeClampMax - shapeClampMin;
 
@@ -54,6 +54,7 @@ public abstract class AbstractContinentGenerator implements Continent {
                 .map(shapeLower, 1)
                 .warp(Source.SIMPLEX, seed.next(), continentScale / 2, 2, continentScale / 4D)
                 .warp(seed.next(), 50, 3, 20D)
+//                .alpha(0.75)
         ;
     }
 
@@ -218,7 +219,7 @@ public abstract class AbstractContinentGenerator implements Continent {
             return shape.getValue(x, z);
         }
 
-        float scale = (shapeClampMax - edgeValue) / shapeRange;
+        float scale = (shapeClampMax - edgeValue) / (shapeClampMax - shapeClampMin);
         float bias = 1 - scale;
         return bias + shape.getValue(x, z) * scale;
     }

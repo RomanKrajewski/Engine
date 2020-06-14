@@ -95,7 +95,6 @@ public class RenderWorld {
     }
 
     public void update(float x, float y, float zoom, boolean filters) {
-        System.out.println("..");
         renderer.getSettings().zoom = zoom;
         renderer.getSettings().resolution = getResolution();
         float factor = regionCount > 1 ? (regionCount - 1F) / regionCount : 0F;
