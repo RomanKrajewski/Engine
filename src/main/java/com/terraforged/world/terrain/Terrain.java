@@ -162,7 +162,7 @@ public class Terrain implements ITerrain.Delegate {
         return new Terrain("badlands", settings.terrain.badlands.weight, TerrainType.FLATLAND) {
             @Override
             public float erosionModifier() {
-                return 0.225F;
+                return 0.25F;
             }
         };
     }
@@ -180,7 +180,7 @@ public class Terrain implements ITerrain.Delegate {
     }
 
     public static Terrain torridonian(Settings settings) {
-        return new Terrain("torridonian_fells", settings.terrain.torridonian.weight, TerrainType.HIGHLAND);
+        return new Terrain("torridonian", settings.terrain.torridonian.weight, TerrainType.HIGHLAND);
     }
 
     public static Terrain mountains(Settings settings) {

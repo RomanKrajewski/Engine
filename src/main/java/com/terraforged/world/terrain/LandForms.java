@@ -208,8 +208,8 @@ public class LandForms {
     }
 
     public Module badlands(Seed seed) {
-        Module mask = Source.perlin(seed.next(), 200, 2).clamp(0.35, 0.65).map(0, 1);
-        Module hills = Source.ridge(seed.next(), 300, 4)
+        Module mask = Source.perlin(seed.next(), 270, 2).clamp(0.35, 0.65).map(0, 1);
+        Module hills = Source.ridge(seed.next(), 275, 4)
                 .warp(seed.next(), 400, 2, 100)
                 .mult(mask);
 
@@ -229,7 +229,7 @@ public class LandForms {
 
         Module badlands = shape.mult(detail.alpha(0.5));
 
-        return settings.badlands.apply(groundLevel + 0.05F, 0.6, badlands);
+        return settings.badlands.apply(groundLevel + 0.025F, 0.55, badlands);
     }
 
     public Module torridonian(Seed seed) {
