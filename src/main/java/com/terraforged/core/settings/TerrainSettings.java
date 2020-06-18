@@ -50,11 +50,11 @@ public class TerrainSettings {
 
         @Range(min = 125, max = 5000)
         @Comment("Controls the size of terrain regions")
-        public int terrainRegionSize = 1000;
+        public int terrainRegionSize = 1200;
 
         @Range(min = 0, max = 1)
         @Comment("Globally controls the vertical scaling of terrain")
-        public float globalVerticalScale = 0.985F;
+        public float globalVerticalScale = 0.98F;
 
         @Range(min = 0, max = 5)
         @Comment("Globally controls the horizontal scaling of terrain")
