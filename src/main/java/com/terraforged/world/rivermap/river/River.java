@@ -185,13 +185,14 @@ public class River extends TerrainPopulator implements Comparable<River> {
     }
 
     private boolean carveBanks(Cell cell, float banksAlpha, float bedHeight) {
+        tag(cell, terrains.riverBanks);
+
         // lerp the position's height to the riverbed height (ie the riverbank slopes)
         if (cell.value > bedHeight) {
             cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
             if (cell.value < bedHeight) {
                 cell.value = bedHeight;
                 cell.erosionMask = true;
-                tag(cell, terrains.riverBanks);
             }
             return true;
         }
