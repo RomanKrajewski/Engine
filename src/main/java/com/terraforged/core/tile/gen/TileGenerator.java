@@ -103,7 +103,7 @@ public class TileGenerator {
     }
 
     protected void postProcess(Tile tile) {
-//        generator.getFilters().apply(region);
+        generator.getFilters().apply(tile);
         tile.decorate(generator.getDecorators().getDecorators());
     }
 

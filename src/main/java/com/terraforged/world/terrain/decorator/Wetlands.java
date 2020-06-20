@@ -55,7 +55,7 @@ public class Wetlands implements Decorator {
             return false;
         }
 
-        float tempAlpha = getAlpha(cell.temperature, 0.3F, 0.7F);
+        float tempAlpha = getAlpha(cell.temperature, 0.3F, 0.65F);
         if (tempAlpha == 0) {
             return false;
         }
