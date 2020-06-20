@@ -80,9 +80,13 @@ public class ClimateSettings {
     @Serializable
     public static class BiomeShape {
 
-        @Range(min = 50, max = 1000)
+        @Range(min = 50, max = 2000)
         @Comment("Controls the size of individual biomes")
         public int biomeSize = 250;
+
+        @Range(min = 1, max = 20)
+        @Comment("Macro noise is used to group large areas of biomes into a single type (such as deserts)")
+        public int macroNoiseSize = 8;
 
         @Range(min = 1, max = 500)
         @Comment("Controls the scale of shape distortion for biomes")

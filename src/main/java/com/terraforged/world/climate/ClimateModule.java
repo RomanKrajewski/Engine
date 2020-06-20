@@ -94,7 +94,7 @@ public class ClimateModule {
                 .warp(seed.next(), tempScale * 4, 2, tempScale * 4)
                 .warp(seed.next(), tempScale, 1, tempScale);
 
-        this.macroBiomeNoise = Source.cell(seed.next(), 10);
+        this.macroBiomeNoise = Source.cell(seed.next(), context.settings.climate.biomeShape.macroNoiseSize);
     }
 
     public void apply(Cell cell, float x, float y) {
