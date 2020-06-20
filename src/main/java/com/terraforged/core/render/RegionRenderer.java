@@ -5,6 +5,8 @@ import com.terraforged.core.region.Region;
 
 public class RegionRenderer {
 
+    public static final float RENDER_SCALE = 1F;
+
     private final RenderSettings settings;
     private final RenderAPI context;
 

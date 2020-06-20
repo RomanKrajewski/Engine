@@ -6,6 +6,7 @@ import com.terraforged.core.serialization.annotation.Serializable;
 import com.terraforged.world.continent.ContinentMode;
 import com.terraforged.world.continent.SpawnType;
 import com.terraforged.n2d.func.DistanceFunc;
+import com.terraforged.world.heightmap.Heightmap;
 
 @Serializable
 public class WorldSettings {
@@ -13,6 +14,8 @@ public class WorldSettings {
     public transient long seed = 0L;
 
     public Continent continent = new Continent();
+
+    public TransitionPoints transitionPoints = new TransitionPoints();
 
     public Properties properties = new Properties();
 
@@ -32,6 +35,30 @@ public class WorldSettings {
         @Range(min = 100, max = 10000)
         @Comment("Controls the size of continents")
         public int continentScale = 3000;
+    }
+
+    @Serializable
+    public static class TransitionPoints {
+
+        @Range(min = 0F, max = 1F)
+        @Comment("The deep ocean transition point")
+        public float deepOcean = Heightmap.DEEP_OCEAN_VALUE;
+
+        @Range(min = 0F, max = 1F)
+        @Comment("The shallow ocean transition point")
+        public float shallowOcean = Heightmap.OCEAN_VALUE;
+
+        @Range(min = 0F, max = 1F)
+        @Comment("The beach transition point")
+        public float beach = Heightmap.BEACH_VALUE;
+
+        @Range(min = 0F, max = 1F)
+        @Comment("The coast transition point")
+        public float coast = Heightmap.COAST_VALUE;
+
+        @Range(min = 0F, max = 1F)
+        @Comment("The inland transition point")
+        public float inland = Heightmap.INLAND_VALUE;
     }
 
     @Serializable

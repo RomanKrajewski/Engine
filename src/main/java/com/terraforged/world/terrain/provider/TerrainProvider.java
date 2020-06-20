@@ -26,9 +26,10 @@
 package com.terraforged.world.terrain.provider;
 
 import com.terraforged.core.cell.Populator;
+import com.terraforged.core.settings.TerrainSettings;
 import com.terraforged.world.terrain.LandForms;
 import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.TerrainPopulator;
+import com.terraforged.world.terrain.populator.TerrainPopulator;
 import com.terraforged.n2d.Module;
 
 import java.util.List;
@@ -71,16 +72,12 @@ public interface TerrainProvider {
      * 'Mixable' TerrainPopulators are used to create additional terrain types, created by blending two
      * different mixable TerrainPopulators together (this is in addition to the unmixed version of the populator)
      */
-    default void registerMixable(Terrain type, Module source) {
-        registerMixable(new TerrainPopulator(source, type));
+    default void registerMixable(Terrain type, Module base, Module variance, TerrainSettings.Terrain settings) {
+        registerMixable(TerrainPopulator.of(type, base, variance, settings));
     }
 
-    /**
-     * Add a TerrainPopulator to world generation
-     *
-     * 'UnMixable' TerrainPopulators are NOT blended together to create additional terrain types
-     */
-    default void registerUnMixable(Terrain type, Module source) {
-        registerUnMixable(new TerrainPopulator(source, type));
+    default void registerUnMixable(Terrain type, Module base, Module variance, TerrainSettings.Terrain settings) {
+        registerUnMixable(TerrainPopulator.of(type, base, variance, settings));
     }
+
 }

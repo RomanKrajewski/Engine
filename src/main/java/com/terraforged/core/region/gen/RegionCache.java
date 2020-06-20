@@ -87,8 +87,8 @@ public class RegionCache implements Disposable.Listener<Region> {
         return cache.computeIfAbsent(Region.getRegionId(regionX, regionZ), syncGetter);
     }
 
-    public void queueRegion(int regionX, int regionZ) {
-        cache.computeIfAbsent(Region.getRegionId(regionX, regionZ), asyncGetter);
+    public CacheEntry<Region> queueRegion(int regionX, int regionZ) {
+        return cache.computeIfAbsent(Region.getRegionId(regionX, regionZ), asyncGetter);
     }
 
     private LongFunction<CacheEntry<Region>> syncGetter() {

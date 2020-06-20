@@ -47,8 +47,6 @@ public class RenderWorld {
     }
 
     public Cell getCenter() {
-        if (true) return Cell.empty();
-
         float cx = regionCount / 2F;
         float cz = regionCount / 2F;
 
@@ -130,7 +128,6 @@ public class RenderWorld {
                 float x = rx * regionSize.size * w;
                 float z = rz * regionSize.size * h;
                 context.translate(x, z, 0);
-//                renderer.render(region);
                 region.getMesh().draw();
                 context.popMatrix();
             }

@@ -28,7 +28,7 @@ package com.terraforged.core.settings;
 import com.terraforged.core.serialization.annotation.Comment;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
-import com.terraforged.world.terrain.TerrainPopulator;
+import com.terraforged.world.terrain.populator.TerrainPopulator;
 import com.terraforged.n2d.Module;
 
 @Serializable

@@ -30,7 +30,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.heightmap.RegionConfig;
 import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.TerrainPopulator;
+import com.terraforged.world.terrain.populator.TerrainPopulator;
 import com.terraforged.world.terrain.Terrains;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
@@ -53,7 +53,7 @@ public class VolcanoPopulator extends TerrainPopulator {
     private final Terrain outer;
 
     public VolcanoPopulator(Seed seed, RegionConfig region, Levels levels, Terrains terrains) {
-        super(Source.ZERO, terrains.volcano);
+        super(terrains.volcano, Source.ZERO, Source.ZERO);
         float midpoint = 0.3F;
         float range = 0.3F;
 

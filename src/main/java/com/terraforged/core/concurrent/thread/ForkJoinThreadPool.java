@@ -22,6 +22,11 @@ public class ForkJoinThreadPool implements ThreadPool {
     }
 
     @Override
+    public boolean supportsBatching() {
+        return false;
+    }
+
+    @Override
     public int size() {
         return size;
     }

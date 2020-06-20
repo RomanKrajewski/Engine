@@ -19,7 +19,7 @@ public enum RenderMode {
 
                 if (cell.terrain == context.terrain.beach) {
                     hsb[0] = 0.15F;
-                    hsb[1] = 0.25F;
+                    hsb[1] = 0.55F;
                     hsb[2] = 1.00F;
                 } else {
                     Color c = cell.biomeType.getColor();

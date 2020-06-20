@@ -103,7 +103,7 @@ public class RegionGenerator {
     }
 
     protected void postProcess(Region region) {
-        generator.getFilters().apply(region);
+//        generator.getFilters().apply(region);
         region.decorate(generator.getDecorators().getDecorators());
     }
 

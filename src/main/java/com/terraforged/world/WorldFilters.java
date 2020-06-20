@@ -50,7 +50,7 @@ public class WorldFilters {
     public WorldFilters(GeneratorContext context) {
         context = context.copy();
         this.settings = context.settings.filters;
-        this.beach = new BeachDetect(context.terrain);
+        this.beach = new BeachDetect(context);
         this.smoothing = new Smoothing(context.settings, context.levels);
         this.steepness = new Steepness(1, 10F, context.terrain, context.levels);
         this.erosionFactory = Erosion.factory(context);

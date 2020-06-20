@@ -271,7 +271,7 @@ public class Region implements Disposable, SafeCloseable {
     }
 
     public void generateArea(Heightmap heightmap, Batcher batcher, int batchSize) {
-        int jobSize = chunkSize.total / batchSize;
+        int jobSize = Math.max(1, chunkSize.total / batchSize);
         int jobCount = chunkSize.total / jobSize;
         if (jobCount * jobSize < chunkSize.total) {
             jobCount += 1;

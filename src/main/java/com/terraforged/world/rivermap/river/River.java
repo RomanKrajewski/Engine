@@ -27,7 +27,7 @@ package com.terraforged.world.rivermap.river;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.TerrainPopulator;
+import com.terraforged.world.terrain.populator.TerrainPopulator;
 import com.terraforged.world.terrain.Terrains;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
@@ -69,7 +69,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
     private final float continentRiverModifier;
 
     public River(RiverBounds bounds, RiverConfig config, Settings settings, Terrains terrains) {
-        super(Source.ZERO, terrains.river);
+        super(terrains.river, Source.ZERO, Source.ZERO);
         Module in = Source.constant(settings.fadeIn);
         Module out = Source.constant(settings.fadeOut);
         Module bedWidth = Source.constant(config.bedWidth * config.bedWidth);

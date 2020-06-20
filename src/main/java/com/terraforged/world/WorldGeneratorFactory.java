@@ -27,7 +27,6 @@ package com.terraforged.world;
 
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.heightmap.Heightmap;
-import com.terraforged.world.heightmap.WorldHeightmap;
 
 import java.util.function.Supplier;
 
@@ -38,7 +37,7 @@ public class WorldGeneratorFactory implements Supplier<WorldGenerator> {
     private final WorldDecorators decorators;
 
     public WorldGeneratorFactory(GeneratorContext context) {
-        this.heightmap = new WorldHeightmap(context);
+        this.heightmap = new Heightmap(context);
         this.filters = new WorldFilters(context);
         this.decorators = new WorldDecorators(context);
     }

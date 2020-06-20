@@ -3,15 +3,15 @@ package com.terraforged.world.continent.generator;
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.settings.WorldSettings;
-import com.terraforged.world.continent.Continent;
-import com.terraforged.world.continent.MutableVeci;
-import com.terraforged.world.heightmap.WorldHeightmap;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.domain.Domain;
 import com.terraforged.n2d.func.DistanceFunc;
 import com.terraforged.n2d.func.EdgeFunc;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.continent.Continent;
+import com.terraforged.world.continent.MutableVeci;
+import com.terraforged.world.heightmap.TransitionPoints;
 
 public abstract class AbstractContinentGenerator implements Continent {
 
@@ -28,6 +28,7 @@ public abstract class AbstractContinentGenerator implements Continent {
     private final float edgeMax;
     private final float edgeRange;
     private final DistanceFunc distanceFunc;
+    private final TransitionPoints transition;
 
     protected final Domain warp;
     protected final Module shape;
@@ -38,8 +39,8 @@ public abstract class AbstractContinentGenerator implements Continent {
         double oceans = Math.min(Math.max(settings.continent.oceanScale, 0), 1);
         double shapeMin = 0.15 + (oceans * 0.35);
         this.seed = seed.next();
-
         this.distanceFunc = settings.continent.continentShape;
+        this.transition = new TransitionPoints(settings.transitionPoints);
         this.frequency = 1F / tectonicScale;
         this.edgeMin = edgeClampMin;
         this.edgeMax = (float) oceans;
@@ -48,7 +49,7 @@ public abstract class AbstractContinentGenerator implements Continent {
                 .warp(Domain.warp(Source.SIMPLEX, seed.next(), continentScale, 3, continentScale))
         ;
 
-        float shapeLower = WorldHeightmap.OCEAN_VALUE - ((WorldHeightmap.OCEAN_VALUE - WorldHeightmap.DEEP_OCEAN_VALUE) / 3F);
+        float shapeLower = transition.shallowOcean - ((transition.shallowOcean - transition.shallowOcean) / 3F);
         this.shape = Source.perlin(seed.next(), settings.continent.continentScale, 1)
                 .clamp(shapeMin, 0.65)
                 .map(shapeLower, 1)
@@ -134,7 +135,7 @@ public abstract class AbstractContinentGenerator implements Continent {
             float z = cz + dz * mid;
             float edge = getEdgeNoise(x, z);
 
-            if (edge > WorldHeightmap.OCEAN_VALUE) {
+            if (edge > transition.shallowOcean) {
                 low = mid;
             } else {
                 high = mid;

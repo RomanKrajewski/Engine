@@ -1,18 +1,21 @@
 package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.world.heightmap.WorldHeightmap;
+import com.terraforged.world.GeneratorContext;
+import com.terraforged.world.heightmap.TransitionPoints;
 import com.terraforged.world.terrain.Terrains;
 
 public class BeachDetect implements Filter, Filter.Visitor {
 
     private final Terrains terrains;
+    private final TransitionPoints transition;
     private final float grad2;
     private final int radius = 8;
     private final int diameter = radius + 1 + radius;
 
-    public BeachDetect(Terrains terrains) {
-        this.terrains = terrains;
+    public BeachDetect(GeneratorContext context) {
+        this.terrains = context.terrain;
+        this.transition = new TransitionPoints(context.settings.world.transitionPoints);
         float delta = (8F / 256F) / diameter;
         this.grad2 = delta * delta;
     }
@@ -25,7 +28,7 @@ public class BeachDetect implements Filter, Filter.Visitor {
     @Override
     public void visit(Filterable cellMap, Cell cell, int dx, int dz) {
         if (cell.terrain.isCoast()) {
-            if (cell.continentEdge < WorldHeightmap.COAST_VALUE) {
+            if (cell.continentEdge < transition.coast) {
                 Cell n = cellMap.getCellRaw(dx, dz - radius);
                 Cell s = cellMap.getCellRaw(dx, dz + radius);
                 Cell e = cellMap.getCellRaw(dx + radius, dz);

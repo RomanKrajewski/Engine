@@ -26,17 +26,15 @@
 package com.terraforged.world.climate;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.Resource;
-import com.terraforged.world.GeneratorContext;
-import com.terraforged.world.continent.Continent;
-import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.heightmap.WorldHeightmap;
-import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.Terrains;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.source.Rand;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.GeneratorContext;
+import com.terraforged.world.continent.Continent;
+import com.terraforged.world.heightmap.Heightmap;
+import com.terraforged.world.heightmap.Levels;
+import com.terraforged.world.terrain.Terrains;
 
 public class Climate {
 
@@ -81,7 +79,7 @@ public class Climate {
         return offsetY.getValue(x, z) * distance;
     }
 
-    public void apply(Cell cell, float x, float z, WorldHeightmap heightmap) {
+    public void apply(Cell cell, float x, float z, Heightmap heightmap) {
         biomeNoise.apply(cell, x, z, true);
 
         float edgeBlend = 0.4F;

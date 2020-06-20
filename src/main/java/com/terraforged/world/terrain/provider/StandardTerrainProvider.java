@@ -27,12 +27,13 @@ package com.terraforged.world.terrain.provider;
 
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Populator;
+import com.terraforged.core.settings.TerrainSettings;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.heightmap.RegionConfig;
 import com.terraforged.world.terrain.LandForms;
 import com.terraforged.world.terrain.MixedTerarin;
 import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.TerrainPopulator;
+import com.terraforged.world.terrain.populator.TerrainPopulator;
 import com.terraforged.world.terrain.special.VolcanoPopulator;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
@@ -51,30 +52,32 @@ public class StandardTerrainProvider implements TerrainProvider {
 
     private final LandForms landForms;
     private final RegionConfig config;
+    private final TerrainSettings settings;
     private final GeneratorContext context;
     private final Populator defaultPopulator;
 
     public StandardTerrainProvider(GeneratorContext context, RegionConfig config, Populator defaultPopulator) {
         this.config = config;
         this.context = context;
+        this.settings = context.settings.terrain;
         this.landForms = new LandForms(context.settings.terrain, context.levels);
         this.defaultPopulator = defaultPopulator;
         init();
     }
 
     public void init() {
-        registerMixable(context.terrain.dales, landForms.dales(context.seed));
-        registerMixable(context.terrain.hills, landForms.hills1(context.seed));
-        registerMixable(context.terrain.hills, landForms.hills2(context.seed));
-        registerMixable(context.terrain.steppe, landForms.steppe(context.seed));
-        registerMixable(context.terrain.plains, landForms.plains(context.seed));
-        registerMixable(context.terrain.plateau, landForms.plateau(context.seed));
-        registerMixable(context.terrain.badlands, landForms.badlands(context.seed));
-        registerMixable(context.terrain.torridonian, landForms.torridonian(context.seed));
+        registerMixable(context.terrain.dales, landForms.getLandBase(), landForms.dales(context.seed), settings.dales);
+        registerMixable(context.terrain.hills, landForms.getLandBase(), landForms.hills1(context.seed), settings.hills);
+        registerMixable(context.terrain.hills, landForms.getLandBase(), landForms.hills2(context.seed), settings.hills);
+        registerMixable(context.terrain.steppe, landForms.getLandBase(), landForms.steppe(context.seed), settings.steppe);
+        registerMixable(context.terrain.plains, landForms.getLandBase(), landForms.plains(context.seed), settings.plains);
+        registerMixable(context.terrain.plateau, landForms.getLandBase(), landForms.plateau(context.seed), settings.plateau);
+        registerMixable(context.terrain.badlands, landForms.getLandBase(), landForms.badlands(context.seed), settings.badlands);
+        registerMixable(context.terrain.torridonian, landForms.getLandBase(), landForms.torridonian(context.seed), settings.torridonian);
 
-        registerUnMixable(context.terrain.badlands, landForms.badlands(context.seed));
-        registerUnMixable(context.terrain.mountains, landForms.mountains2(context.seed));
-        registerUnMixable(context.terrain.mountains, landForms.mountains3(context.seed));
+        registerUnMixable(context.terrain.badlands, landForms.getLandBase(), landForms.badlands(context.seed), settings.badlands);
+        registerUnMixable(context.terrain.mountains, landForms.getLandBase(), landForms.mountains2(context.seed), settings.mountains);
+        registerUnMixable(context.terrain.mountains, landForms.getLandBase(), landForms.mountains3(context.seed), settings.mountains);
         registerUnMixable(new VolcanoPopulator(context.seed, config, context.levels, context.terrain));
     }
 
@@ -124,15 +127,15 @@ public class StandardTerrainProvider implements TerrainProvider {
         return combine(tp1, tp2, context.seed, config.scale / 2);
     }
 
-    private static TerrainPopulator combine(TerrainPopulator tp1, TerrainPopulator tp2, Seed seed, int scale) {
+    private TerrainPopulator combine(TerrainPopulator tp1, TerrainPopulator tp2, Seed seed, int scale) {
         Terrain type = new MixedTerarin(tp1.getType(), tp2.getType());
 
         Module combined = Source.perlin(seed.next(), scale, 1)
                 .warp(seed.next(), scale / 2, 2, scale / 2D)
-                .blend(tp1.getSource(), tp2.getSource(), 0.5, 0.25)
+                .blend(tp1.getVariance(), tp2.getVariance(), 0.5, 0.25)
                 .clamp(0, 1);
 
-        return new TerrainPopulator(combined, type);
+        return new TerrainPopulator(type, landForms.getLandBase(), combined);
     }
 
     private static <T> List<T> combine(List<T> input, BiFunction<T, T, T> operator) {

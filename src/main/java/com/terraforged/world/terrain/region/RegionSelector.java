@@ -27,7 +27,7 @@ package com.terraforged.world.terrain.region;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
-import com.terraforged.world.terrain.TerrainPopulator;
+import com.terraforged.world.terrain.populator.TerrainPopulator;
 import com.terraforged.n2d.util.NoiseUtil;
 
 import java.util.LinkedList;
