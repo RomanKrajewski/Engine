@@ -55,6 +55,7 @@ public class ClimateModule {
     private final Module warpZ;
     private final Module moisture;
     private final Module temperature;
+    private final Module macroBiomeNoise;
     private final Continent continent;
     private final Terrains terrains;
 
@@ -92,6 +93,8 @@ public class ClimateModule {
         this.temperature = settings.climate.temperature.apply(temperature)
                 .warp(seed.next(), tempScale * 4, 2, tempScale * 4)
                 .warp(seed.next(), tempScale, 1, tempScale);
+
+        this.macroBiomeNoise = Source.cell(seed.next(), 10);
     }
 
     public void apply(Cell cell, float x, float y) {
@@ -152,6 +155,7 @@ public class ClimateModule {
         cell.biome = cellValue(seed, cellX, cellY);
         cell.moisture = moisture.getValue(biomeX, biomeY);
         cell.temperature = temperature.getValue(biomeX, biomeY);
+        cell.macroNoise = macroBiomeNoise.getValue(biomeX, biomeY);
 
         int posX = (int) (biomeX / biomeFreq);
         int posZ = (int) (biomeY / biomeFreq);

@@ -64,6 +64,10 @@ public class Cell {
     public float moisture;
     public float temperature;
 
+    // random noise assigned to a large biome-aligned region
+    // current use-case is to change all sand biomes within a certain area to a single colour (yellow or red)
+    public float macroNoise;
+
     public float steepness;
     public float erosion;
     public float sediment;

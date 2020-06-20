@@ -2,13 +2,11 @@ package com.terraforged.core.render;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
-import com.terraforged.core.concurrent.pool.ArrayPool;
 import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.n2d.util.NoiseUtil;
 
 import java.awt.*;
-import java.util.function.IntFunction;
 
 public enum RenderMode {
     BIOME_TYPE {
@@ -58,6 +56,13 @@ public enum RenderMode {
         public void fill(Cell cell, float height, RenderBuffer buffer, RenderSettings context) {
             float hue = cell.biome * 70;
             color(buffer, hue, 70, 80, height, 0.4F, context.levels);
+        }
+    },
+    MACRO_NOISE {
+        @Override
+        public void fill(Cell cell, float height, RenderBuffer buffer, RenderSettings context) {
+            float hue = hue(1 - cell.macroNoise, 64, 70);
+            color(buffer, hue, 70, 70, height, 0.4F, context.levels);
         }
     },
     STEEPNESS {
