@@ -23,15 +23,19 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.region.chunk;
+package com.terraforged.core.tile.chunk;
 
-public interface ChunkHolder {
+import com.terraforged.core.cell.Cell;
 
-    int getChunkX();
+public interface ChunkWriter extends ChunkHolder {
 
-    int getChunkZ();
+    Cell genCell(int dx, int dz);
 
-    int getBlockX();
-
-    int getBlockZ();
+    default void generate(Cell.Visitor visitor) {
+        for (int dz = 0; dz < 16; dz++) {
+            for (int dx = 0; dx < 16; dx++) {
+                visitor.visit(genCell(dx, dz), dx, dz);
+            }
+        }
+    }
 }

@@ -1,19 +1,19 @@
 package com.terraforged.core.render;
 
-import com.terraforged.core.region.Region;
+import com.terraforged.core.tile.Tile;
 
 public class RenderRegion {
 
-    private final Region region;
+    private final Tile tile;
     private final Object lock = new Object();
     private RenderBuffer mesh;
 
-    public RenderRegion(Region region) {
-        this.region = region;
+    public RenderRegion(Tile tile) {
+        this.tile = tile;
     }
 
-    public Region getRegion() {
-        return region;
+    public Tile getTile() {
+        return tile;
     }
 
     public RenderBuffer getMesh() {

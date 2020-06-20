@@ -23,26 +23,26 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.region.gen;
+package com.terraforged.core.tile.gen;
 
 import com.terraforged.core.concurrent.Disposable;
 import com.terraforged.core.concurrent.cache.Cache;
 import com.terraforged.core.concurrent.cache.CacheEntry;
-import com.terraforged.core.region.Region;
-import com.terraforged.core.region.chunk.ChunkReader;
+import com.terraforged.core.tile.Tile;
+import com.terraforged.core.tile.chunk.ChunkReader;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
 
-public class RegionCache implements Disposable.Listener<Region> {
+public class TileCache implements Disposable.Listener<Tile> {
 
     private final boolean queuing;
-    private final RegionGenerator generator;
-    private final Cache<CacheEntry<Region>> cache;
-    private final LongFunction<CacheEntry<Region>> syncGetter;
-    private final LongFunction<CacheEntry<Region>> asyncGetter;
+    private final TileGenerator generator;
+    private final Cache<CacheEntry<Tile>> cache;
+    private final LongFunction<CacheEntry<Tile>> syncGetter;
+    private final LongFunction<CacheEntry<Tile>> asyncGetter;
 
-    public RegionCache(boolean queueNeighbours, RegionGenerator generator) {
+    public TileCache(boolean queueNeighbours, TileGenerator generator) {
         this.generator = generator;
         this.syncGetter = syncGetter();
         this.asyncGetter = asyncGetter();
@@ -52,8 +52,8 @@ public class RegionCache implements Disposable.Listener<Region> {
     }
 
     @Override
-    public void onDispose(Region region) {
-        cache.remove(region.getRegionId());
+    public void onDispose(Tile tile) {
+        cache.remove(tile.getRegionId());
     }
 
     public int chunkToRegion(int coord) {
@@ -63,39 +63,39 @@ public class RegionCache implements Disposable.Listener<Region> {
     public ChunkReader getChunk(int chunkX, int chunkZ) {
         int regionX = generator.chunkToRegion(chunkX);
         int regionZ = generator.chunkToRegion(chunkZ);
-        long regionId = Region.getRegionId(regionX, regionZ);
+        long regionId = Tile.getRegionId(regionX, regionZ);
         return cache.map(regionId, syncGetter, entry -> entry.get().getChunk(chunkX, chunkZ));
     }
 
-    public Region getRegion(int regionX, int regionZ) {
-        Region region = getEntry(regionX, regionZ).get();
+    public Tile getRegion(int regionX, int regionZ) {
+        Tile tile = getEntry(regionX, regionZ).get();
         if (queuing) {
             queueNeighbours(regionX, regionZ);
         }
-        return region;
+        return tile;
     }
 
-    public Region getIfPresent(int regionX, int regionZ) {
-        CacheEntry<Region> entry = cache.get(Region.getRegionId(regionX, regionZ));
+    public Tile getIfPresent(int regionX, int regionZ) {
+        CacheEntry<Tile> entry = cache.get(Tile.getRegionId(regionX, regionZ));
         if (entry == null || !entry.isDone()) {
             return null;
         }
         return entry.get();
     }
 
-    public CacheEntry<Region> getEntry(int regionX, int regionZ) {
-        return cache.computeIfAbsent(Region.getRegionId(regionX, regionZ), syncGetter);
+    public CacheEntry<Tile> getEntry(int regionX, int regionZ) {
+        return cache.computeIfAbsent(Tile.getRegionId(regionX, regionZ), syncGetter);
     }
 
-    public CacheEntry<Region> queueRegion(int regionX, int regionZ) {
-        return cache.computeIfAbsent(Region.getRegionId(regionX, regionZ), asyncGetter);
+    public CacheEntry<Tile> queueRegion(int regionX, int regionZ) {
+        return cache.computeIfAbsent(Tile.getRegionId(regionX, regionZ), asyncGetter);
     }
 
-    private LongFunction<CacheEntry<Region>> syncGetter() {
+    private LongFunction<CacheEntry<Tile>> syncGetter() {
         return id -> generator.getSync((int) id, (int) (id >> 32));
     }
 
-    private LongFunction<CacheEntry<Region>> asyncGetter() {
+    private LongFunction<CacheEntry<Tile>> asyncGetter() {
         return id -> generator.getAsync((int) id, (int) (id >> 32));
     }
 

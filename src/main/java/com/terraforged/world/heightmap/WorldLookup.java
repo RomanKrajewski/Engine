@@ -2,9 +2,9 @@ package com.terraforged.world.heightmap;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
-import com.terraforged.core.region.Region;
-import com.terraforged.core.region.chunk.ChunkReader;
-import com.terraforged.core.region.gen.RegionCache;
+import com.terraforged.core.tile.Tile;
+import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.WorldDecorators;
 import com.terraforged.world.WorldGeneratorFactory;
@@ -14,7 +14,7 @@ public class WorldLookup {
 
     private final float waterLevel;
     private final float beachLevel;
-    private final RegionCache cache;
+    private final TileCache cache;
     private final Heightmap heightmap;
     private final GeneratorContext context;
     private final WorldDecorators decorators;
@@ -50,9 +50,9 @@ public class WorldLookup {
     private boolean computeCached(Cell cell, int x, int z) {
         int rx = cache.chunkToRegion(x >> 4);
         int rz = cache.chunkToRegion(z >> 4);
-        Region region = cache.getIfPresent(rx, rz);
-        if (region != null) {
-            Cell c = region.getCell(x, z);
+        Tile tile = cache.getIfPresent(rx, rz);
+        if (tile != null) {
+            Cell c = tile.getCell(x, z);
             if (c != null) {
                 cell.copy(c);
             }

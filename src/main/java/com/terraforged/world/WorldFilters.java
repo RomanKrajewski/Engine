@@ -30,8 +30,8 @@ import com.terraforged.core.filter.Erosion;
 import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.filter.Smoothing;
 import com.terraforged.core.filter.Steepness;
-import com.terraforged.core.region.Region;
-import com.terraforged.core.region.Size;
+import com.terraforged.core.tile.Tile;
+import com.terraforged.core.tile.Size;
 import com.terraforged.core.settings.FilterSettings;
 
 import java.util.function.IntFunction;
@@ -56,12 +56,12 @@ public class WorldFilters {
         this.erosionFactory = Erosion.factory(context);
     }
 
-    public void apply(Region region) {
-        Filterable map = region.filterable();
-        getErosion(map.getSize()).apply(map, region.getRegionX(), region.getRegionZ(), settings.erosion.iterations);
-        smoothing.apply(map, region.getRegionX(), region.getRegionZ(), settings.smoothing.iterations);
-        steepness.apply(map, region.getRegionX(), region.getRegionZ(), 1);
-        beach.apply(map, region.getRegionX(), region.getRegionZ(), 1);
+    public void apply(Tile tile) {
+        Filterable map = tile.filterable();
+        getErosion(map.getSize()).apply(map, tile.getRegionX(), tile.getRegionZ(), settings.erosion.iterations);
+        smoothing.apply(map, tile.getRegionX(), tile.getRegionZ(), settings.smoothing.iterations);
+        steepness.apply(map, tile.getRegionX(), tile.getRegionZ(), 1);
+        beach.apply(map, tile.getRegionX(), tile.getRegionZ(), 1);
     }
 
     private Erosion getErosion(Size size) {

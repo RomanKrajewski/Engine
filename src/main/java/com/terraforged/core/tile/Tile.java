@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.region;
+package com.terraforged.core.tile;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Disposable;
@@ -31,11 +31,11 @@ import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.batch.Batcher;
 import com.terraforged.core.concurrent.cache.SafeCloseable;
 import com.terraforged.core.filter.Filterable;
-import com.terraforged.core.region.chunk.ChunkBatchTask;
-import com.terraforged.core.region.chunk.ChunkGenTask;
-import com.terraforged.core.region.chunk.ChunkReader;
-import com.terraforged.core.region.chunk.ChunkWriter;
-import com.terraforged.core.region.gen.RegionResources;
+import com.terraforged.core.tile.chunk.ChunkBatchTask;
+import com.terraforged.core.tile.chunk.ChunkGenTask;
+import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.core.tile.chunk.ChunkWriter;
+import com.terraforged.core.tile.gen.TileResources;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.Rivermap;
 import com.terraforged.world.terrain.decorator.Decorator;
@@ -45,7 +45,7 @@ import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class Region implements Disposable, SafeCloseable {
+public class Tile implements Disposable, SafeCloseable {
 
     private final int regionX;
     private final int regionZ;
@@ -72,9 +72,9 @@ public class Region implements Disposable, SafeCloseable {
     private final AtomicInteger disposed = new AtomicInteger();
 
     // basically the RegionCache
-    private final Disposable.Listener<Region> listener;
+    private final Disposable.Listener<Tile> listener;
 
-    public Region(int regionX, int regionZ, int size, int borderChunks, RegionResources resources, Listener<Region> listener) {
+    public Tile(int regionX, int regionZ, int size, int borderChunks, TileResources resources, Listener<Tile> listener) {
         this.regionX = regionX;
         this.regionZ = regionZ;
         this.listener = listener;
@@ -387,8 +387,8 @@ public class Region implements Disposable, SafeCloseable {
             this.regionBlockX = regionChunkX << 4;
             this.regionBlockZ = regionChunkZ << 4;
             // the real coordinate of this chunk within the world
-            this.chunkX = Region.this.chunkX + regionChunkX - getOffsetChunks();
-            this.chunkZ = Region.this.chunkZ + regionChunkZ - getOffsetChunks();
+            this.chunkX = Tile.this.chunkX + regionChunkX - getOffsetChunks();
+            this.chunkZ = Tile.this.chunkZ + regionChunkZ - getOffsetChunks();
             // the real block coordinate of this chunk within the world
             this.blockX = chunkX << 4;
             this.blockZ = chunkZ << 4;
@@ -406,7 +406,7 @@ public class Region implements Disposable, SafeCloseable {
 
         @Override
         public void dispose() {
-            Region.this.dispose();
+            Tile.this.dispose();
         }
 
         @Override

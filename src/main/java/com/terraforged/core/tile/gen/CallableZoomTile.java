@@ -1,16 +1,17 @@
-package com.terraforged.core.region.gen;
+package com.terraforged.core.tile.gen;
 
-import com.terraforged.core.region.Region;
+import com.terraforged.core.concurrent.LazyCallable;
+import com.terraforged.core.tile.Tile;
 
-public class CallableZoomRegion extends GenCallable<Region> {
+public class CallableZoomTile extends LazyCallable<Tile> {
 
     private final float centerX;
     private final float centerY;
     private final float zoom;
     private final boolean filters;
-    private final RegionGenerator generator;
+    private final TileGenerator generator;
 
-    public CallableZoomRegion(float centerX, float centerY, float zoom, boolean filters, RegionGenerator generator) {
+    public CallableZoomTile(float centerX, float centerY, float zoom, boolean filters, TileGenerator generator) {
         this.centerX = centerX;
         this.centerY = centerY;
         this.zoom = zoom;
@@ -19,7 +20,7 @@ public class CallableZoomRegion extends GenCallable<Region> {
     }
 
     @Override
-    protected Region create() {
+    protected Tile create() {
         return generator.generateRegion(centerX, centerY, zoom, filters);
     }
 }

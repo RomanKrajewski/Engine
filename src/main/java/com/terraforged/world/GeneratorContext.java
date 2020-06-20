@@ -27,8 +27,8 @@ package com.terraforged.world;
 
 import com.terraforged.core.Seed;
 import com.terraforged.core.concurrent.thread.ThreadPools;
-import com.terraforged.core.region.gen.RegionCache;
-import com.terraforged.core.region.gen.RegionGenerator;
+import com.terraforged.core.tile.gen.TileCache;
+import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrains;
@@ -43,7 +43,7 @@ public class GeneratorContext {
     public final Levels levels;
     public final Terrains terrain;
     public final Settings settings;
-    public final RegionCache cache;
+    public final TileCache cache;
     public final WorldGeneratorFactory factory;
     public final TerrainProviderFactory terrainFactory;
 
@@ -51,7 +51,7 @@ public class GeneratorContext {
         this(terrain, settings, StandardTerrainProvider::new, GeneratorContext::createCache);
     }
 
-    public <T extends Settings> GeneratorContext(Terrains terrain, T settings, TerrainProviderFactory terrainFactory, Function<WorldGeneratorFactory, RegionCache> cache) {
+    public <T extends Settings> GeneratorContext(Terrains terrain, T settings, TerrainProviderFactory terrainFactory, Function<WorldGeneratorFactory, TileCache> cache) {
         this.terrain = terrain;
         this.settings = settings;
         this.seed = new Seed(settings.world.seed);
@@ -83,8 +83,8 @@ public class GeneratorContext {
         return new GeneratorContext(terrain, settings, StandardTerrainProvider::new, s -> null);
     }
 
-    protected static <T extends Settings> RegionCache createCache(WorldGeneratorFactory factory) {
-        return RegionGenerator.builder()
+    protected static <T extends Settings> TileCache createCache(WorldGeneratorFactory factory) {
+        return TileGenerator.builder()
                 .factory(factory)
                 .size(3, 2)
                 .pool(ThreadPools.getPool())

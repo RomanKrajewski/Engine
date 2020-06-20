@@ -26,7 +26,7 @@
 package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.region.Size;
+import com.terraforged.core.tile.Size;
 import com.terraforged.core.settings.FilterSettings;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.n2d.util.NoiseUtil;

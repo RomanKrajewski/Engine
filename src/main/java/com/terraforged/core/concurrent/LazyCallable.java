@@ -1,4 +1,4 @@
-package com.terraforged.core.region.gen;
+package com.terraforged.core.concurrent;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -6,9 +6,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public abstract class GenCallable<T> implements Callable<T>, Future<T> {
+public abstract class LazyCallable<T> implements Callable<T>, Future<T> {
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
     private T value = null;
 
     @Override

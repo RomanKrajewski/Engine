@@ -1,7 +1,7 @@
-package com.terraforged.core.region.chunk;
+package com.terraforged.core.tile.chunk;
 
 import com.terraforged.core.concurrent.batch.BatchTask;
-import com.terraforged.core.region.Region;
+import com.terraforged.core.tile.Tile;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.Rivermap;
 
@@ -10,15 +10,15 @@ public class ChunkBatchTask implements BatchTask {
     private final int x;
     private final int z;
     private final int size;
-    private final Region region;
+    private final Tile tile;
     private final Heightmap heightmap;
 
     private BatchTask.Notifier notifier = BatchTask.NONE;
     protected Rivermap rivers = null;
 
-    public ChunkBatchTask(int x, int z, int size, Region region, Heightmap heightmap) {
+    public ChunkBatchTask(int x, int z, int size, Tile tile, Heightmap heightmap) {
         this.heightmap = heightmap;
-        this.region = region;
+        this.tile = tile;
         this.x = x;
         this.z = z;
         this.size = size;
@@ -41,16 +41,16 @@ public class ChunkBatchTask implements BatchTask {
     private void drive() {
         for (int dz = 0; dz < size; dz++) {
             int cz = z + dz;
-            if (cz > region.getChunkSize().total) {
+            if (cz > tile.getChunkSize().total) {
                 continue;
             }
             for (int dx = 0; dx < size; dx++) {
                 int cx = x + dx;
-                if (cx > region.getChunkSize().total) {
+                if (cx > tile.getChunkSize().total) {
                     continue;
                 }
                 try {
-                    driveOne(region.getChunkWriter(cx, cz), heightmap);
+                    driveOne(tile.getChunkWriter(cx, cz), heightmap);
                 } catch (Throwable t) {
                     t.printStackTrace();
                 }
@@ -75,8 +75,8 @@ public class ChunkBatchTask implements BatchTask {
         private final float translateZ;
         private final float zoom;
 
-        public Zoom(int x, int z, int size, Region region, Heightmap heightmap, float translateX, float translateZ, float zoom) {
-            super(x, z, size, region, heightmap);
+        public Zoom(int x, int z, int size, Tile tile, Heightmap heightmap, float translateX, float translateZ, float zoom) {
+            super(x, z, size, tile, heightmap);
             this.translateX = translateX;
             this.translateZ = translateZ;
             this.zoom = zoom;

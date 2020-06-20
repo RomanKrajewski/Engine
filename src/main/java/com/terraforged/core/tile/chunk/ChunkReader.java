@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.region.chunk;
+package com.terraforged.core.tile.chunk;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Disposable;

@@ -23,28 +23,28 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.region.gen;
+package com.terraforged.core.tile.gen;
 
 import com.terraforged.core.concurrent.Disposable;
 import com.terraforged.core.concurrent.cache.CacheEntry;
 import com.terraforged.core.concurrent.thread.ThreadPool;
-import com.terraforged.core.region.Region;
+import com.terraforged.core.tile.Tile;
 import com.terraforged.world.WorldGenerator;
 import com.terraforged.world.WorldGeneratorFactory;
 
-public class RegionGenerator {
+public class TileGenerator {
 
     protected final int factor;
     protected final int border;
     protected final int batchSize;
     protected final ThreadPool threadPool;
     protected final WorldGenerator generator;
-    private final RegionResources resources = new RegionResources();
+    private final TileResources resources = new TileResources();
 
-    private Disposable.Listener<Region> listener = r -> {
+    private Disposable.Listener<Tile> listener = r -> {
     };
 
-    protected RegionGenerator(Builder builder) {
+    protected TileGenerator(Builder builder) {
         this.factor = builder.factor;
         this.border = builder.border;
         this.batchSize = builder.batchSize;
@@ -52,7 +52,7 @@ public class RegionGenerator {
         this.generator = builder.factory.get();
     }
 
-    protected void setListener(Disposable.Listener<Region> listener) {
+    protected void setListener(Disposable.Listener<Tile> listener) {
         this.listener = listener;
     }
 
@@ -60,58 +60,58 @@ public class RegionGenerator {
         return i >> factor;
     }
 
-    public RegionCache toCache() {
+    public TileCache toCache() {
         return toCache(true);
     }
 
-    public RegionCache toCache(boolean queueNeighbours) {
-        return new RegionCache(queueNeighbours, this);
+    public TileCache toCache(boolean queueNeighbours) {
+        return new TileCache(queueNeighbours, this);
     }
 
-    public CacheEntry<Region> getSync(int regionX, int regionZ) {
-        return CacheEntry.supply(new CallableRegion(regionX, regionZ, this));
+    public CacheEntry<Tile> getSync(int regionX, int regionZ) {
+        return CacheEntry.supply(new CallableTile(regionX, regionZ, this));
     }
 
-    public CacheEntry<Region> getSync(int regionX, int regionZ, float zoom, boolean filter) {
-        return CacheEntry.supply(new CallableZoomRegion(regionX, regionZ, zoom, filter, this));
+    public CacheEntry<Tile> getSync(int regionX, int regionZ, float zoom, boolean filter) {
+        return CacheEntry.supply(new CallableZoomTile(regionX, regionZ, zoom, filter, this));
     }
 
-    public CacheEntry<Region> getAsync(int regionX, int regionZ) {
-        return CacheEntry.supplyAsync(new CallableRegion(regionX, regionZ, this), threadPool);
+    public CacheEntry<Tile> getAsync(int regionX, int regionZ) {
+        return CacheEntry.supplyAsync(new CallableTile(regionX, regionZ, this), threadPool);
     }
 
-    public CacheEntry<Region> getAsync(float centerX, float centerZ, float zoom, boolean filter) {
-        return CacheEntry.supplyAsync(new CallableZoomRegion(centerX, centerZ, zoom, filter, this), threadPool);
+    public CacheEntry<Tile> getAsync(float centerX, float centerZ, float zoom, boolean filter) {
+        return CacheEntry.supplyAsync(new CallableZoomTile(centerX, centerZ, zoom, filter, this), threadPool);
     }
 
-    public Region generateRegion(int regionX, int regionZ) {
-        Region region = createEmptyRegion(regionX, regionZ);
-        region.generate(generator.getHeightmap());
-        postProcess(region);
-        return region;
+    public Tile generateRegion(int regionX, int regionZ) {
+        Tile tile = createEmptyRegion(regionX, regionZ);
+        tile.generate(generator.getHeightmap());
+        postProcess(tile);
+        return tile;
     }
 
-    public Region generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
-        Region region = createEmptyRegion(0, 0);
-        region.generate(generator.getHeightmap(), centerX, centerZ, zoom);
-        postProcess(region, centerX, centerZ, zoom, filter);
-        return region;
+    public Tile generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
+        Tile tile = createEmptyRegion(0, 0);
+        tile.generate(generator.getHeightmap(), centerX, centerZ, zoom);
+        postProcess(tile, centerX, centerZ, zoom, filter);
+        return tile;
     }
 
-    protected Region createEmptyRegion(int regionX, int regionZ) {
-        return new Region(regionX, regionZ, factor, border, resources, listener);
+    protected Tile createEmptyRegion(int regionX, int regionZ) {
+        return new Tile(regionX, regionZ, factor, border, resources, listener);
     }
 
-    protected void postProcess(Region region) {
+    protected void postProcess(Tile tile) {
 //        generator.getFilters().apply(region);
-        region.decorate(generator.getDecorators().getDecorators());
+        tile.decorate(generator.getDecorators().getDecorators());
     }
 
-    protected void postProcess(Region region, float centerX, float centerZ, float zoom, boolean filter) {
+    protected void postProcess(Tile tile, float centerX, float centerZ, float zoom, boolean filter) {
         if (filter) {
-            generator.getFilters().apply(region);
+            generator.getFilters().apply(tile);
         }
-        region.decorateZoom(generator.getDecorators().getDecorators(), centerX, centerZ, zoom);
+        tile.decorateZoom(generator.getDecorators().getDecorators(), centerX, centerZ, zoom);
     }
 
     public static Builder builder() {
@@ -155,11 +155,11 @@ public class RegionGenerator {
             return this;
         }
 
-        public RegionGenerator build() {
+        public TileGenerator build() {
             if (threadPool.supportsBatching() && batchSize > 1) {
-                return new RegionGeneratorBatched(this);
+                return new TileGeneratorBatched(this);
             }
-            return new RegionGenerator(this);
+            return new TileGenerator(this);
         }
     }
 }

@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.region;
+package com.terraforged.core.tile;
 
 public class Size {
 

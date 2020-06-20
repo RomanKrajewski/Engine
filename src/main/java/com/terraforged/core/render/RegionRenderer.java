@@ -1,7 +1,7 @@
 package com.terraforged.core.render;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.region.Region;
+import com.terraforged.core.tile.Tile;
 
 public class RegionRenderer {
 
@@ -19,8 +19,8 @@ public class RegionRenderer {
         return settings;
     }
 
-    public RenderRegion render(Region region) {
-        RenderRegion renderRegion = new RenderRegion(region);
+    public RenderRegion render(Tile tile) {
+        RenderRegion renderRegion = new RenderRegion(tile);
         render(renderRegion);
         return renderRegion;
     }
@@ -36,15 +36,15 @@ public class RegionRenderer {
         shape.noFill();
         for (int dy = 0; dy < resolution; dy++) {
             for (int dx = 0; dx < resolution; dx++) {
-                draw(shape, region.getRegion(), dx, dy, resolution, w, h, unit);
+                draw(shape, region.getTile(), dx, dy, resolution, w, h, unit);
             }
         }
         shape.endQuads();
         region.setMesh(shape);
     }
 
-    private void draw(RenderBuffer shape, Region region, int dx, int dz, int resolution, float w, float h, float unit) {
-        Cell cell = region.getCell(dx, dz);
+    private void draw(RenderBuffer shape, Tile tile, int dx, int dz, int resolution, float w, float h, float unit) {
+        Cell cell = tile.getCell(dx, dz);
         if (cell == null) {
             return;
         }
@@ -81,41 +81,41 @@ public class RegionRenderer {
         if (dz <= 0 && dx >= resolution - 1) {
             drawEdge(shape, dx, y, dz, w, h, false);
             drawEdge(shape, dx + 1, y, dz, w, h, true);
-            drawFace(shape, region, dx, y, dz, dx - 1, dz, w, h, unit);
+            drawFace(shape, tile, dx, y, dz, dx - 1, dz, w, h, unit);
             return;
         }
 
         if (dx <= 0) {
             drawEdge(shape, dx, y, dz, w, h, true);
-            drawFace(shape, region, dx, y, dz, dx, dz - 1, w, h, unit);
+            drawFace(shape, tile, dx, y, dz, dx, dz - 1, w, h, unit);
             return;
         }
         if (dz <= 0) {
             drawEdge(shape, dx, y, dz, w, h, false);
-            drawFace(shape, region, dx, y, dz, dx - 1, dz, w, h, unit);
+            drawFace(shape, tile, dx, y, dz, dx - 1, dz, w, h, unit);
             return;
         }
 
         if (dx >= resolution - 1) {
             drawEdge(shape, dx + 1, y, dz, w, h, true);
-            drawFace(shape, region, dx, y, dz, dx, dz - 1, w, h, unit);
-            drawFace(shape, region, dx, y, dz, dx - 1, dz, w, h, unit);
+            drawFace(shape, tile, dx, y, dz, dx, dz - 1, w, h, unit);
+            drawFace(shape, tile, dx, y, dz, dx - 1, dz, w, h, unit);
             return;
         }
 
         if (dz >= resolution - 1) {
             drawEdge(shape, dx, y, dz + 1, w, h, false);
-            drawFace(shape, region, dx, y, dz, dx - 1, dz, w, h, unit);
-            drawFace(shape, region, dx, y, dz, dx, dz - 1, w, h, unit);
+            drawFace(shape, tile, dx, y, dz, dx - 1, dz, w, h, unit);
+            drawFace(shape, tile, dx, y, dz, dx, dz - 1, w, h, unit);
             return;
         }
 
-        drawFace(shape, region, dx, y, dz, dx - 1, dz, w, h, unit);
-        drawFace(shape, region, dx, y, dz, dx, dz - 1, w, h, unit);
+        drawFace(shape, tile, dx, y, dz, dx - 1, dz, w, h, unit);
+        drawFace(shape, tile, dx, y, dz, dx, dz - 1, w, h, unit);
     }
 
-    private void drawFace(RenderBuffer shape, Region region, int px, int py, int pz, int dx, int dz, float w, float h, float unit) {
-        Cell cell = region.getCell(dx, dz);
+    private void drawFace(RenderBuffer shape, Tile tile, int px, int py, int pz, int dx, int dz, float w, float h, float unit) {
+        Cell cell = tile.getCell(dx, dz);
         if (cell == null) {
             return;
         }

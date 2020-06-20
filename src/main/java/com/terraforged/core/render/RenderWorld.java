@@ -4,9 +4,9 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.cache.CacheEntry;
 import com.terraforged.core.concurrent.thread.ThreadPool;
 import com.terraforged.core.concurrent.thread.ThreadPools;
-import com.terraforged.core.region.Region;
-import com.terraforged.core.region.Size;
-import com.terraforged.core.region.gen.RegionGenerator;
+import com.terraforged.core.tile.Tile;
+import com.terraforged.core.tile.Size;
+import com.terraforged.core.tile.gen.TileGenerator;
 
 public class RenderWorld {
 
@@ -14,12 +14,12 @@ public class RenderWorld {
     private final Size regionSize;
     private final RenderAPI context;
     private final RegionRenderer renderer;
-    private final RegionGenerator generator;
+    private final TileGenerator generator;
     private final RenderRegion[] view;
     private final CacheEntry<RenderRegion>[] queue;
     private final ThreadPool threadPool = ThreadPools.getPool();
 
-    public RenderWorld(RegionGenerator generator, RenderAPI context, RenderSettings settings, int regionCount, int regionSize) {
+    public RenderWorld(TileGenerator generator, RenderAPI context, RenderSettings settings, int regionCount, int regionSize) {
         this.context = context;
         this.generator = generator;
         this.regionCount = regionCount;
@@ -60,10 +60,10 @@ public class RenderWorld {
 
         float ox = cx - rx;
         float oz = cz - rz;
-        Region region = renderRegion.getRegion();
-        int dx = (int) (region.getBlockSize().size * ox);
-        int dz = (int) (region.getBlockSize().size * oz);
-        return region.getCell(dx, dz);
+        Tile tile = renderRegion.getTile();
+        int dx = (int) (tile.getBlockSize().size * ox);
+        int dz = (int) (tile.getBlockSize().size * oz);
+        return tile.getCell(dx, dz);
     }
 
     public void redraw() {

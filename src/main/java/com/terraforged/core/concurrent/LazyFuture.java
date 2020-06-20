@@ -2,60 +2,36 @@ package com.terraforged.core.concurrent;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
-public class LazyFuture<T> implements Future<T> {
+public class LazyFuture<T> extends LazyCallable<T> {
 
-    private final Callable<T> callable;
-    private volatile T value = null;
+    private final Supplier<T> supplier;
 
-    public LazyFuture(Callable<T> callable) {
-        this.callable = callable;
+    public LazyFuture(Supplier<T> supplier) {
+        this.supplier = supplier;
     }
 
     @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        return false;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return false;
-    }
-
-    @Override
-    public boolean isDone() {
-        return value != null;
-    }
-
-    private T getOrCall() throws Exception {
-        if (value == null) {
-            T result = callable.call();
-            value = result;
-            return result;
-        }
-        return value;
-    }
-
-    @Override
-    public T get() {
-        try {
-            return getOrCall();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    @Override
-    public T get(long timeout, TimeUnit unit) {
-        return get();
+    protected T create() {
+        return supplier.get();
     }
 
     public static Future<Void> adapt(Runnable runnable) {
         return new LazyFuture<>(() -> {
             runnable.run();
             return null;
+        });
+    }
+
+    public static <T> Future<T> adapt(Callable<T> callable) {
+        return new LazyFuture<>(() -> {
+            try {
+                return callable.call();
+            } catch (Throwable t) {
+                t.printStackTrace();
+                return null;
+            }
         });
     }
 }

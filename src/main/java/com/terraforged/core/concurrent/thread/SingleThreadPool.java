@@ -24,7 +24,7 @@ public class SingleThreadPool implements ThreadPool {
 
     @Override
     public <T> Future<T> submit(Callable<T> callable) {
-        return new LazyFuture<>(callable);
+        return LazyFuture.adapt(callable);
     }
 
     @Override

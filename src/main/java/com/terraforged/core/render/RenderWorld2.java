@@ -2,9 +2,9 @@ package com.terraforged.core.render;
 
 import com.terraforged.core.concurrent.cache.CacheEntry;
 import com.terraforged.core.concurrent.thread.ThreadPools;
-import com.terraforged.core.region.Size;
-import com.terraforged.core.region.gen.RegionCache;
-import com.terraforged.core.region.gen.RegionGenerator;
+import com.terraforged.core.tile.Size;
+import com.terraforged.core.tile.gen.TileCache;
+import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.core.util.PosIterator;
 import com.terraforged.core.util.RollingGrid;
 
@@ -12,15 +12,15 @@ public class RenderWorld2 implements RollingGrid.Generator<RenderWorld2.RegionHo
 
     private final int factor;
     private final Size regionSize;
-    private final RegionCache cache;
-    private final RegionGenerator generator;
+    private final TileCache cache;
+    private final TileGenerator generator;
     private final RenderAPI context;
     private final RegionRenderer renderer;
     private final RollingGrid<RegionHolder> world;
 
     private boolean first = true;
 
-    public RenderWorld2(RegionGenerator generator, RenderAPI context, RenderSettings settings, int regionCount, int regionSize) {
+    public RenderWorld2(TileGenerator generator, RenderAPI context, RenderSettings settings, int regionCount, int regionSize) {
         this.context = context;
         this.factor = regionSize;
         this.generator = generator;
