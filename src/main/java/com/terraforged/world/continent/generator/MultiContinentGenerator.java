@@ -44,10 +44,10 @@ public class MultiContinentGenerator extends AbstractContinentGenerator {
     public void apply(Cell cell, float x, float y, float px, float py) {
         int cellX = 0;
         int cellY = 0;
-        Vec2f center = null;
-
         int xr = NoiseUtil.round(px);
         int yr = NoiseUtil.round(py);
+        Vec2f center = NoiseUtil.CELL_2D[NoiseUtil.hash2D(seed, xr, yr) & 255];
+
         float edgeDistance = NumConstants.LARGE;
         float edgeDistance2 = NumConstants.LARGE;
         float valueDistance = NumConstants.LARGE;
@@ -112,17 +112,13 @@ public class MultiContinentGenerator extends AbstractContinentGenerator {
                 float vecY = yi - py + vec.y;
                 float distance = dist.apply(vecX, vecY);
 
-                if (distance < valueDistance) {
+                if (distance < valueDistance || (center == null && dx == 0 && dy == 0)) {
                     valueDistance = distance;
+                    center = vec;
                     cellX = xi;
                     cellY = yi;
-                    center = vec;
                 }
             }
-        }
-
-        if (center == null) {
-            return;
         }
 
         pos.x = (int) ((cellX + center.x) / frequency);

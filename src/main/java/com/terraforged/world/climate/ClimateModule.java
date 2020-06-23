@@ -113,10 +113,10 @@ public class ClimateModule {
 
         int cellX = 0;
         int cellY = 0;
-
-        Vec2f vec2f = null;
         int xr = NoiseUtil.round(x);
         int yr = NoiseUtil.round(y);
+        Vec2f center = null;
+
         float edgeDistance = NumConstants.LARGE;
         float edgeDistance2 = NumConstants.LARGE;
         float valueDistance = NumConstants.LARGE;
@@ -132,9 +132,9 @@ public class ClimateModule {
                 float vecY = yi - y + vec.y;
                 float distance = dist.apply(vecX, vecY);
 
-                if (distance < valueDistance) {
+                if (distance < valueDistance || (center == null && dx == 0 && dy == 0)) {
                     valueDistance = distance;
-                    vec2f = vec;
+                    center = vec;
                     cellX = xi;
                     cellY = yi;
                 }
@@ -149,8 +149,8 @@ public class ClimateModule {
             }
         }
 
-        float biomeX = cellX + vec2f.x;
-        float biomeY = cellY + vec2f.y;
+        float biomeX = cellX + center.x;
+        float biomeY = cellY + center.y;
 
         cell.biome = cellValue(seed, cellX, cellY);
         cell.moisture = moisture.getValue(biomeX, biomeY);
