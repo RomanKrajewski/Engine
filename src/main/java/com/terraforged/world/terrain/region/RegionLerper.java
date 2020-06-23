@@ -60,13 +60,4 @@ public class RegionLerper implements Populator {
 
         cell.value = NoiseUtil.lerp(lowerValue, upperValue, alpha);
     }
-
-    @Override
-    public void tag(Cell cell, float x, float y) {
-        if (cell.regionEdge == 0) {
-            lower.tag(cell, x, y);
-            return;
-        }
-        upper.tag(cell, x, y);
-    }
 }

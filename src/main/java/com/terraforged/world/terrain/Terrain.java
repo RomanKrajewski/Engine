@@ -184,7 +184,21 @@ public class Terrain implements ITerrain.Delegate {
     }
 
     public static Terrain mountains(Settings settings) {
-        return new Terrain("mountains", settings.terrain.mountains.weight, TerrainType.HIGHLAND);
+        return new Terrain("mountains", settings.terrain.mountains.weight, TerrainType.HIGHLAND) {
+            @Override
+            public boolean isMountain() {
+                return true;
+            }
+        };
+    }
+
+    public static Terrain mountainChain(Settings settings) {
+        return new Terrain("mountain_chain", settings.terrain.mountains.weight, TerrainType.HIGHLAND) {
+            @Override
+            public boolean isMountain() {
+                return true;
+            }
+        };
     }
 
     public static Terrain volcano(Settings settings) {

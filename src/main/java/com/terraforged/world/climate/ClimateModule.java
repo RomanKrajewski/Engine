@@ -29,16 +29,16 @@ import com.terraforged.core.NumConstants;
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.settings.Settings;
-import com.terraforged.world.GeneratorContext;
-import com.terraforged.world.biome.BiomeType;
-import com.terraforged.world.continent.Continent;
-import com.terraforged.world.terrain.Terrains;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.func.DistanceFunc;
 import com.terraforged.n2d.func.EdgeFunc;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.n2d.util.Vec2f;
+import com.terraforged.world.GeneratorContext;
+import com.terraforged.world.biome.BiomeType;
+import com.terraforged.world.continent.Continent;
+import com.terraforged.world.terrain.Terrains;
 
 public class ClimateModule {
 

@@ -47,9 +47,21 @@ public interface TerrainProvider {
     List<Populator> getPopulators();
 
     /**
+     * Returns the number of Populator variants for the given terrain type
+     */
+    int getVariantCount(Terrain terrain);
+
+    /**
      * Returns a populator for the provided Terrain, or the default if not registered
      */
-    Populator getPopulator(Terrain terrain);
+    default Populator getPopulator(Terrain terrain) {
+        return getPopulator(terrain, 0);
+    }
+
+    /**
+     * Returns a populator for the provided Terrain, or the default if not registered
+     */
+    Populator getPopulator(Terrain terrain, int variant);
 
     /**
      * Add a TerrainPopulator to world generation.

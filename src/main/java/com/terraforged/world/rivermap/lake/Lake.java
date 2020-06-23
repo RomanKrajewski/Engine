@@ -89,17 +89,8 @@ public class Lake extends TerrainPopulator {
             float lakeDepth = Math.min(cell.value, depth);
             cell.value = NoiseUtil.lerp(cell.value, lakeDepth, depthAlpha);
             cell.riverMask *= (1 - depthAlpha);
-            tag(cell);
+            cell.terrain = terrains.lake;
         }
-    }
-
-    @Override
-    public void tag(Cell cell, float x, float z) {
-//        cell.tag = terrains.lake;
-    }
-
-    protected void tag(Cell cell) {
-        cell.terrain = terrains.lake;
     }
 
     public boolean overlaps(float x, float z, float radius2) {

@@ -78,11 +78,6 @@ public abstract class AbstractContinentGenerator implements Continent {
     }
 
     @Override
-    public void tag(Cell cell, float x, float y) {
-
-    }
-
-    @Override
     public final void apply(Cell cell, final float x, final float y) {
         float ox = warp.getOffsetX(x, y);
         float oz = warp.getOffsetY(x, y);

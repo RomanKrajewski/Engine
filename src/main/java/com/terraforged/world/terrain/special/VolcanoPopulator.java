@@ -117,28 +117,4 @@ public class VolcanoPopulator extends TerrainPopulator {
 
         cell.value = bias + value;
     }
-
-    @Override
-    public void tag(Cell cell, float x, float z) {
-        float value = cone.getValue(x, z);
-        float limit = height.getValue(x, z);
-        float maxHeight = limit * inversionPoint;
-        if (value > maxHeight) {
-            float steepnessModifier = 1;
-
-            // as alpha approaches 1.0, position is closer to center of volcano
-            float delta = (value - maxHeight) * steepnessModifier;
-            float range = (limit - maxHeight);
-            float alpha = delta / range;
-
-            // calculate height inside volcano
-            if (alpha > throat_value) {
-                cell.terrain = inner;
-            } else {
-                cell.terrain = outer;
-            }
-        } else {
-            cell.terrain = outer;
-        }
-    }
 }

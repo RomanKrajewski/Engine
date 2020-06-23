@@ -27,9 +27,9 @@ package com.terraforged.core.cell;
 
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.pool.ObjectPool;
+import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.terrain.Terrain;
-import com.terraforged.n2d.util.NoiseUtil;
 
 public class Cell {
 
@@ -42,7 +42,7 @@ public class Cell {
         }
     };
 
-    private static final ObjectPool<Cell> POOL = new ObjectPool<>(500, Cell::new);
+    private static final ObjectPool<Cell> POOL = new ObjectPool<>(32, Cell::new);
 
     public int continentX;
     public int continentZ;
@@ -93,6 +93,7 @@ public class Cell {
 
         moisture = other.moisture;
         temperature = other.temperature;
+        macroNoise = other.macroNoise;
 
         steepness = other.steepness;
         erosion = other.erosion;

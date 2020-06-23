@@ -28,6 +28,8 @@ package com.terraforged.world.terrain.provider;
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.core.settings.TerrainSettings;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.heightmap.RegionConfig;
 import com.terraforged.world.terrain.LandForms;
@@ -35,8 +37,6 @@ import com.terraforged.world.terrain.MixedTerarin;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.populator.TerrainPopulator;
 import com.terraforged.world.terrain.special.VolcanoPopulator;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ public class StandardTerrainProvider implements TerrainProvider {
 
     private final List<TerrainPopulator> mixable = new ArrayList<>();
     private final List<TerrainPopulator> unmixable = new ArrayList<>();
-    private final Map<Terrain, Populator> populators = new HashMap<>();
+    private final Map<Terrain, List<Populator>> populators = new HashMap<>();
 
     private final LandForms landForms;
     private final RegionConfig config;
@@ -76,6 +76,7 @@ public class StandardTerrainProvider implements TerrainProvider {
         registerMixable(context.terrain.torridonian, landForms.getLandBase(), landForms.torridonian(context.seed), settings.torridonian);
 
         registerUnMixable(context.terrain.badlands, landForms.getLandBase(), landForms.badlands(context.seed), settings.badlands);
+        registerUnMixable(context.terrain.mountains, landForms.getLandBase(), landForms.mountains(context.seed), settings.mountains);
         registerUnMixable(context.terrain.mountains, landForms.getLandBase(), landForms.mountains2(context.seed), settings.mountains);
         registerUnMixable(context.terrain.mountains, landForms.getLandBase(), landForms.mountains3(context.seed), settings.mountains);
         registerUnMixable(new VolcanoPopulator(context.seed, config, context.levels, context.terrain));
@@ -83,19 +84,41 @@ public class StandardTerrainProvider implements TerrainProvider {
 
     @Override
     public void registerMixable(TerrainPopulator populator) {
-        populators.putIfAbsent(populator.getType(), populator);
+        populators.computeIfAbsent(populator.getType(), t -> new ArrayList<>()).add(populator);
         mixable.add(populator);
     }
 
     @Override
     public void registerUnMixable(TerrainPopulator populator) {
-        populators.putIfAbsent(populator.getType(), populator);
+        populators.computeIfAbsent(populator.getType(), t -> new ArrayList<>()).add(populator);
         unmixable.add(populator);
     }
 
     @Override
-    public Populator getPopulator(Terrain terrain) {
-        return populators.getOrDefault(terrain, defaultPopulator);
+    public int getVariantCount(Terrain terrain) {
+        List<Populator> list = populators.get(terrain);
+        if (list == null) {
+            return 0;
+        }
+        return list.size();
+    }
+
+    @Override
+    public Populator getPopulator(Terrain terrain, int variant) {
+        if (variant < 0) {
+            return defaultPopulator;
+        }
+
+        List<Populator> list = populators.get(terrain);
+        if (list == null) {
+            return defaultPopulator;
+        }
+
+        if (variant >= list.size()) {
+            variant = list.size() - 1;
+        }
+
+        return list.get(variant);
     }
 
     @Override

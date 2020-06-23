@@ -28,8 +28,8 @@ package com.terraforged.core.settings;
 import com.terraforged.core.serialization.annotation.Comment;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
-import com.terraforged.world.terrain.populator.TerrainPopulator;
 import com.terraforged.n2d.Module;
+import com.terraforged.world.terrain.populator.TerrainPopulator;
 
 @Serializable
 public class TerrainSettings {
@@ -41,9 +41,9 @@ public class TerrainSettings {
     public Terrain dales = new Terrain(2F, 1F, 1F);
     public Terrain plateau = new Terrain(2F, 1F, 1F);
     public Terrain badlands = new Terrain(2F, 1F, 1F);
-    public Terrain torridonian = new Terrain(0.5F, 1F, 1F);
+    public Terrain torridonian = new Terrain(1F, 1F, 1F);
     public Terrain mountains = new Terrain(2F, 1F, 1F);
-    public Terrain volcano = new Terrain(1F, 1F, 1F);
+    public Terrain volcano = new Terrain(1.5F, 1F, 1F);
 
     @Serializable
     public static class General {

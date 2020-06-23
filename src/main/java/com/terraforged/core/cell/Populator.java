@@ -32,8 +32,6 @@ public interface Populator extends Module {
 
     void apply(Cell cell, float x, float y);
 
-    void tag(Cell cell, float x, float y);
-
     @Override
     default float getValue(float x, float z) {
         try (Resource<Cell> cell = Cell.pooled()) {

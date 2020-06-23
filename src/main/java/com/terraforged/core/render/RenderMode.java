@@ -3,8 +3,8 @@ package com.terraforged.core.render;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.pool.ObjectPool;
-import com.terraforged.world.heightmap.Levels;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.heightmap.Levels;
 
 import java.awt.*;
 

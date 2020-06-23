@@ -27,10 +27,10 @@ package com.terraforged.core.module;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
-import com.terraforged.world.climate.Climate;
-import com.terraforged.world.terrain.Terrain;
 import com.terraforged.n2d.func.Interpolation;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.climate.Climate;
+import com.terraforged.world.terrain.Terrain;
 
 public class MultiBlender extends Select implements Populator {
 
@@ -93,30 +93,6 @@ public class MultiBlender extends Select implements Populator {
 
             upper.apply(cell, x, y);
             cell.value = NoiseUtil.lerp(lowerVal, cell.value, alpha);
-        }
-    }
-
-    @Override
-    public void tag(Cell cell, float x, float y) {
-        float select = getSelect(cell, x, y);
-        if (select < blendLower) {
-            lower.tag(cell, x, y);
-            return;
-        }
-
-        if (select > blendUpper) {
-            upper.tag(cell, x, y);
-            return;
-        }
-
-        if (select < midpoint) {
-            lower.tag(cell, x, y);
-//            upper.tag(cell, x, y);
-            if (cell.value > cell.terrain.getMax(climate.getRand().getValue(x, y))) {
-                upper.tag(cell, x, y);
-            }
-        } else {
-            upper.tag(cell, x, y);
         }
     }
 }

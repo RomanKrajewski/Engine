@@ -46,6 +46,10 @@ public interface ITerrain {
         return false;
     }
 
+    default boolean isMountain() {
+        return false;
+    }
+
     interface Delegate extends ITerrain {
 
         TerrainType getType();
@@ -103,6 +107,11 @@ public interface ITerrain {
         @Override
         default boolean isSubmerged() {
             return getType().isSubmerged();
+        }
+
+        @Override
+        default boolean isMountain() {
+            return getType().isMountain();
         }
     }
 }

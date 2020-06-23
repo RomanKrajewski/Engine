@@ -3,9 +3,9 @@ package com.terraforged.core.settings;
 import com.terraforged.core.serialization.annotation.Comment;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
+import com.terraforged.n2d.func.DistanceFunc;
 import com.terraforged.world.continent.ContinentMode;
 import com.terraforged.world.continent.SpawnType;
-import com.terraforged.n2d.func.DistanceFunc;
 import com.terraforged.world.heightmap.Heightmap;
 
 @Serializable

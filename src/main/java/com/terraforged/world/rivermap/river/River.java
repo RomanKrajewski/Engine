@@ -109,13 +109,6 @@ public class River extends TerrainPopulator implements Comparable<River> {
         carve(cell, x, z);
     }
 
-    @Override
-    public void tag(Cell cell, float x, float z) {
-        if (!cell.terrain.overridesRiver()) {
-            cell.terrain = terrains.river;
-        }
-    }
-
     private void carve(Cell cell, float x, float z) {
         float valleyAlpha = valley.getValue(x, z);
         if (valleyAlpha == 0) {

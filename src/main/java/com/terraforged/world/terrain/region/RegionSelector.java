@@ -48,11 +48,6 @@ public class RegionSelector implements Populator {
         get(cell.region).apply(cell, x, y);
     }
 
-    @Override
-    public void tag(Cell cell, float x, float y) {
-        get(cell.region).tag(cell, x, y);
-    }
-
     public Populator get(float identity) {
         int index = NoiseUtil.round(identity * maxIndex);
         return nodes[index];

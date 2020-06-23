@@ -94,27 +94,4 @@ public class ContinentLerper3 implements Populator {
             cell.value = NoiseUtil.lerp(lowerVal, cell.value, alpha);
         }
     }
-
-    @Override
-    public void tag(Cell cell, float x, float y) {
-        float select = cell.continentEdge;
-        if (select < blendLower) {
-            lower.tag(cell, x, y);
-            return;
-        }
-
-        if (select > blendUpper) {
-            upper.tag(cell, x, y);
-            return;
-        }
-
-        if (select < midpoint) {
-            lower.tag(cell, x, y);
-            if (cell.value > cell.terrain.getMax(climate.getRand().getValue(x, y))) {
-                upper.tag(cell, x, y);
-            }
-        } else {
-            upper.tag(cell, x, y);
-        }
-    }
 }

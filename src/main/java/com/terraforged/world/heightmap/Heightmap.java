@@ -28,6 +28,7 @@ package com.terraforged.world.heightmap;
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.module.Blender;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.core.settings.TerrainSettings;
@@ -59,11 +60,11 @@ public class Heightmap implements Populator {
     public static final float BEACH_VALUE = 0.375F;
     public static final float INLAND_VALUE = 0.55F;
 
-    private final Terrains terrain;
+    protected final Terrains terrain;
     private final TransitionPoints transitionPoints;
 
-    private final Continent continentGenerator;
-    private final Populator regionModule;
+    protected final Continent continentGenerator;
+    protected final Populator regionModule;
 
     private final Climate climate;
     private final Populator root;
@@ -120,7 +121,7 @@ public class Heightmap implements Populator {
 
         // mountain populator
         Populator mountains = register(
-                context.terrain.mountains,
+                context.terrain.mountainChain,
                 terrainProvider.getLandforms().getLandBase(),
                 terrainProvider.getLandforms().mountains(context.seed),
                 settings.terrain.mountains
@@ -171,11 +172,13 @@ public class Heightmap implements Populator {
         applyClimate(cell, x, z);
     }
 
-    @Override
     public void tag(Cell cell, float x, float z) {
-        continentGenerator.apply(cell, x, z);
-        regionModule.apply(cell, x, z);
-        root.tag(cell, x, z);
+        try (Resource<Cell> resource = Cell.pooled()) {
+            continentGenerator.apply(resource.get(), x, z);
+            regionModule.apply(resource.get(), x, z);
+            root.apply(resource.get(), x, z);
+            cell.terrain = resource.get().terrain;
+        }
     }
 
     public void applyBase(Cell cell, float x, float z) {
@@ -213,8 +216,8 @@ public class Heightmap implements Populator {
         return transitionPoints;
     }
 
-    public Populator getPopulator(Terrain terrain) {
-        return terrainProvider.getPopulator(terrain);
+    public Populator getPopulator(Terrain terrain, int id) {
+        return terrainProvider.getPopulator(terrain, id);
     }
 
     private TerrainPopulator register(Terrain terrain, Module variance) {

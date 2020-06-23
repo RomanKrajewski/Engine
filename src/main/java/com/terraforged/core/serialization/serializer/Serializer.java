@@ -134,7 +134,7 @@ public class Serializer {
         Comment comment = field.getAnnotation(Comment.class);
         if (comment != null) {
             writer.name("comment");
-            writer.value(comment.value()[0]);
+            writer.value(getComment(comment));
         }
 
         if (field.getType() == boolean.class) {
@@ -167,6 +167,10 @@ public class Serializer {
         Name nameMeta = field.getAnnotation(Name.class);
         String name = nameMeta == null ? field.getName() : nameMeta.value();
         return NameUtil.toTranslationKey(parent, name);
+    }
+
+    private static String getComment(Comment comment) {
+        return String.join("\n", comment.value());
     }
 
     protected static boolean isSerializable(Field field) {

@@ -77,20 +77,4 @@ public class ContinentLerper2 implements Populator {
 
         cell.value = NoiseUtil.lerp(lowerVal, upperVal, alpha);
     }
-
-    @Override
-    public void tag(Cell cell, float x, float y) {
-        float select = cell.continentEdge;
-        if (select < blendLower) {
-            lower.tag(cell, x, y);
-            return;
-        }
-
-        if (select > blendUpper) {
-            upper.tag(cell, x, y);
-            return;
-        }
-
-        upper.tag(cell, x, y);
-    }
 }

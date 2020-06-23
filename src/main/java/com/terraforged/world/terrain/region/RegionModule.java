@@ -105,11 +105,6 @@ public class RegionModule implements Populator {
         cell.regionEdge = edgeValue(edgeDistance, edgeDistance2);
     }
 
-    @Override
-    public void tag(Cell cell, float x, float y) {
-
-    }
-
     private float cellValue(int seed, int cellX, int cellY) {
         float value = NoiseUtil.valCoord2D(seed, cellX, cellY);
         return NoiseUtil.map(value, -1, 1, 2);

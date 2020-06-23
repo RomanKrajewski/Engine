@@ -27,9 +27,9 @@ package com.terraforged.core.util;
 
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.world.heightmap.Levels;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
+import com.terraforged.world.heightmap.Levels;
 
 import java.util.function.BiPredicate;
 

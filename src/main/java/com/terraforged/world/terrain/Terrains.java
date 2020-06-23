@@ -50,6 +50,7 @@ public class Terrains {
     public final Terrain dales;
     public final Terrain torridonian;
     public final Terrain mountains;
+    public final Terrain mountainChain;
     public final Terrain volcano;
     public final Terrain volcanoPipe;
     public final List<Terrain> index;
@@ -75,6 +76,7 @@ public class Terrains {
                 hills = mutable.hills,
                 dales = mutable.dales,
                 mountains = mutable.mountains,
+                mountainChain = mutable.mountainChain,
                 volcano = mutable.volcanoes,
                 volcanoPipe = mutable.volcanoPipe
         );
@@ -100,6 +102,7 @@ public class Terrains {
         terrain.dales = Terrain.dales(settings);
         terrain.torridonian = Terrain.torridonian(settings);
         terrain.mountains = Terrain.mountains(settings);
+        terrain.mountainChain = Terrain.mountainChain(settings);
         terrain.volcanoes = Terrain.volcano(settings);
         terrain.volcanoPipe = Terrain.volcanoPipe(settings);
         return terrain.create();
@@ -124,6 +127,7 @@ public class Terrains {
         public Terrain dales = Terrain.NONE;
         public Terrain torridonian = Terrain.NONE;
         public Terrain mountains = Terrain.NONE;
+        public Terrain mountainChain = Terrain.NONE;
         public Terrain volcanoes = Terrain.NONE;
         public Terrain volcanoPipe = Terrain.NONE;
 

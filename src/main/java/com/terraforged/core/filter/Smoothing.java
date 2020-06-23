@@ -27,8 +27,8 @@ package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.settings.Settings;
-import com.terraforged.world.heightmap.Levels;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.heightmap.Levels;
 
 public class Smoothing implements Filter {
 

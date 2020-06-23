@@ -68,11 +68,6 @@ public class TerrainPopulator implements Populator {
         cell.terrain = type;
     }
 
-    @Override
-    public void tag(Cell cell, float x, float y) {
-        cell.terrain = type;
-    }
-
     public static Module clamp(Module module) {
         if (module.minValue() < 0 || module.maxValue() > 1) {
             return module.clamp(0, 1);

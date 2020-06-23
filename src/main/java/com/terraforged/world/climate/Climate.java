@@ -88,13 +88,14 @@ public class Climate {
             if (cell.terrain == terrains.coast) {
                 cell.terrain = terrains.ocean;
             }
-        } else if (cell.biomeEdge < edgeBlend) {
+        } else if (cell.biomeEdge < edgeBlend || cell.terrain == terrains.mountainChain) {
             float modifier = 1 - NoiseUtil.map(cell.biomeEdge, 0, edgeBlend, edgeBlend);
             float distance = offsetDistance * modifier;
             float dx = getOffsetX(x, z, distance);
             float dz = getOffsetZ(x, z, distance);
             x += dx;
             z += dz;
+
             biomeNoise.apply(cell, x, z, false);
         }
 

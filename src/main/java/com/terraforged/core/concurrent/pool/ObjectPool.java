@@ -30,6 +30,8 @@ import com.terraforged.core.concurrent.cache.SafeCloseable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 public class ObjectPool<T> {
@@ -37,6 +39,7 @@ public class ObjectPool<T> {
     private final int capacity;
     private final List<Item<T>> pool;
     private final Supplier<? extends T> supplier;
+    private final ReadWriteLock mutex = new ReentrantReadWriteLock();
 
     public ObjectPool(int size, Supplier<? extends T> supplier) {
         this.capacity = size;
@@ -45,22 +48,21 @@ public class ObjectPool<T> {
     }
 
     public Resource<T> get() {
-        synchronized (pool) {
-            if (pool.size() > 0) {
-                return pool.remove(pool.size() - 1).retain();
+        if (mutex.readLock().tryLock()) {
+            int size = pool.size();
+            mutex.readLock().unlock();
+
+            if (size > 0 && mutex.writeLock().tryLock()) {
+                Item<T> item = pool.remove(pool.size() - 1).retain();
+                mutex.writeLock().unlock();
+                return item;
             }
         }
         return new Item<>(supplier.get(), this);
     }
 
-    public int size() {
-        synchronized (pool) {
-            return pool.size();
-        }
-    }
-
     private boolean restore(Item<T> item) {
-        synchronized (pool) {
+        if (mutex.writeLock().tryLock()) {
             int size = pool.size();
             if (size < capacity) {
                 pool.add(item);

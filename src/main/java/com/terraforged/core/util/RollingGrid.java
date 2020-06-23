@@ -8,7 +8,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.function.IntFunction;
 
 public class RollingGrid<T> {

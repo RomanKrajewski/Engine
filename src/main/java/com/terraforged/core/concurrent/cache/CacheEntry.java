@@ -2,8 +2,6 @@ package com.terraforged.core.concurrent.cache;
 
 import com.terraforged.core.concurrent.thread.ThreadPool;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;

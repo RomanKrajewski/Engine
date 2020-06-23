@@ -27,10 +27,10 @@ package com.terraforged.core.module;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
-import com.terraforged.world.terrain.Terrain;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.func.Interpolation;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.terrain.Terrain;
 
 public class Blender extends Select implements Populator {
 
@@ -91,26 +91,6 @@ public class Blender extends Select implements Populator {
         cell.value = NoiseUtil.lerp(lowerVal, upperVal, alpha);
         if (select < midpoint) {
             cell.terrain = lowerType;
-        }
-    }
-
-    @Override
-    public void tag(Cell cell, float x, float y) {
-        float select = getSelect(cell, x, y);
-        if (select < blendLower) {
-            lower.tag(cell, x, y);
-            return;
-        }
-
-        if (select > blendUpper) {
-            upper.tag(cell, x, y);
-            return;
-        }
-
-        if (select < tagThreshold) {
-            lower.tag(cell, x, y);
-        } else {
-            upper.tag(cell, x, y);
         }
     }
 }
