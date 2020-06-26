@@ -12,6 +12,7 @@ public class ArrayPool<T> {
     private final int capacity;
     private final IntFunction<T[]> constructor;
     private final List<ArrayPool.Item<T>> pool;
+    private final Object lock = new Object();
 
     public ArrayPool(int size, IntFunction<T[]> constructor) {
         this.capacity = size;
@@ -19,26 +20,20 @@ public class ArrayPool<T> {
         this.pool = new ArrayList<>(size);
     }
 
-    public Resource<T[]> get(int size) {
-        synchronized (pool) {
+    public Resource<T[]> get(int arraySize) {
+        synchronized (lock) {
             if (pool.size() > 0) {
                 ArrayPool.Item<T> resource = pool.remove(pool.size() - 1);
-                if (resource.get().length >= size) {
+                if (resource.get().length >= arraySize) {
                     return resource.retain();
                 }
             }
         }
-        return new ArrayPool.Item<>(constructor.apply(size), this);
-    }
-
-    public int size() {
-        synchronized (pool) {
-            return pool.size();
-        }
+        return new ArrayPool.Item<>(constructor.apply(arraySize), this);
     }
 
     private boolean restore(ArrayPool.Item<T> item) {
-        synchronized (pool) {
+        synchronized (lock) {
             if (pool.size() < capacity) {
                 pool.add(item);
                 return true;
