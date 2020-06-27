@@ -1,5 +1,8 @@
 package com.terraforged.core.concurrent.thread;
 
+import com.terraforged.core.concurrent.thread.context.ContextThread;
+import com.terraforged.core.concurrent.thread.context.ContextWorkerThread;
+
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.ThreadFactory;
@@ -19,7 +22,7 @@ public class WorkerFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable task) {
-        Thread thread = new Thread(group, task);
+        Thread thread = new ContextThread(group, task);
         thread.setDaemon(true);
         thread.setName(prefix + threadNumber.getAndIncrement());
         return thread;
@@ -33,7 +36,7 @@ public class WorkerFactory implements ThreadFactory {
 
         @Override
         public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
-            ForkJoinWorkerThread thread = new ForkJoinWorkerThread(pool) {};
+            ForkJoinWorkerThread thread = new ContextWorkerThread(pool);
             thread.setDaemon(true);
             thread.setName(prefix + threadNumber.getAndIncrement());
             return thread;

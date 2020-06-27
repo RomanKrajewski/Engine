@@ -27,6 +27,7 @@ package com.terraforged.core.cell;
 
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.pool.ObjectPool;
+import com.terraforged.core.concurrent.thread.context.ContextualThread;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.terrain.Terrain;
@@ -132,9 +133,16 @@ public class Cell {
     }
 
     public static Resource<Cell> pooled() {
-        Resource<Cell> item = POOL.get();
-        item.get().reset();
-        return item;
+        // prefer obtaining a cell from ContextualThreads
+        Thread current = Thread.currentThread();
+        if (current instanceof ContextualThread) {
+            ContextualThread contextual = (ContextualThread) current;
+            return contextual.getContext().cell;
+        } else {
+            Resource<Cell> item = POOL.get();
+            item.get().reset();
+            return item;
+        }
     }
 
     public interface Visitor {
