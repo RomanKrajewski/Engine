@@ -1,14 +1,18 @@
 package com.terraforged.core.concurrent.thread;
 
+import java.lang.ref.WeakReference;
+
 public class ThreadPools {
 
-    private static final ThreadPool instance = createDefaultPool(defaultPoolSize());
+    private static final Object lock = new Object();
+    private static final ThreadPool util = createInitialPool(2);
+    private static WeakReference<ThreadPool> instance = new WeakReference<>(null);
 
-    public static ThreadPool getPool() {
-        return instance;
+    public static ThreadPool getUtilPool() {
+        return util;
     }
 
-    private static ThreadPool createDefaultPool(int poolSize) {
+    private static ThreadPool createInitialPool(int poolSize) {
         if (poolSize == 1) {
             return new SingleThreadPool();
         }
@@ -18,21 +22,55 @@ public class ThreadPools {
         return BatchingThreadPool.of(poolSize);
     }
 
+    public static ThreadPool createDefault() {
+        return create(defaultPoolSize());
+    }
+
+    public static ThreadPool create(int poolSize) {
+        return create(poolSize, poolSize < 4);
+    }
+
     public static ThreadPool create(int poolSize, boolean batching) {
+        synchronized (lock) {
+            ThreadPool current = instance.get();
+
+            if (current != null) {
+                if (poolSize == current.size() && current.supportsBatching() == batching) {
+                    return current;
+                }
+
+                current.shutdown();
+            }
+        }
+
         if (poolSize == 1) {
-            return new SingleThreadPool();
+            return setAndGet(new SingleThreadPool());
         }
+
         if (poolSize < 4 || !batching) {
-            return new ForkJoinThreadPool(poolSize);
+            return setAndGet(new ForkJoinThreadPool(poolSize));
         }
-        if (poolSize == instance.size() && instance.supportsBatching()) {
-            return instance;
+
+        return setAndGet(BatchingThreadPool.of(poolSize));
+    }
+
+    private static ThreadPool setAndGet(ThreadPool threadPool) {
+        synchronized (lock) {
+            instance = new WeakReference<>(threadPool);
         }
-        return BatchingThreadPool.of(poolSize);
+        return threadPool;
     }
 
     public static int defaultPoolSize() {
         int processors = Runtime.getRuntime().availableProcessors();
         return Math.max(1, (processors / 3) * 2);
+    }
+
+    public static void shutdown(ThreadPool threadPool) {
+        synchronized (lock) {
+            if (threadPool == instance.get()) {
+                instance = new WeakReference<>(null);
+            }
+        }
     }
 }

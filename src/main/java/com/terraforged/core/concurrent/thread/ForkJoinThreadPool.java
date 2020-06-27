@@ -44,6 +44,7 @@ public class ForkJoinThreadPool implements ThreadPool {
     @Override
     public void shutdown() {
         executor.shutdown();
+        ThreadPools.shutdown(this);
     }
 
     @Override

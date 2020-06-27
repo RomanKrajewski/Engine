@@ -12,7 +12,7 @@ public class Cache<V extends ExpiringEntry> implements Runnable {
     private final long expireMS;
     private final long intervalMS;
     private final SynchronizedLongMap<V> map;
-    private final ThreadPool threadPool = ThreadPools.getPool();
+    private final ThreadPool threadPool = ThreadPools.getUtilPool();
 
     private volatile long timestamp = 0L;
 

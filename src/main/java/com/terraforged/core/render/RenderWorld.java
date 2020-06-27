@@ -17,7 +17,7 @@ public class RenderWorld {
     private final TileGenerator generator;
     private final RenderRegion[] view;
     private final CacheEntry<RenderRegion>[] queue;
-    private final ThreadPool threadPool = ThreadPools.getPool();
+    private final ThreadPool threadPool = ThreadPools.getUtilPool();
 
     public RenderWorld(TileGenerator generator, RenderAPI context, RenderSettings settings, int regionCount, int regionSize) {
         this.context = context;

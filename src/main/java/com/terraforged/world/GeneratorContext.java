@@ -84,10 +84,11 @@ public class GeneratorContext {
     }
 
     protected static <T extends Settings> TileCache createCache(WorldGeneratorFactory factory) {
+        System.out.println("YAS");
         return TileGenerator.builder()
                 .factory(factory)
                 .size(3, 2)
-                .pool(ThreadPools.getPool())
+                .pool(ThreadPools.createDefault())
                 .build()
                 .toCache(false);
     }

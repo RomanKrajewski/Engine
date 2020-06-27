@@ -40,6 +40,7 @@ public class BatchingThreadPool implements ThreadPool {
     public void shutdown() {
         taskExecutor.shutdown();
         batchExecutor.shutdown();
+        ThreadPools.shutdown(this);
     }
 
     @Override

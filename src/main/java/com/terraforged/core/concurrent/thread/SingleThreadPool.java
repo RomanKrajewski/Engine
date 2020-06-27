@@ -29,7 +29,7 @@ public class SingleThreadPool implements ThreadPool {
 
     @Override
     public void shutdown() {
-
+        ThreadPools.shutdown(this);
     }
 
     @Override

@@ -103,7 +103,7 @@ public class RenderWorld2 implements RollingGrid.Generator<RenderWorld2.RegionHo
 
     @Override
     public RegionHolder generate(int x, int z) {
-        return new RegionHolder(generator.getAsync(x, z).then(ThreadPools.getPool(), renderer::render));
+        return new RegionHolder(generator.getAsync(x, z).then(ThreadPools.getUtilPool(), renderer::render));
     }
 
     public static class RegionHolder {
