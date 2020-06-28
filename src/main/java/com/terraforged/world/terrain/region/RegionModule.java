@@ -27,13 +27,13 @@ package com.terraforged.world.terrain.region;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
-import com.terraforged.world.heightmap.RegionConfig;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.domain.Domain;
 import com.terraforged.n2d.func.DistanceFunc;
 import com.terraforged.n2d.func.EdgeFunc;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.n2d.util.Vec2f;
+import com.terraforged.world.heightmap.RegionConfig;
 
 public class RegionModule implements Populator {
 

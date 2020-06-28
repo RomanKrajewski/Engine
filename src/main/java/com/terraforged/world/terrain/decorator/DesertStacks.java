@@ -27,11 +27,11 @@ package com.terraforged.world.terrain.decorator;
 
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.world.biome.BiomeType;
-import com.terraforged.world.heightmap.Levels;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.biome.BiomeType;
+import com.terraforged.world.heightmap.Levels;
 
 public class DesertStacks implements Decorator {
 

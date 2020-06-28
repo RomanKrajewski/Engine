@@ -26,8 +26,8 @@
 package com.terraforged.world.terrain;
 
 import com.terraforged.core.settings.Settings;
-import com.terraforged.world.heightmap.Levels;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.heightmap.Levels;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -119,7 +119,7 @@ public class Terrain implements ITerrain.Delegate {
     }
 
     public static Terrain beach(Settings settings) {
-        return new Terrain("beach", 2, TerrainType.COAST) {
+        return new Terrain("beach", 2, TerrainType.BEACH) {
 
             private final float max = new Levels(settings.world).ground(1);
 

@@ -27,14 +27,14 @@ package com.terraforged.world.terrain.special;
 
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.heightmap.RegionConfig;
-import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.populator.TerrainPopulator;
-import com.terraforged.world.terrain.Terrains;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.func.EdgeFunc;
+import com.terraforged.world.heightmap.Levels;
+import com.terraforged.world.heightmap.RegionConfig;
+import com.terraforged.world.terrain.Terrain;
+import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.populator.TerrainPopulator;
 
 public class VolcanoPopulator extends TerrainPopulator {
 

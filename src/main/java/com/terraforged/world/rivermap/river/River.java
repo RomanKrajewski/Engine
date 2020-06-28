@@ -26,15 +26,15 @@
 package com.terraforged.world.rivermap.river;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.populator.TerrainPopulator;
-import com.terraforged.world.terrain.Terrains;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.func.CurveFunc;
 import com.terraforged.n2d.func.SCurve;
 import com.terraforged.n2d.source.Line;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.terrain.Terrain;
+import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.populator.TerrainPopulator;
 
 import java.util.Random;
 

@@ -4,11 +4,11 @@ import com.terraforged.core.NumConstants;
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.settings.WorldSettings;
-import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.n2d.func.DistanceFunc;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.n2d.util.Vec2f;
 import com.terraforged.n2d.util.Vec2i;
+import com.terraforged.world.continent.MutableVeci;
 
 public class SingleContinentGenerator extends AbstractContinentGenerator {
 

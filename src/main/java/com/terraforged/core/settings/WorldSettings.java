@@ -11,6 +11,8 @@ import com.terraforged.world.heightmap.Heightmap;
 @Serializable
 public class WorldSettings {
 
+    public static final int DEFAULT_CONTINENT_SCALE = 3000;
+
     public transient long seed = 0L;
 
     public Continent continent = new Continent();
@@ -34,30 +36,50 @@ public class WorldSettings {
 
         @Range(min = 100, max = 10000)
         @Comment("Controls the size of continents")
-        public int continentScale = 3000;
+        public int continentScale = DEFAULT_CONTINENT_SCALE;
     }
 
     @Serializable
     public static class TransitionPoints {
 
         @Range(min = 0F, max = 1F)
-        @Comment("The deep ocean transition point")
+        @Comment({
+                "The point at which deep oceans transition into shallow oceans.",
+                "The value must be lower than the next transition point. A larger",
+                "distance to the next transition point will produce a more gradual",
+                "transition."
+        })
         public float deepOcean = Heightmap.DEEP_OCEAN_VALUE;
 
         @Range(min = 0F, max = 1F)
-        @Comment("The shallow ocean transition point")
+        @Comment({
+                "The point at which shallow oceans transition into beaches.",
+                "The value must be lower than the next transition point. A larger",
+                "distance to the next transition point will produce a more gradual",
+                "transition."
+        })
         public float shallowOcean = Heightmap.OCEAN_VALUE;
 
         @Range(min = 0F, max = 1F)
-        @Comment("The beach transition point")
+        @Comment({
+                "The point at which beaches transition into coastal terrain.",
+                "The value must be lower than the next transition point. A larger",
+                "distance to the next transition point will produce a more gradual",
+                "transition."
+        })
         public float beach = Heightmap.BEACH_VALUE;
 
         @Range(min = 0F, max = 1F)
-        @Comment("The coast transition point")
+        @Comment({
+                "The point at which coasts transition into normal inland terrain.",
+                "The value must be lower than the next transition point. A larger",
+                "distance to the next transition point will produce a more gradual",
+                "transition."
+        })
         public float coast = Heightmap.COAST_VALUE;
 
         @Range(min = 0F, max = 1F)
-        @Comment("The inland transition point")
+        @Comment("The point above which terrain is purely normal inland terrain.")
         public float inland = Heightmap.INLAND_VALUE;
     }
 

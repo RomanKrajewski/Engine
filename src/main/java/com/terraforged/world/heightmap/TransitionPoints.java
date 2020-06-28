@@ -10,11 +10,24 @@ public class TransitionPoints {
     public final float coast;
     public final float inland;
 
-    public TransitionPoints(WorldSettings.TransitionPoints transitionPoints) {
-        this.inland = transitionPoints.inland;
-        this.coast = Math.min(transitionPoints.coast, this.inland);
-        this.beach = Math.min(transitionPoints.beach, this.coast);
-        this.shallowOcean = Math.min(transitionPoints.shallowOcean, this.coast);
-        this.deepOcean = Math.min(transitionPoints.deepOcean, this.shallowOcean);
+    public TransitionPoints(WorldSettings.TransitionPoints points) {
+        if (!validate(points)) {
+            points = new WorldSettings.TransitionPoints();
+        }
+
+        this.inland = points.inland;
+        this.coast = points.coast;
+        this.beach = points.beach;
+        this.shallowOcean = points.shallowOcean;
+        this.deepOcean = points.deepOcean;
+    }
+
+    public static boolean validate(WorldSettings.TransitionPoints points) {
+        return points.inland <= 1
+                && points.inland > points.coast
+                && points.coast > points.beach
+                && points.beach > points.shallowOcean
+                && points.shallowOcean > points.deepOcean
+                && points.deepOcean >= 0;
     }
 }

@@ -25,8 +25,8 @@
 
 package com.terraforged.world.rivermap.river;
 
-import com.terraforged.world.heightmap.Levels;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.heightmap.Levels;
 
 public class RiverConfig {
 

@@ -27,9 +27,9 @@ package com.terraforged.world;
 
 import com.terraforged.core.Seed;
 import com.terraforged.core.concurrent.thread.ThreadPools;
+import com.terraforged.core.settings.Settings;
 import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.core.tile.gen.TileGenerator;
-import com.terraforged.core.settings.Settings;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrains;
 import com.terraforged.world.terrain.provider.StandardTerrainProvider;
@@ -84,7 +84,6 @@ public class GeneratorContext {
     }
 
     protected static <T extends Settings> TileCache createCache(WorldGeneratorFactory factory) {
-        System.out.println("YAS");
         return TileGenerator.builder()
                 .factory(factory)
                 .size(3, 2)

@@ -26,13 +26,13 @@
 package com.terraforged.world.terrain.decorator;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.func.CellFunc;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrains;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
-import com.terraforged.n2d.func.CellFunc;
 
 public class DesertDunes implements Decorator {
 

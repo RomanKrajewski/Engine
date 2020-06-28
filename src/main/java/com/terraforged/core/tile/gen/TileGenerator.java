@@ -103,14 +103,12 @@ public class TileGenerator {
     }
 
     protected void postProcess(Tile tile) {
-        generator.getFilters().apply(tile);
+        generator.getFilters().apply(tile, true);
         tile.decorate(generator.getDecorators().getDecorators());
     }
 
     protected void postProcess(Tile tile, float centerX, float centerZ, float zoom, boolean filter) {
-        if (filter) {
-            generator.getFilters().apply(tile);
-        }
+        generator.getFilters().apply(tile, filter);
         tile.decorateZoom(generator.getDecorators().getDecorators(), centerX, centerZ, zoom);
     }
 

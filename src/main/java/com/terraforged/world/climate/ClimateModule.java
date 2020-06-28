@@ -187,7 +187,7 @@ public class ClimateModule {
     }
 
     private void modifyTerrain(Cell cell, float continentEdge) {
-        if (continentEdge <= 0.65F) {
+        if (cell.terrain.isOverground() && continentEdge <= 0.65F) {
             cell.terrain = terrains.coast;
         }
     }

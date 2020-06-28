@@ -113,18 +113,30 @@ public class Erosion implements Filter {
         final int size = map.getSize().total;
         final Cell[] cells = map.getBacking();
 
+        float posX;
+        float posY;
+        float dirX;
+        float dirY;
+        float speed;
+        float water;
+        float sediment;
+        TerrainPos gradient1 = new TerrainPos();
+        TerrainPos gradient2 = new TerrainPos();
+
         random.setSeed(NoiseUtil.seed(seedX, seedZ));
         while (iterations-- > 0) {
-            float posX = nextCoord(map.getSize(), random);
-            float posY = nextCoord(map.getSize(), random);
+            dirX = 0;
+            dirY = 0;
+            sediment = 0;
 
-            float dirX = 0;
-            float dirY = 0;
-            float speed = initialSpeed;
-            float water = initialWaterVolume;
-            float sediment = 0;
-            TerrainPos gradient1 = new TerrainPos();
-            TerrainPos gradient2 = new TerrainPos();
+            gradient1.reset();
+            gradient2.reset();
+
+            speed = initialSpeed;
+            water = initialWaterVolume;
+
+            posX = nextCoord(map.getSize(), random);
+            posY = nextCoord(map.getSize(), random);
 
             for (int lifetime = 0; lifetime < maxDropletLifetime; lifetime++) {
                 int nodeX = (int) posX;
@@ -294,6 +306,12 @@ public class Erosion implements Filter {
             // Calculate height with bilinear interpolation of the heights of the nodes of the cell
             this.height = heightNW * (1 - x) * (1 - y) + heightNE * x * (1 - y) + heightSW * (1 - x) * y + heightSE * x * y;
             return this;
+        }
+
+        private void reset() {
+            height = 0;
+            gradientX = 0;
+            gradientY = 0;
         }
     }
 

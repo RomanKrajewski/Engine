@@ -40,7 +40,6 @@ import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.Rivermap;
 import com.terraforged.world.terrain.decorator.Decorator;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -111,21 +110,21 @@ public class Tile implements Disposable, SafeCloseable {
     public void close() {
         // only dispose resources if there are no chunks actively being used
         if (active.compareAndSet(0, -1)) {
-            if (blockResource.isOpen()) {
-                // cells can be reused
-                for (Cell cell : blocks) {
-                    if (cell != null) {
-                        cell.reset();
-                    }
-                }
-                blockResource.close();
-            }
-
-            if (chunkResource.isOpen()) {
-                // chunks must be null'd
-                Arrays.fill(chunks, null);
-                chunkResource.close();
-            }
+//            if (blockResource.isOpen()) {
+//                // cells can be reused
+//                for (Cell cell : blocks) {
+//                    if (cell != null) {
+//                        cell.reset();
+//                    }
+//                }
+//                blockResource.close();
+//            }
+//
+//            if (chunkResource.isOpen()) {
+//                // chunks must be null'd
+//                Arrays.fill(chunks, null);
+//                chunkResource.close();
+//            }
         }
     }
 

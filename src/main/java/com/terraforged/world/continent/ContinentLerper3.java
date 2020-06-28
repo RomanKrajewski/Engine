@@ -27,10 +27,10 @@ package com.terraforged.world.continent;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
-import com.terraforged.world.climate.Climate;
-import com.terraforged.world.terrain.Terrain;
 import com.terraforged.n2d.func.Interpolation;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.climate.Climate;
+import com.terraforged.world.terrain.Terrain;
 
 public class ContinentLerper3 implements Populator {
 

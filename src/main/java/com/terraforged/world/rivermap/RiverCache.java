@@ -2,10 +2,10 @@ package com.terraforged.world.rivermap;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.cache.Cache;
+import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.gen.RiverGenerator;
-import com.terraforged.n2d.util.NoiseUtil;
 
 import java.util.concurrent.TimeUnit;
 

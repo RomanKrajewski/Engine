@@ -26,12 +26,12 @@
 package com.terraforged.world.rivermap.lake;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.world.rivermap.river.River;
-import com.terraforged.world.terrain.populator.TerrainPopulator;
-import com.terraforged.world.terrain.Terrains;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.n2d.util.Vec2f;
+import com.terraforged.world.rivermap.river.River;
+import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.populator.TerrainPopulator;
 
 public class Lake extends TerrainPopulator {
 

@@ -27,6 +27,7 @@ package com.terraforged.core.serialization.serializer;
 
 import com.terraforged.core.serialization.annotation.Comment;
 import com.terraforged.core.serialization.annotation.Name;
+import com.terraforged.core.serialization.annotation.NoName;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
 import com.terraforged.core.util.NameUtil;
@@ -135,6 +136,12 @@ public class Serializer {
         if (comment != null) {
             writer.name("comment");
             writer.value(getComment(comment));
+        }
+
+        NoName noName = field.getAnnotation(NoName.class);
+        if (noName != null) {
+            writer.name("noname");
+            writer.value("true");
         }
 
         if (field.getType() == boolean.class) {

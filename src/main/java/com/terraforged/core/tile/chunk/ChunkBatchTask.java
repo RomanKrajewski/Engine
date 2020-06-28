@@ -63,8 +63,8 @@ public class ChunkBatchTask implements BatchTask {
             float x = chunk.getBlockX() + dx;
             float z = chunk.getBlockZ() + dz;
             heightmap.apply(cell, x, z);
-            rivers = Rivermap.get(cell, rivers, heightmap);
-            rivers.apply(cell, x, z);
+//            rivers = Rivermap.get(cell, rivers, heightmap);
+//            rivers.apply(cell, x, z);
             heightmap.applyClimate(cell, x, z);
         });
     }

@@ -27,10 +27,10 @@ package com.terraforged.world.terrain.provider;
 
 import com.terraforged.core.cell.Populator;
 import com.terraforged.core.settings.TerrainSettings;
+import com.terraforged.n2d.Module;
 import com.terraforged.world.terrain.LandForms;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.populator.TerrainPopulator;
-import com.terraforged.n2d.Module;
 
 import java.util.List;
 
