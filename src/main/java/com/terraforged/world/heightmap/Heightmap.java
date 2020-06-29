@@ -58,7 +58,7 @@ public class Heightmap implements Populator {
     public static final float OCEAN_VALUE = 0.32F;
     public static final float COAST_VALUE = 0.425F;
     public static final float BEACH_VALUE = 0.375F;
-    public static final float INLAND_VALUE = 0.55F;
+    public static final float MAINLAND_VALUE = 0.55F;
 
     protected final Terrains terrain;
     private final TransitionPoints transitionPoints;
@@ -149,7 +149,7 @@ public class Heightmap implements Populator {
                 register(context.terrain.coast, Source.constant(context.levels.water)),
                 transitionPoints.deepOcean, // below == deep, above == transition to shallow
                 transitionPoints.shallowOcean,  // below == transition to deep, above == transition to coast
-                transitionPoints.coast   // below == transition to shallow, above == coast
+                transitionPoints.beach   // below == transition to shallow, above == beach
         );
 
         // blends between the ocean/coast terrain and land terrains
@@ -197,7 +197,7 @@ public class Heightmap implements Populator {
 
     public void applyClimate(Cell cell, float x, float z) {
         // apply climate data
-        climate.apply(cell, x, z, this);
+        climate.apply(cell, x, z);
     }
 
     public Climate getClimate() {

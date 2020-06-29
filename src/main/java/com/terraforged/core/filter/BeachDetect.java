@@ -27,18 +27,16 @@ public class BeachDetect implements Filter, Filter.Visitor {
 
     @Override
     public void visit(Filterable cellMap, Cell cell, int dx, int dz) {
-        if (cell.terrain.isCoast()) {
-            if (cell.continentEdge < transition.coast) {
-                Cell n = cellMap.getCellRaw(dx, dz - radius);
-                Cell s = cellMap.getCellRaw(dx, dz + radius);
-                Cell e = cellMap.getCellRaw(dx + radius, dz);
-                Cell w = cellMap.getCellRaw(dx - radius, dz);
-                float gx = grad(e, w, cell);
-                float gz = grad(n, s, cell);
-                float d2 = (gx * gx + gz * gz);
-                if (d2 < 0.275F) {
-                    cell.terrain = terrains.beach;
-                }
+        if (cell.terrain.isCoast() && cell.continentEdge < transition.coast) {
+            Cell n = cellMap.getCellRaw(dx, dz - radius);
+            Cell s = cellMap.getCellRaw(dx, dz + radius);
+            Cell e = cellMap.getCellRaw(dx + radius, dz);
+            Cell w = cellMap.getCellRaw(dx - radius, dz);
+            float gx = grad(e, w, cell);
+            float gz = grad(n, s, cell);
+            float d2 = (gx * gx + gz * gz);
+            if (d2 < 0.275F) {
+                cell.terrain = terrains.beach;
             }
         }
     }

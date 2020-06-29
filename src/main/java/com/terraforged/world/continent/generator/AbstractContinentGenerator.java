@@ -49,7 +49,7 @@ public abstract class AbstractContinentGenerator implements Continent {
                 .warp(Domain.warp(Source.SIMPLEX, seed.next(), continentScale, 3, continentScale))
         ;
 
-        float shapeLower = transition.shallowOcean - ((transition.shallowOcean - transition.shallowOcean) / 3F);
+        float shapeLower = transition.shallowOcean - ((transition.shallowOcean - transition.deepOcean) / 3F);
         this.shape = Source.perlin(seed.next(), settings.continent.continentScale, 1)
                 .clamp(shapeMin, 0.65)
                 .map(shapeLower, 1)

@@ -38,6 +38,7 @@ import com.terraforged.n2d.util.Vec2f;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.continent.Continent;
+import com.terraforged.world.heightmap.TransitionPoints;
 import com.terraforged.world.terrain.Terrains;
 
 public class ClimateModule {
@@ -58,6 +59,7 @@ public class ClimateModule {
     private final Module macroBiomeNoise;
     private final Continent continent;
     private final Terrains terrains;
+    private final TransitionPoints transitionPoints;
 
     public ClimateModule(Continent continent, GeneratorContext context) {
         Seed seed = context.seed;
@@ -80,6 +82,7 @@ public class ClimateModule {
         this.edgeClamp = 1F;
         this.edgeScale = 1 / edgeClamp;
         this.biomeFreq = 1F / biomeSize;
+        this.transitionPoints = new TransitionPoints(context.settings.world.transitionPoints);
         this.warpStrength = settings.climate.biomeShape.biomeWarpStrength;
         this.warpX = Source.simplex(seed.next(), warpScale, 2).bias(-0.5);
         this.warpZ = Source.simplex(seed.next(), warpScale, 2).bias(-0.5);
@@ -187,7 +190,7 @@ public class ClimateModule {
     }
 
     private void modifyTerrain(Cell cell, float continentEdge) {
-        if (cell.terrain.isOverground() && continentEdge <= 0.65F) {
+        if (cell.terrain.isOverground() && continentEdge <= transitionPoints.inland) {
             cell.terrain = terrains.coast;
         }
     }

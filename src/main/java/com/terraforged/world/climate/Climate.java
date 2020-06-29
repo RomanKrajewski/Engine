@@ -32,7 +32,6 @@ import com.terraforged.n2d.source.Rand;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.Continent;
-import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrains;
 
@@ -79,7 +78,7 @@ public class Climate {
         return offsetY.getValue(x, z) * distance;
     }
 
-    public void apply(Cell cell, float x, float z, Heightmap heightmap) {
+    public void apply(Cell cell, float x, float z) {
         biomeNoise.apply(cell, x, z, true);
 
         float edgeBlend = 0.4F;

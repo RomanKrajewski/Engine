@@ -26,6 +26,7 @@
 package com.terraforged.core.serialization.serializer;
 
 import com.terraforged.core.serialization.annotation.Comment;
+import com.terraforged.core.serialization.annotation.Limit;
 import com.terraforged.core.serialization.annotation.Name;
 import com.terraforged.core.serialization.annotation.NoName;
 import com.terraforged.core.serialization.annotation.Range;
@@ -142,6 +143,15 @@ public class Serializer {
         if (noName != null) {
             writer.name("noname");
             writer.value("true");
+        }
+
+        Limit limit = field.getAnnotation(Limit.class);
+        if (limit != null) {
+            writer.name("limit_lower");
+            writer.value(limit.lower());
+
+            writer.name("limit_upper");
+            writer.value(limit.upper());
         }
 
         if (field.getType() == boolean.class) {
