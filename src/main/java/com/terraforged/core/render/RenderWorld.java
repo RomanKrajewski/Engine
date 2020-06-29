@@ -13,13 +13,14 @@ public class RenderWorld {
     private final int regionCount;
     private final Size regionSize;
     private final RenderAPI context;
+    private final ThreadPool threadPool;
     private final RegionRenderer renderer;
     private final TileGenerator generator;
     private final RenderRegion[] view;
     private final CacheEntry<RenderRegion>[] queue;
-    private final ThreadPool threadPool = ThreadPools.getUtilPool();
 
-    public RenderWorld(TileGenerator generator, RenderAPI context, RenderSettings settings, int regionCount, int regionSize) {
+    public RenderWorld(ThreadPool threadPool, TileGenerator generator, RenderAPI context, RenderSettings settings, int regionCount, int regionSize) {
+        this.threadPool = threadPool;
         this.context = context;
         this.generator = generator;
         this.regionCount = regionCount;

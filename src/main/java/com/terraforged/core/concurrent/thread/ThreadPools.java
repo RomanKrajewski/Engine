@@ -17,9 +17,9 @@ public class ThreadPools {
             return new SingleThreadPool();
         }
         if (poolSize < 4) {
-            return new ForkJoinThreadPool(poolSize);
+            return new ForkJoinThreadPool(poolSize, true);
         }
-        return BatchingThreadPool.of(poolSize);
+        return BatchingThreadPool.of(poolSize, true);
     }
 
     public static ThreadPool createDefault() {
@@ -31,14 +31,17 @@ public class ThreadPools {
     }
 
     public static ThreadPool create(int poolSize, boolean batching) {
+        return create(poolSize, batching, false);
+    }
+
+    public static ThreadPool create(int poolSize, boolean batching, boolean keepAlive) {
         synchronized (lock) {
             ThreadPool current = instance.get();
 
-            if (current != null) {
+            if (current != null && !current.keepAlive()) {
                 if (poolSize == current.size() && current.supportsBatching() == batching) {
                     return current;
                 }
-
                 current.shutdown();
             }
         }
@@ -48,15 +51,17 @@ public class ThreadPools {
         }
 
         if (poolSize < 4 || !batching) {
-            return setAndGet(new ForkJoinThreadPool(poolSize));
+            return setAndGet(new ForkJoinThreadPool(poolSize, keepAlive));
         }
 
-        return setAndGet(BatchingThreadPool.of(poolSize));
+        return setAndGet(BatchingThreadPool.of(poolSize, keepAlive));
     }
 
     private static ThreadPool setAndGet(ThreadPool threadPool) {
-        synchronized (lock) {
-            instance = new WeakReference<>(threadPool);
+        if (!threadPool.keepAlive()) {
+            synchronized (lock) {
+                instance = new WeakReference<>(threadPool);
+            }
         }
         return threadPool;
     }

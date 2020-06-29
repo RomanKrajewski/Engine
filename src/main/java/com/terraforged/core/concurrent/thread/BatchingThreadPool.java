@@ -12,13 +12,15 @@ import java.util.concurrent.Future;
 public class BatchingThreadPool implements ThreadPool {
 
     private final int size;
+    private final boolean keepalive;
     private final ExecutorService taskExecutor;
     private final ExecutorService batchExecutor;
 
-    private BatchingThreadPool(int taskSize, int batchSize) {
-        size = taskSize + batchSize;
-        taskExecutor = Executors.newFixedThreadPool(taskSize, new WorkerFactory("TF-Task"));
-        batchExecutor = Executors.newFixedThreadPool(batchSize, new WorkerFactory("TF-Batch"));
+    private BatchingThreadPool(int taskSize, int batchSize, boolean keepalive) {
+        this.keepalive = keepalive;
+        this.size = taskSize + batchSize;
+        this.taskExecutor = Executors.newFixedThreadPool(taskSize, new WorkerFactory("TF-Task"));
+        this.batchExecutor = Executors.newFixedThreadPool(batchSize, new WorkerFactory("TF-Batch"));
     }
 
     @Override
@@ -37,6 +39,11 @@ public class BatchingThreadPool implements ThreadPool {
     }
 
     @Override
+    public boolean keepAlive() {
+        return keepalive;
+    }
+
+    @Override
     public void shutdown() {
         taskExecutor.shutdown();
         batchExecutor.shutdown();
@@ -48,8 +55,8 @@ public class BatchingThreadPool implements ThreadPool {
         return new TaskBatcher(batchExecutor);
     }
 
-    public static ThreadPool of(int size) {
+    public static ThreadPool of(int size, boolean keepalive) {
         int tasks = Math.max(1, size / 4);
-        return new BatchingThreadPool(tasks, size - tasks);
+        return new BatchingThreadPool(tasks, size - tasks, keepalive);
     }
 }

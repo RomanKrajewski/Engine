@@ -12,11 +12,13 @@ import java.util.concurrent.Future;
 public class ForkJoinThreadPool implements ThreadPool {
 
     private final int size;
+    private final boolean keepAlive;
     private final ForkJoinPool executor;
     private final ObjectPool<Batcher> batchers;
 
-    public ForkJoinThreadPool(int size) {
+    public ForkJoinThreadPool(int size, boolean keepAlive) {
         this.size = size;
+        this.keepAlive = keepAlive;
         this.executor = new ForkJoinPool(size, new WorkerFactory.ForkJoin("TF-Fork"), null, true);
         this.batchers = new ObjectPool<>(10, () -> new ForkJoinBatcher(executor));
     }
@@ -39,6 +41,11 @@ public class ForkJoinThreadPool implements ThreadPool {
     @Override
     public <T> Future<T> submit(Callable<T> callable) {
         return executor.submit(callable);
+    }
+
+    @Override
+    public boolean keepAlive() {
+        return keepAlive;
     }
 
     @Override

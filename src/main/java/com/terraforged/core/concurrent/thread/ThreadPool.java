@@ -12,6 +12,10 @@ public interface ThreadPool {
 
     void shutdown();
 
+    default boolean keepAlive() {
+        return false;
+    }
+
     default boolean supportsBatching() {
         return size() > 2;
     }
