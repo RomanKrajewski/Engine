@@ -55,10 +55,10 @@ public class Heightmap implements Populator {
 
     public static final int MOUNTAIN_SCALE = 1000;
     public static final float DEEP_OCEAN_VALUE = 0.1F;
-    public static final float OCEAN_VALUE = 0.32F;
-    public static final float COAST_VALUE = 0.425F;
-    public static final float BEACH_VALUE = 0.375F;
-    public static final float MAINLAND_VALUE = 0.55F;
+    public static final float SHALLOW_OCEAN_VALUE = 0.25F;
+    public static final float BEACH_VALUE = 0.300F;
+    public static final float COAST_VALUE = 0.310F;
+    public static final float INLAND_VALUE = 0.55F;
 
     protected final Terrains terrain;
     private final TransitionPoints transitionPoints;

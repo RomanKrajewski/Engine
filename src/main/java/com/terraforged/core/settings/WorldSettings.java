@@ -32,7 +32,7 @@ public class WorldSettings {
                 "Controls how continent shapes are calculated.",
                 "You may also need to adjust the transition points to ensure beaches etc still form."
         })
-        public DistanceFunc continentShape = DistanceFunc.EUCLIDEAN;
+        public DistanceFunc continentShape = DistanceFunc.NATURAL;
 
         @Range(min = 0F, max = 1F)
         @Comment({
@@ -70,7 +70,7 @@ public class WorldSettings {
                 "distance to the next transition point will produce a more gradual",
                 "transition."
         })
-        public float shallowOcean = Heightmap.OCEAN_VALUE;
+        public float shallowOcean = Heightmap.SHALLOW_OCEAN_VALUE;
 
         @Range(min = 0F, max = 1F)
         @Limit(lower = "shallowOcean", upper = "coast")
@@ -95,7 +95,7 @@ public class WorldSettings {
         @Range(min = 0F, max = 1F)
         @Limit(lower = "coast")
         @Comment("The point above which terrain is normal terrain & biomes.")
-        public float inland = Heightmap.MAINLAND_VALUE;
+        public float inland = Heightmap.INLAND_VALUE;
     }
 
     @Serializable

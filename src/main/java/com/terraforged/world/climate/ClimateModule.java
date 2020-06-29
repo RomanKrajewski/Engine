@@ -190,7 +190,7 @@ public class ClimateModule {
     }
 
     private void modifyTerrain(Cell cell, float continentEdge) {
-        if (cell.terrain.isOverground() && continentEdge <= transitionPoints.inland) {
+        if (cell.terrain.isOverground() && continentEdge <= transitionPoints.coastMarker) {
             cell.terrain = terrains.coast;
         }
     }

@@ -25,6 +25,7 @@
 
 package com.terraforged.world.heightmap;
 
+import com.terraforged.core.settings.Settings;
 import com.terraforged.core.settings.WorldSettings;
 import com.terraforged.n2d.util.NoiseUtil;
 
@@ -100,5 +101,9 @@ public class Levels {
 
     public float ground(int amount) {
         return NoiseUtil.div(groundY + amount, worldHeight);
+    }
+
+    public static float scale(int steps, Settings settings) {
+        return steps / (float) settings.world.properties.worldHeight;
     }
 }

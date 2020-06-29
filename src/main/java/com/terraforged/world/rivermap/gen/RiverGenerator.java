@@ -140,7 +140,7 @@ public class RiverGenerator {
             settings.continentRiverModifier = 0.15F * random.nextFloat();
             settings.continentValleyModifier = settings.continentRiverModifier + (0.4F * random.nextFloat());
 
-            River river = new River(bounds, primary, settings, terrain);
+            River river = new River(bounds, primary, settings, terrain, levels);
             roots.add(new GenRiver(river, angle, dx, dz, length));
             rivers.add(river);
 
@@ -179,7 +179,7 @@ public class RiverGenerator {
                 settings.continentRiverModifier = 0.1F * random.nextFloat();
                 settings.continentValleyModifier = settings.continentRiverModifier + (0.3F * random.nextFloat());
 
-                River fork = new River(bounds, forkConfig, settings, terrain);
+                River fork = new River(bounds, forkConfig, settings, terrain, levels);
 
                 if (riverOverlaps(fork, parent, rivers)) {
                     continue;

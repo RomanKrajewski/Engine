@@ -8,6 +8,7 @@ public class TransitionPoints {
     public final float shallowOcean;
     public final float beach;
     public final float coast;
+    public final float coastMarker;
     public final float inland;
 
     public TransitionPoints(WorldSettings.TransitionPoints points) {
@@ -20,6 +21,7 @@ public class TransitionPoints {
         this.beach = points.beach;
         this.shallowOcean = points.shallowOcean;
         this.deepOcean = points.deepOcean;
+        this.coastMarker = coast + ((inland - coast) / 2F);
     }
 
     public static boolean validate(WorldSettings.TransitionPoints points) {

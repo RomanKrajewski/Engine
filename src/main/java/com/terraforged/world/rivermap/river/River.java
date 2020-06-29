@@ -32,7 +32,7 @@ import com.terraforged.n2d.func.CurveFunc;
 import com.terraforged.n2d.func.SCurve;
 import com.terraforged.n2d.source.Line;
 import com.terraforged.n2d.util.NoiseUtil;
-import com.terraforged.world.terrain.Terrain;
+import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrains;
 import com.terraforged.world.terrain.populator.TerrainPopulator;
 
@@ -48,6 +48,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
     private final boolean connecting;
 
     private final float bedHeight;
+    private final float extraBedHeight;
     private final float minBankHeight;
     private final float maxBankHeight;
     private final float bankAlphaMin;
@@ -68,7 +69,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
     private final float continentValleyModifier;
     private final float continentRiverModifier;
 
-    public River(RiverBounds bounds, RiverConfig config, Settings settings, Terrains terrains) {
+    public River(RiverBounds bounds, RiverConfig config, Settings settings, Terrains terrains, Levels levels) {
         super(terrains.river, Source.ZERO, Source.ZERO);
         Module in = Source.constant(settings.fadeIn);
         Module out = Source.constant(settings.fadeOut);
@@ -81,6 +82,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
         this.terrains = terrains;
         this.connecting = settings.connecting;
         this.bedHeight = config.bedHeight;
+        this.extraBedHeight = bedHeight - levels.scale(3);
         this.minBankHeight = config.minBankHeight;
         this.maxBankHeight = config.maxBankHeight;
         this.valleyCurve = settings.valleyCurve;
@@ -140,17 +142,19 @@ public class River extends TerrainPopulator implements Comparable<River> {
         }
 
         float riverMod = 1 - (continent * continentRiverModifier);
-        float bedHeight = getBedHeight(bankHeight, widthModifier);
+        float depthAlpha = depthFadeBias + (DEPTH_FADE_STRENGTH * widthModifier);
+        float bedHeight = NoiseUtil.lerp(bankHeight, this.bedHeight, depthAlpha);
+        float extraBedHeight = NoiseUtil.lerp(this.extraBedHeight, bedHeight, depthAlpha);
         if (!carveBanks(cell, banksAlpha * riverMod, bedHeight)) {
             return;
         }
 
         float bedAlpha = bed.getValue(x, z);
-        if (bedAlpha == 0) {
+        if (bedAlpha == 0 || cell.value <= bedHeight) {
             return;
         }
 
-        carveBed(cell, bedHeight, bankHeight);
+        carveBed(cell, bedHeight, extraBedHeight);
     }
 
     private float getBankHeight(Cell cell, float x, float z) {
@@ -178,24 +182,25 @@ public class River extends TerrainPopulator implements Comparable<River> {
     }
 
     private boolean carveBanks(Cell cell, float banksAlpha, float bedHeight) {
-        tag(cell, terrains.riverBanks);
+        cell.terrain = terrains.riverBanks;
 
         // lerp the position's height to the riverbed height (ie the riverbank slopes)
         if (cell.value > bedHeight) {
             cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
-            if (cell.value < bedHeight) {
-                cell.value = bedHeight;
-                cell.erosionMask = true;
-            }
             return true;
         }
         return false;
     }
 
-    private void carveBed(Cell cell, float bedHeight, float bankHeight) {
-        cell.value = bedHeight;
+    private void carveBed(Cell cell, float bedHeight, float extraBedHeight) {
         cell.erosionMask = true;
-        tag(cell, terrains.river);
+        cell.terrain = terrains.river;
+
+        if (cell.value < bedHeight) {
+            cell.value = getExtraBedHeight(cell.value, bedHeight, extraBedHeight);
+        } else {
+            cell.value = bedHeight;
+        }
     }
 
     private float getMouthModifier(Cell cell) {
@@ -203,8 +208,12 @@ public class River extends TerrainPopulator implements Comparable<River> {
         return modifier * modifier;
     }
 
-    private void tag(Cell cell, Terrain tag) {
-        cell.terrain = tag;
+    private static float getExtraBedHeight(float height, float bedHeight, float extraBedHeight) {
+        if (height < extraBedHeight) {
+            return extraBedHeight;
+        }
+        float alpha = (height - extraBedHeight) / (bedHeight - extraBedHeight);
+        return NoiseUtil.lerp(extraBedHeight, bedHeight, alpha);
     }
 
     public static class Settings {
