@@ -32,7 +32,7 @@ public class WorldSettings {
                 "Controls how continent shapes are calculated.",
                 "You may also need to adjust the transition points to ensure beaches etc still form."
         })
-        public DistanceFunc continentShape = DistanceFunc.NATURAL;
+        public DistanceFunc continentShape = DistanceFunc.EUCLIDEAN;
 
         @Range(min = 0F, max = 1F)
         @Comment({

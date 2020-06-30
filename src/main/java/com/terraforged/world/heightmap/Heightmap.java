@@ -54,11 +54,11 @@ import com.terraforged.world.terrain.region.RegionSelector;
 public class Heightmap implements Populator {
 
     public static final int MOUNTAIN_SCALE = 1000;
-    public static final float DEEP_OCEAN_VALUE = 0.1F;
-    public static final float SHALLOW_OCEAN_VALUE = 0.25F;
+    public static final float DEEP_OCEAN_VALUE = 0.075F;
+    public static final float SHALLOW_OCEAN_VALUE = 0.225F;
     public static final float BEACH_VALUE = 0.300F;
-    public static final float COAST_VALUE = 0.310F;
-    public static final float INLAND_VALUE = 0.55F;
+    public static final float COAST_VALUE = 0.350F;
+    public static final float INLAND_VALUE = 0.5F;
 
     protected final Terrains terrain;
     private final TransitionPoints transitionPoints;
@@ -96,7 +96,8 @@ public class Heightmap implements Populator {
         regionModule = new RegionModule(regionConfig);
 
         // controls where mountain chains form in the world
-        Module mountainShapeBase = Source.cellEdge(context.seed.next(), MOUNTAIN_SCALE, EdgeFunc.DISTANCE_2_ADD);
+        Module mountainShapeBase = Source.cellEdge(context.seed.next(), MOUNTAIN_SCALE, EdgeFunc.DISTANCE_2_ADD)
+                .warp(context.seed.next(), MOUNTAIN_SCALE / 3, 2, MOUNTAIN_SCALE / 4D);
 
         // sharpens the transition to create steeper mountains
         Module mountainShape = mountainShapeBase

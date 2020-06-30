@@ -77,7 +77,7 @@ public interface Reader {
         return getChild(index).getInt();
     }
 
-    default void writeTo(Object object) throws Throwable {
-        new Deserializer().deserialize(this, object);
+    default boolean writeTo(Object object) throws Throwable {
+        return Deserializer.deserialize(this, object);
     }
 }

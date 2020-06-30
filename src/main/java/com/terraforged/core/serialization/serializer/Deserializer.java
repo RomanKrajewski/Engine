@@ -32,7 +32,8 @@ import java.lang.reflect.Field;
 
 public class Deserializer {
 
-    public static void deserialize(Reader reader, Object object) throws Throwable {
+    public static boolean deserialize(Reader reader, Object object) throws Throwable {
+        boolean valid = true;
         Class<?> type = object.getClass();
         for (String name : reader.getKeys()) {
             if (name.charAt(0) == '#') {
@@ -43,46 +44,49 @@ public class Deserializer {
                 Field field = type.getField(name);
                 if (Serializer.isSerializable(field)) {
                     field.setAccessible(true);
-                    fromValue(reader, object, field);
+                    valid &= fromValue(reader, object, field);
                 }
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
+                valid = false;
             }
         }
+        return valid;
     }
 
-    private static void fromValue(Reader reader, Object object, Field field) throws Throwable {
+    private static boolean fromValue(Reader reader, Object object, Field field) throws Throwable {
         if (field.getType() == int.class) {
             field.set(object, reader.getInt(field.getName()));
-            return;
+            return true;
         }
         if (field.getType() == float.class) {
             field.set(object, reader.getFloat(field.getName()));
-            return;
+            return true;
         }
         if (field.getType() == boolean.class) {
             field.set(object, reader.getString(field.getName()).equals("true"));
-            return;
+            return true;
         }
         if (field.getType() == String.class) {
             field.set(object, reader.getString(field.getName()));
-            return;
+            return true;
         }
         if (field.getType().isEnum()) {
             String name = reader.getString(field.getName());
             for (Enum<?> e : field.getType().asSubclass(Enum.class).getEnumConstants()) {
                 if (e.name().equals(name)) {
                     field.set(object, e);
-                    return;
+                    return true;
                 }
             }
+            return false;
         }
         if (field.getType().isAnnotationPresent(Serializable.class)) {
             Reader child = reader.getChild(field.getName());
             Object value = field.getType().newInstance();
             deserialize(child, value);
             field.set(object, value);
-            return;
+            return true;
         }
         if (field.getType().isArray()) {
             Class<?> type = field.getType().getComponentType();
@@ -97,5 +101,6 @@ public class Deserializer {
                 field.set(object, array);
             }
         }
+        return true;
     }
 }

@@ -36,15 +36,38 @@ public class WorldLookup {
     }
 
     public Resource<Cell> getCell(int x, int z) {
+        return getCell(x, z, false);
+    }
+
+    public Resource<Cell> getCell(int x, int z, boolean load) {
         Resource<Cell> resource = Cell.pooled();
-        applyCell(resource.get(), x, z);
+        applyCell(resource.get(), x, z, load);
         return resource;
     }
 
     public void applyCell(Cell cell, int x, int z) {
+        applyCell(cell, x, z, false);
+    }
+
+    public void applyCell(Cell cell, int x, int z, boolean load) {
+        if (load && computeAccurate(cell, x, z)) {
+            return;
+        }
+
         if (!computeCached(cell, x, z)) {
             compute(cell, x, z);
         }
+    }
+
+    private boolean computeAccurate(Cell cell, int x, int z) {
+        int rx = cache.chunkToRegion(x >> 4);
+        int rz = cache.chunkToRegion(z >> 4);
+        Tile tile = cache.getRegion(rx, rz);
+        Cell c = tile.getCell(x, z);
+        if (c != null) {
+            cell.copy(c);
+        }
+        return cell.terrain != null;
     }
 
     private boolean computeCached(Cell cell, int x, int z) {

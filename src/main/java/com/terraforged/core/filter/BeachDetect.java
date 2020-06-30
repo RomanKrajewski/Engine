@@ -27,7 +27,7 @@ public class BeachDetect implements Filter, Filter.Visitor {
 
     @Override
     public void visit(Filterable cellMap, Cell cell, int dx, int dz) {
-        if (cell.terrain.isCoast() && cell.continentEdge < transition.coast) {
+        if (cell.terrain.isCoast() && cell.continentEdge < transition.beach) {
             Cell n = cellMap.getCellRaw(dx, dz - radius);
             Cell s = cellMap.getCellRaw(dx, dz + radius);
             Cell e = cellMap.getCellRaw(dx + radius, dz);
