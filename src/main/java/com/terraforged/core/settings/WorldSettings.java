@@ -34,13 +34,6 @@ public class WorldSettings {
         })
         public DistanceFunc continentShape = DistanceFunc.EUCLIDEAN;
 
-        @Range(min = 0F, max = 1F)
-        @Comment({
-                "Controls the amount of ocean between continents.",
-                "You may also need to adjust the transition points to ensure beaches etc still form."
-        })
-        public float oceanScale = 0.8F;
-
         @Range(min = 100, max = 10000)
         @Comment({
                 "Controls the size of continents.",

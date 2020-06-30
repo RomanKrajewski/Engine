@@ -54,11 +54,11 @@ import com.terraforged.world.terrain.region.RegionSelector;
 public class Heightmap implements Populator {
 
     public static final int MOUNTAIN_SCALE = 1000;
-    public static final float DEEP_OCEAN_VALUE = 0.075F;
-    public static final float SHALLOW_OCEAN_VALUE = 0.225F;
-    public static final float BEACH_VALUE = 0.300F;
-    public static final float COAST_VALUE = 0.350F;
-    public static final float INLAND_VALUE = 0.5F;
+    public static final float DEEP_OCEAN_VALUE = 0.1F;
+    public static final float SHALLOW_OCEAN_VALUE = 0.25F;
+    public static final float BEACH_VALUE = 0.327F;
+    public static final float COAST_VALUE = 0.448F;
+    public static final float INLAND_VALUE = 0.502F;
 
     protected final Terrains terrain;
     private final TransitionPoints transitionPoints;
@@ -150,7 +150,7 @@ public class Heightmap implements Populator {
                 register(context.terrain.coast, Source.constant(context.levels.water)),
                 transitionPoints.deepOcean, // below == deep, above == transition to shallow
                 transitionPoints.shallowOcean,  // below == transition to deep, above == transition to coast
-                transitionPoints.beach   // below == transition to shallow, above == beach
+                transitionPoints.coast   // below == transition to shallow, above == beach
         );
 
         // blends between the ocean/coast terrain and land terrains
@@ -160,7 +160,7 @@ public class Heightmap implements Populator {
                 transitionPoints.shallowOcean, // below == pure ocean
                 transitionPoints.inland, // above == pure land
                 transitionPoints.coast, // split point
-                transitionPoints.coast - 0.05F
+                transitionPoints.beach
         );
 
         riverMap = new RiverCache(this, context);

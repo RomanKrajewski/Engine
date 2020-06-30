@@ -59,7 +59,7 @@ public class SingleContinentGenerator extends AbstractContinentGenerator {
             }
         }
 
-        if (center == null || !isCenter(center, cellX, cellY)) {
+        if (!isCenter(center, cellX, cellY)) {
             return;
         }
 

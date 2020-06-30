@@ -27,6 +27,7 @@ public abstract class AbstractContinentGenerator implements Continent {
     private final float edgeMin;
     private final float edgeMax;
     private final float edgeRange;
+
     private final DistanceFunc distanceFunc;
     private final TransitionPoints transition;
 
@@ -35,28 +36,20 @@ public abstract class AbstractContinentGenerator implements Continent {
 
     public AbstractContinentGenerator(Seed seed, WorldSettings settings) {
         int tectonicScale = settings.continent.continentScale * 4;
+
         this.continentScale = settings.continent.continentScale / 2;
-        double oceans = Math.min(Math.max(settings.continent.oceanScale, 0), 1);
-        double shapeMin = 0.15 + (oceans * 0.35);
         this.seed = seed.next();
         this.distanceFunc = settings.continent.continentShape;
         this.transition = new TransitionPoints(settings.transitionPoints);
         this.frequency = 1F / tectonicScale;
-        this.edgeMin = edgeClampMin;
-        this.edgeMax = (float) oceans;
+        this.edgeMin = 0.2F;
+        this.edgeMax = 1.0F;
         this.edgeRange = edgeMax - edgeMin;
-        this.warp = Domain.warp(Source.PERLIN, seed.next(), 20, 2, 20)
-                .warp(Domain.warp(Source.SIMPLEX, seed.next(), continentScale, 3, continentScale))
-        ;
 
-        float shapeLower = transition.shallowOcean - ((transition.shallowOcean - transition.deepOcean) / 3F);
-        this.shape = Source.perlin(seed.next(), settings.continent.continentScale, 1)
-                .clamp(shapeMin, 0.65)
-                .map(shapeLower, 1)
-                .warp(Source.SIMPLEX, seed.next(), continentScale / 2, 2, continentScale / 4D)
-                .warp(seed.next(), 50, 3, 20D)
-//                .alpha(0.75)
-        ;
+        this.warp = Domain.warp(Source.PERLIN, seed.next(), 20, 2, 20)
+                .warp(Domain.warp(Source.SIMPLEX, seed.next(), continentScale, 3, continentScale));
+
+        this.shape = Source.simplex(seed.next(), settings.continent.continentScale * 3, 1).bias(0.5).clamp(0, 1);
     }
 
     protected abstract void apply(Cell cell, float x, float y, float px, float py);
@@ -206,17 +199,14 @@ public abstract class AbstractContinentGenerator implements Continent {
         return (edgeValue - edgeMin) / edgeRange;
     }
 
+    // shape 'cuts' out some of the coast line to create sharper descents into the ocean (cliffs)
     protected float getShape(float x, float z, float edgeValue) {
-        if (edgeValue >= shapeClampMax) {
+        if (edgeValue >= transition.inland) {
             return 1F;
         }
 
-        if (edgeValue < shapeClampMin) {
-            return shape.getValue(x, z);
-        }
+        float alpha = (edgeValue / transition.inland);
 
-        float scale = (shapeClampMax - edgeValue) / (shapeClampMax - shapeClampMin);
-        float bias = 1 - scale;
-        return bias + shape.getValue(x, z) * scale;
+        return shape.getValue(x, z) * alpha;
     }
 }
