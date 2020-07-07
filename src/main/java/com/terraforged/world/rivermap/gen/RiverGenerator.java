@@ -120,9 +120,9 @@ public class RiverGenerator {
             float dz = NoiseUtil.cos(angle);
 
             // varies distance from continent center that the river starts
-            float startMod = 0.1F + random.nextFloat() * 0.35F;
+            float startMod = 0.05F + random.nextFloat() * 0.35F;
             float length = heightmap.getContinent().getDistanceToOcean(x, z, dx, dz, pos);
-            float startDist = Math.max(500, startMod * length);
+            float startDist = Math.max(300, startMod * length);
 
             // start and end points of the river
             float x1 = x + dx * startDist;
