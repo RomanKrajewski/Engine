@@ -1,5 +1,6 @@
 package com.terraforged.world.rivermap.wetland;
 
+import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
@@ -24,14 +25,16 @@ public class Wetland extends TerrainPopulator {
     private final float banks;
     private final float mounds;
     private final Module shape;
+    private final Module edge;
 
-    public Wetland(Vec2f a, Vec2f b, float radius, Levels levels, Terrains terrains) {
+    public Wetland(Seed seed, Vec2f a, Vec2f b, float radius, Levels levels, Terrains terrains) {
         super(terrains.wetlands, Source.ZERO, Source.ZERO);
-        this.bed = levels.water(-2);
+        this.bed = levels.water(-1) - (0.5F / levels.worldHeight);
         this.banks = levels.ground(4);
-        this.mounds = levels.water(3);
+        this.mounds = levels.water(2);
         this.line = Source.line(a.x, a.y, b.x, b.y, radius, 0, 0);
-        this.shape = Source.perlin(123, 8, 1).clamp(0.4, 0.6).map(0, 1);
+        this.shape = Source.perlin(seed.next(), 10, 1).clamp(0.4, 0.6).map(0, 1);
+        this.edge = Source.perlin(seed.next(), 8, 1).clamp(0.2, 0.8).map(0, 0.9);
     }
 
     @Override
@@ -63,12 +66,15 @@ public class Wetland extends TerrainPopulator {
             cell.erosionMask = true;
         }
 
+        if (dist > VALLEY && poolsAlpha > edge.getValue(x, z)) {
+            cell.terrain = getType();
+        }
+
         if (cell.value >= bed && cell.value <= mounds) {
             float shapeAlpha = shape.getValue(x, z) * poolsAlpha;
             cell.value = NoiseUtil.lerp(cell.value, mounds, shapeAlpha);
         }
 
-        cell.terrain = getType();
         cell.riverMask *= (1 - valleyAlpha);
     }
 }

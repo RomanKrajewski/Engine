@@ -206,7 +206,7 @@ public class Tile implements Disposable, SafeCloseable {
     }
 
     public void generate(Heightmap heightmap) {
-        Rivermap continent = null;
+        Rivermap riverMap = null;
         for (int cz = 0; cz < chunkSize.total; cz++) {
             for (int cx = 0; cx < chunkSize.total; cx++) {
                 int index = chunkSize.indexOf(cx, cz);
@@ -217,8 +217,10 @@ public class Tile implements Disposable, SafeCloseable {
                         float z = chunk.getBlockZ() + dz;
                         Cell cell = chunk.genCell(dx, dz);
                         heightmap.applyBase(cell, x, z);
-                        continent = Rivermap.get(cell, continent, heightmap);
-                        continent.apply(cell, x, z);
+
+                        riverMap = Rivermap.get(cell, riverMap, heightmap);
+                        heightmap.applyRivers(cell, x, z, riverMap);
+
                         heightmap.applyClimate(cell, x, z);
                     }
                 }
@@ -237,6 +239,7 @@ public class Tile implements Disposable, SafeCloseable {
     }
 
     public void generate(Heightmap heightmap, float offsetX, float offsetZ, float zoom) {
+        Rivermap riverMap = null;
         float translateX = offsetX - ((blockSize.size * zoom) / 2F);
         float translateZ = offsetZ - ((blockSize.size * zoom) / 2F);
         for (int cz = 0; cz < chunkSize.total; cz++) {
@@ -248,7 +251,13 @@ public class Tile implements Disposable, SafeCloseable {
                         float x = ((chunk.getBlockX() + dx) * zoom) + translateX;
                         float z = ((chunk.getBlockZ() + dz) * zoom) + translateZ;
                         Cell cell = chunk.genCell(dx, dz);
-                        heightmap.apply(cell, x, z);
+
+                        heightmap.applyBase(cell, x, z);
+
+                        riverMap = Rivermap.get(cell, riverMap, heightmap);
+                        heightmap.applyRivers(cell, x, z, riverMap);
+
+                        heightmap.applyClimate(cell, x, z);
                     }
                 }
             }

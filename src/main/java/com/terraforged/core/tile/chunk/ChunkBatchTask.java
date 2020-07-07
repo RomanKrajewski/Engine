@@ -1,5 +1,6 @@
 package com.terraforged.core.tile.chunk;
 
+import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.batch.BatchTask;
 import com.terraforged.core.tile.Tile;
 import com.terraforged.world.heightmap.Heightmap;
@@ -14,7 +15,6 @@ public class ChunkBatchTask implements BatchTask {
     private final Heightmap heightmap;
 
     private BatchTask.Notifier notifier = BatchTask.NONE;
-    protected Rivermap rivers = null;
 
     public ChunkBatchTask(int x, int z, int size, Tile tile, Heightmap heightmap) {
         this.heightmap = heightmap;
@@ -44,11 +44,13 @@ public class ChunkBatchTask implements BatchTask {
             if (cz > tile.getChunkSize().total) {
                 continue;
             }
+
             for (int dx = 0; dx < size; dx++) {
                 int cx = x + dx;
                 if (cx > tile.getChunkSize().total) {
                     continue;
                 }
+
                 try {
                     driveOne(tile.getChunkWriter(cx, cz), heightmap);
                 } catch (Throwable t) {
@@ -59,14 +61,24 @@ public class ChunkBatchTask implements BatchTask {
     }
 
     protected void driveOne(ChunkWriter chunk, Heightmap heightmap) {
-        chunk.generate((cell, dx, dz) -> {
-            float x = chunk.getBlockX() + dx;
-            float z = chunk.getBlockZ() + dz;
-            rivers = Rivermap.get(cell, rivers, heightmap);
-            heightmap.applyBase(cell, x, z);
-            heightmap.applyRivers(cell, x, z, rivers);
-            heightmap.applyClimate(cell, x, z);
-        });
+        Rivermap rivers = null;
+        for (int dz = 0; dz < 16; dz++) {
+            for (int dx = 0; dx < 16; dx++) {
+                Cell cell = chunk.genCell(dx, dz);
+                float x = chunk.getBlockX() + dx;
+                float z = chunk.getBlockZ() + dz;
+
+                // apply continental noise & initial landmass
+                heightmap.applyBase(cell, x, z);
+
+                // apply river map for continent at cell's position
+                rivers = Rivermap.get(cell, rivers, heightmap);
+                heightmap.applyRivers(cell, x, z, rivers);
+
+                // apply climate noise
+                heightmap.applyClimate(cell, x, z);
+            }
+        }
     }
 
     public static class Zoom extends ChunkBatchTask {
@@ -84,14 +96,24 @@ public class ChunkBatchTask implements BatchTask {
 
         @Override
         protected void driveOne(ChunkWriter chunk, Heightmap heightmap) {
-            chunk.generate((cell, dx, dz) -> {
-                float x = ((chunk.getBlockX() + dx) * zoom) + translateX;
-                float z = ((chunk.getBlockZ() + dz) * zoom) + translateZ;
-                rivers = Rivermap.get(cell, rivers, heightmap);
-                heightmap.apply(cell, x, z);
-                heightmap.applyRivers(cell, x, z, rivers);
-                heightmap.applyClimate(cell, x, z);
-            });
+            Rivermap rivers = null;
+            for (int dz = 0; dz < 16; dz++) {
+                for (int dx = 0; dx < 16; dx++) {
+                    Cell cell = chunk.genCell(dx, dz);
+                    float x = ((chunk.getBlockX() + dx) * zoom) + translateX;
+                    float z = ((chunk.getBlockZ() + dz) * zoom) + translateZ;
+
+                    // apply continental noise & initial landmass
+                    heightmap.applyBase(cell, x, z);
+
+                    // apply river map for continent at cell's position
+                    rivers = Rivermap.get(cell, rivers, heightmap);
+                    heightmap.applyRivers(cell, x, z, rivers);
+
+                    // apply climate noise
+                    heightmap.applyClimate(cell, x, z);
+                }
+            }
         }
     }
 }

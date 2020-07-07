@@ -93,6 +93,11 @@ public enum TerrainType implements ITerrain {
         public boolean isWetland() {
             return true;
         }
+
+        @Override
+        public boolean isOverground() {
+            return true;
+        }
     },
     FLATLAND {
         @Override

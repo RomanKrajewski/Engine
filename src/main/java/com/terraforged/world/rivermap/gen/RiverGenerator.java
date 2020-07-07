@@ -1,5 +1,6 @@
 package com.terraforged.world.rivermap.gen;
 
+import com.terraforged.core.Seed;
 import com.terraforged.core.util.Variance;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.n2d.util.Vec2f;
@@ -39,6 +40,7 @@ public class RiverGenerator {
     private static final Variance MAIN_SPACING = Variance.of(0.05, 0.2);
 
     private final int count;
+    private final Seed seed;
     private final LakeConfig lake;
     private final RiverConfig main;
     private final RiverConfig fork;
@@ -50,6 +52,8 @@ public class RiverGenerator {
     public RiverGenerator(Heightmap heightmap, GeneratorContext context) {
         this.heightmap = heightmap;
         this.levels = context.levels;
+
+        seed = context.seed.nextSeed();
 
         count = context.settings.rivers.riverCount;
 
@@ -238,7 +242,7 @@ public class RiverGenerator {
             Vec2f start = river.bounds.pos(startPos);
             Vec2f end = river.bounds.pos(endPos);
 
-            wetlands.add(new Wetland(start, end, width, levels, terrain));
+            wetlands.add(new Wetland(seed, start, end, width, levels, terrain));
         }
     }
 
