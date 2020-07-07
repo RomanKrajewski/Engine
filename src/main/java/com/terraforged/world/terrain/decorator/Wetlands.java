@@ -70,12 +70,12 @@ public class Wetlands implements Decorator {
             return false;
         }
 
-        float riverAlpha = getAlpha(1 - cell.riverMask, 0.85F, 0.95F);
+        float riverAlpha = getAlpha(1 - cell.riverMask, 0.75F, 1F);
         if (riverAlpha == 0) {
             return false;
         }
 
-        float alpha = tempAlpha * moistAlpha * biomeAlpha * riverAlpha;
+        float alpha = tempAlpha * moistAlpha * biomeAlpha * 1F;
         float value1 = NoiseUtil.lerp(cell.value, bankHeight, alpha);
         cell.value = Math.min(cell.value, value1);
 

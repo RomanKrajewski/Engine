@@ -28,14 +28,20 @@ package com.terraforged.core.cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.core.concurrent.thread.context.ContextualThread;
-import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.terrain.Terrain;
 
+// General Notes:
+// - all float are values expected to be within the range 0.0 - 1.0 inclusive
+// - an 'identity' is a value that is constant for all cells within a voronoi cell
+// - the 'edge' value is the corresponding worley/distance noise for that voronoi cell
 public class Cell {
 
-    private static final Cell blank = new Cell();
+    // purely used to reset a cell's to defaults
+    // this is separate to the public Cell.EMPTY as that may accidentally be mutated
+    private static final Cell defaults = new Cell();
 
+    // represents a 'null' cell
     private static final Cell EMPTY = new Cell() {
         @Override
         public boolean isAbsent() {
@@ -47,46 +53,50 @@ public class Cell {
 
     public int continentX;
     public int continentZ;
-
-    public float continent;
     public float continentEdge;
-    public float continentEdgeRaw;
+    public float continentIdentity;
 
-    public float region;
-    public float regionEdge;
+    public float terrainRegionEdge;
+    public float terrainRegionIdentity;
+    public Terrain terrain = Terrain.NONE;
 
-    public float biome;
     public float biomeEdge = 1F;
+    public float biomeIdentity;
 
+    // represents the distance to a river/lake. value decreases the closer to a river the cell is
     public float riverMask = 1F;
+    // a flag that tells the erosion filter not to apply any changes to this cell
     public boolean erosionMask = false;
 
+    // the actual height data
     public float value;
-    public float moisture;
-    public float temperature;
 
-    // random noise assigned to a large biome-aligned region
+    // climate data
+    public float moisture = 0.5F;
+    public float temperature = 0.5F;
+    public BiomeType biomeType = BiomeType.GRASSLAND;
+
+    // random noise assigned to a large biome-aligned area
     // current use-case is to change all sand biomes within a certain area to a single colour (yellow or red)
     public float macroNoise;
 
-    public float steepness;
+    // how steep the surface is at this cell's location
+    public float gradient;
+    // how much material was eroded at this cell's location
     public float erosion;
+    // how much material was deposited at this cell's location
     public float sediment;
-    public BiomeType biomeType = BiomeType.GRASSLAND;
-
-    public Terrain terrain = null;
 
     public void copy(Cell other) {
         value = other.value;
 
-        continent = other.continent;
+        continentIdentity = other.continentIdentity;
         continentEdge = other.continentEdge;
-        continentEdgeRaw = other.continentEdgeRaw;
 
-        region = other.region;
-        regionEdge = other.regionEdge;
+        terrainRegionIdentity = other.terrainRegionIdentity;
+        terrainRegionEdge = other.terrainRegionEdge;
 
-        biome = other.biome;
+        biomeIdentity = other.biomeIdentity;
         biomeEdge = other.biomeEdge;
 
         riverMask = other.riverMask;
@@ -96,7 +106,7 @@ public class Cell {
         temperature = other.temperature;
         macroNoise = other.macroNoise;
 
-        steepness = other.steepness;
+        gradient = other.gradient;
         erosion = other.erosion;
         sediment = other.sediment;
         biomeType = other.biomeType;
@@ -105,23 +115,7 @@ public class Cell {
     }
 
     public void reset() {
-        copy(blank);
-    }
-
-    public float continentMask(float min, float max) {
-        return NoiseUtil.map(continentEdge, min, max, max - min);
-    }
-
-    public float regionMask(float min, float max) {
-        return NoiseUtil.map(regionEdge, min, max, max - min);
-    }
-
-    public float biomeMask(float min, float max) {
-        return NoiseUtil.map(biomeEdge, min, max, max - min);
-    }
-
-    public float mask(float cmin, float cmax, float rmin, float rmax) {
-        return riverMask * continentMask(cmin, cmax) * regionMask(rmin, rmax);
+        copy(defaults);
     }
 
     public boolean isAbsent() {

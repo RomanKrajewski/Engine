@@ -29,48 +29,46 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.n2d.func.Interpolation;
 import com.terraforged.n2d.util.NoiseUtil;
-import com.terraforged.world.terrain.Terrain;
 
 public class ContinentLerper2 implements Populator {
 
     private final Populator lower;
     private final Populator upper;
+    private final Interpolation interpolation;
 
     private final float blendLower;
     private final float blendUpper;
     private final float blendRange;
-    private final float midpoint;
-    private final float tagThreshold;
 
-    public ContinentLerper2(Populator lower, Populator upper, float min, float max, float split, float tagThreshold) {
+    public ContinentLerper2(Populator lower, Populator upper, float min, float max) {
+        this(lower, upper, min, max, Interpolation.LINEAR);
+    }
+
+    public ContinentLerper2(Populator lower, Populator upper, float min, float max, Interpolation interpolation) {
         this.lower = lower;
         this.upper = upper;
+        this.interpolation = interpolation;
         this.blendLower = min;
         this.blendUpper = max;
         this.blendRange = blendUpper - blendLower;
-        this.midpoint = blendLower + (blendRange * split);
-        this.tagThreshold = tagThreshold;
     }
 
     @Override
     public void apply(Cell cell, float x, float y) {
-        float select = cell.continentEdge;
-
-        if (select < blendLower) {
+        if (cell.continentEdge < blendLower) {
             lower.apply(cell, x, y);
             return;
         }
 
-        if (select > blendUpper) {
+        if (cell.continentEdge > blendUpper) {
             upper.apply(cell, x, y);
             return;
         }
 
-        float alpha = Interpolation.LINEAR.apply((select - blendLower) / blendRange);
+        float alpha = interpolation.apply((cell.continentEdge - blendLower) / blendRange);
         lower.apply(cell, x, y);
 
         float lowerVal = cell.value;
-        Terrain lowerType = cell.terrain;
 
         upper.apply(cell, x, y);
         float upperVal = cell.value;

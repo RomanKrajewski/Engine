@@ -38,7 +38,7 @@ import com.terraforged.n2d.util.Vec2f;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.continent.Continent;
-import com.terraforged.world.heightmap.TransitionPoints;
+import com.terraforged.world.heightmap.ControlPoints;
 import com.terraforged.world.terrain.Terrains;
 
 public class ClimateModule {
@@ -59,7 +59,7 @@ public class ClimateModule {
     private final Module macroBiomeNoise;
     private final Continent continent;
     private final Terrains terrains;
-    private final TransitionPoints transitionPoints;
+    private final ControlPoints controlPoints;
 
     public ClimateModule(Continent continent, GeneratorContext context) {
         Seed seed = context.seed;
@@ -82,7 +82,7 @@ public class ClimateModule {
         this.edgeClamp = 1F;
         this.edgeScale = 1 / edgeClamp;
         this.biomeFreq = 1F / biomeSize;
-        this.transitionPoints = new TransitionPoints(context.settings.world.transitionPoints);
+        this.controlPoints = new ControlPoints(context.settings.world.controlPoints);
         this.warpStrength = settings.climate.biomeShape.biomeWarpStrength;
         this.warpX = Source.simplex(seed.next(), warpScale, 2).bias(-0.5);
         this.warpZ = Source.simplex(seed.next(), warpScale, 2).bias(-0.5);
@@ -155,7 +155,7 @@ public class ClimateModule {
         float biomeX = cellX + center.x;
         float biomeY = cellY + center.y;
 
-        cell.biome = cellValue(seed, cellX, cellY);
+        cell.biomeIdentity = cellValue(seed, cellX, cellY);
         cell.moisture = moisture.getValue(biomeX, biomeY);
         cell.temperature = temperature.getValue(biomeX, biomeY);
         cell.macroNoise = macroBiomeNoise.getValue(biomeX, biomeY);
@@ -190,7 +190,7 @@ public class ClimateModule {
     }
 
     private void modifyTerrain(Cell cell, float continentEdge) {
-        if (cell.terrain.isOverground() && continentEdge <= transitionPoints.coastMarker) {
+        if (cell.terrain.isOverground() && continentEdge <= controlPoints.coastMarker) {
             cell.terrain = terrains.coast;
         }
     }

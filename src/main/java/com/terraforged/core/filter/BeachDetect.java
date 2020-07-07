@@ -2,20 +2,20 @@ package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.GeneratorContext;
-import com.terraforged.world.heightmap.TransitionPoints;
+import com.terraforged.world.heightmap.ControlPoints;
 import com.terraforged.world.terrain.Terrains;
 
 public class BeachDetect implements Filter, Filter.Visitor {
 
     private final Terrains terrains;
-    private final TransitionPoints transition;
+    private final ControlPoints transition;
     private final float grad2;
     private final int radius = 8;
     private final int diameter = radius + 1 + radius;
 
     public BeachDetect(GeneratorContext context) {
         this.terrains = context.terrain;
-        this.transition = new TransitionPoints(context.settings.world.transitionPoints);
+        this.transition = new ControlPoints(context.settings.world.controlPoints);
         float delta = (8F / 256F) / diameter;
         this.grad2 = delta * delta;
     }

@@ -18,7 +18,7 @@ public class WorldSettings {
 
     public Continent continent = new Continent();
 
-    public TransitionPoints transitionPoints = new TransitionPoints();
+    public ControlPoints controlPoints = new ControlPoints();
 
     public Properties properties = new Properties();
 
@@ -43,51 +43,41 @@ public class WorldSettings {
     }
 
     @Serializable
-    public static class TransitionPoints {
+    public static class ControlPoints {
 
         @Range(min = 0F, max = 1F)
         @Limit(upper = "shallowOcean")
         @Comment({
-                "The point at which deep oceans transition into shallow oceans.",
-                "The value must be lower than the next transition point. A larger",
-                "distance to the next transition point will produce a more gradual",
-                "transition."
+                "Controls the point above which deep oceans transition into shallow oceans.",
+                "The greater the gap to the shallow ocean slider, the more gradual the transition."
         })
         public float deepOcean = Heightmap.DEEP_OCEAN_VALUE;
 
         @Range(min = 0F, max = 1F)
         @Limit(lower = "deepOcean", upper = "beach")
         @Comment({
-                "The point at which shallow oceans transition into beaches.",
-                "The value must be lower than the next transition point. A larger",
-                "distance to the next transition point will produce a more gradual",
-                "transition."
+                "Controls the point above which shallow oceans transition into coastal terrain.",
+                "The greater the gap to the coast slider, the more gradual the transition."
         })
         public float shallowOcean = Heightmap.SHALLOW_OCEAN_VALUE;
 
         @Range(min = 0F, max = 1F)
         @Limit(lower = "shallowOcean", upper = "coast")
-        @Comment({
-                "The point at which beaches transition into coastal terrain/biomes.",
-                "The value must be lower than the next transition point. A larger",
-                "distance to the next transition point will produce a more gradual",
-                "transition."
-        })
+        @Comment("Controls how much of the coastal terrain is assigned to beach biomes.")
         public float beach = Heightmap.BEACH_VALUE;
 
         @Range(min = 0F, max = 1F)
         @Limit(lower = "beach", upper = "inland")
         @Comment({
-                "The point at which coasts transition into normal inland terrain/biomes.",
-                "The value must be lower than the next transition point. A larger",
-                "distance to the next transition point will produce a more gradual",
-                "transition."
+                "Controls the size of coastal regions and is also the point below",
+                "which inland terrain transitions into oceans. Certain biomes such",
+                "as Mushroom Fields only generate in coastal areas."
         })
         public float coast = Heightmap.COAST_VALUE;
 
         @Range(min = 0F, max = 1F)
         @Limit(lower = "coast")
-        @Comment("The point above which terrain is normal terrain & biomes.")
+        @Comment("Controls the overall transition from ocean to inland terrain.")
         public float inland = Heightmap.INLAND_VALUE;
     }
 

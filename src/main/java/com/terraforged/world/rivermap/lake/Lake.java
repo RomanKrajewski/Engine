@@ -76,7 +76,14 @@ public class Lake extends TerrainPopulator {
             if (cell.value < bankHeight) {
                 return;
             }
+
             float valleyAlpha = 1F - ((distance2 - lakeDistance2) / valleyDistance2);
+            if (valleyAlpha < 0) {
+                valleyAlpha = 0;
+            } else if (valleyAlpha > 1) {
+                valleyAlpha = 1;
+            }
+
             cell.value = NoiseUtil.lerp(cell.value, bankHeight, valleyAlpha);
             cell.riverMask *= (1 - valleyAlpha);
             return;
@@ -86,6 +93,12 @@ public class Lake extends TerrainPopulator {
 
         if (distance2 < lakeDistance2) {
             float depthAlpha = 1F - (distance2 / lakeDistance2);
+            if (depthAlpha < 0) {
+                depthAlpha = 0;
+            } else if (depthAlpha > 1) {
+                depthAlpha = 1;
+            }
+
             float lakeDepth = Math.min(cell.value, depth);
             cell.value = NoiseUtil.lerp(cell.value, lakeDepth, depthAlpha);
             cell.riverMask *= (1 - depthAlpha);

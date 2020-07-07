@@ -43,8 +43,6 @@ public class RiverSettings {
 
     public River secondaryRiver = new River(4, 1, 6, 14, 5, 0.95F);
 
-    public River tertiaryRivers = new River(3, 0, 4, 8, 4, 0.95F);
-
     public Lake lake = new Lake();
 
     @Serializable

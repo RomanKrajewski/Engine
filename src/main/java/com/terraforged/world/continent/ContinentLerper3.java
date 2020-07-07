@@ -29,15 +29,14 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.n2d.func.Interpolation;
 import com.terraforged.n2d.util.NoiseUtil;
-import com.terraforged.world.climate.Climate;
-import com.terraforged.world.terrain.Terrain;
 
 public class ContinentLerper3 implements Populator {
 
-    private final Climate climate;
     private final Populator lower;
     private final Populator middle;
     private final Populator upper;
+    private final Interpolation interpolation;
+
     private final float midpoint;
 
     private final float blendLower;
@@ -46,11 +45,15 @@ public class ContinentLerper3 implements Populator {
     private final float lowerRange;
     private final float upperRange;
 
-    public ContinentLerper3(Climate climate, Populator lower, Populator middle, Populator upper, float min, float mid, float max) {
-        this.climate = climate;
+    public ContinentLerper3(Populator lower, Populator middle, Populator upper, float min, float mid, float max) {
+        this(lower, middle, upper, min, mid, max, Interpolation.CURVE3);
+    }
+
+    public ContinentLerper3(Populator lower, Populator middle, Populator upper, float min, float mid, float max, Interpolation interpolation) {
         this.lower = lower;
         this.upper = upper;
         this.middle = middle;
+        this.interpolation = interpolation;
 
         this.midpoint = mid;
         this.blendLower = min;
@@ -74,18 +77,15 @@ public class ContinentLerper3 implements Populator {
         }
 
         if (select < midpoint) {
-            float alpha = Interpolation.CURVE3.apply((select - blendLower) / lowerRange);
+            float alpha = interpolation.apply((select - blendLower) / lowerRange);
 
             lower.apply(cell, x, y);
             float lowerVal = cell.value;
-            Terrain lowerType = cell.terrain;
 
             middle.apply(cell, x, y);
-            float upperVal = cell.value;
-
-            cell.value = NoiseUtil.lerp(lowerVal, upperVal, alpha);
+            cell.value = NoiseUtil.lerp(lowerVal, cell.value, alpha);
         } else {
-            float alpha = Interpolation.CURVE3.apply((select - midpoint) / upperRange);
+            float alpha = interpolation.apply((select - midpoint) / upperRange);
 
             middle.apply(cell, x, y);
             float lowerVal = cell.value;

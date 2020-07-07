@@ -40,7 +40,7 @@ import java.util.Random;
 
 public class River extends TerrainPopulator implements Comparable<River> {
 
-    public static final int VALLEY_WIDTH = 250;
+    public static final int VALLEY_WIDTH = 275;
     private static final float DEPTH_FADE_STRENGTH = 0.5F;
     private static final float MIN_WIDTH2 = 1.5F;
 
@@ -48,7 +48,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
     private final boolean connecting;
 
     private final float bedHeight;
-    private final float extraBedHeight;
+    private final float extraBedDepth;
     private final float minBankHeight;
     private final float maxBankHeight;
     private final float bankAlphaMin;
@@ -82,7 +82,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
         this.terrains = terrains;
         this.connecting = settings.connecting;
         this.bedHeight = config.bedHeight;
-        this.extraBedHeight = bedHeight - levels.scale(3);
+        this.extraBedDepth = levels.scale(3);
         this.minBankHeight = config.minBankHeight;
         this.maxBankHeight = config.maxBankHeight;
         this.valleyCurve = settings.valleyCurve;
@@ -108,10 +108,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
         if (cell.value <= bedHeight) {
             return;
         }
-        carve(cell, x, z);
-    }
 
-    private void carve(Cell cell, float x, float z) {
         float valleyAlpha = valley.getValue(x, z);
         if (valleyAlpha == 0) {
             return;
@@ -119,7 +116,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
         valleyAlpha = valleyCurve.apply(valleyAlpha);
 
-        float continent = NoiseUtil.map(cell.continentEdgeRaw, 0.2F, 0.8F, 0.6F);
+        float continent = NoiseUtil.map(cell.continentEdge, 0.2F, 0.8F, 0.6F);
         float valleyMod = 1 - (continent * continentValleyModifier);
 
         // riverMask decreases the closer to the river the position gets
@@ -134,6 +131,8 @@ public class River extends TerrainPopulator implements Comparable<River> {
             return;
         }
 
+        // width modifier widens the river the further from its start the coords are
+        // mouth modifier widens the river even more the closer to the ocean the coords are
         float mouthModifier = getMouthModifier(cell);
         float widthModifier = banks.getWidthModifier(x, z);
         float banksAlpha = banks.getValue(x, z, MIN_WIDTH2, widthModifier / mouthModifier);
@@ -141,10 +140,10 @@ public class River extends TerrainPopulator implements Comparable<River> {
             return;
         }
 
+        // modifies the steepness of river banks the further inland the position is
         float riverMod = 1 - (continent * continentRiverModifier);
         float depthAlpha = depthFadeBias + (DEPTH_FADE_STRENGTH * widthModifier);
         float bedHeight = NoiseUtil.lerp(bankHeight, this.bedHeight, depthAlpha);
-        float extraBedHeight = NoiseUtil.lerp(this.extraBedHeight, bedHeight, depthAlpha);
         if (!carveBanks(cell, banksAlpha * riverMod, bedHeight)) {
             return;
         }
@@ -154,7 +153,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
             return;
         }
 
-        carveBed(cell, bedHeight, extraBedHeight);
+        carveBed(cell, bedHeight, depthAlpha);
     }
 
     private float getBankHeight(Cell cell, float x, float z) {
@@ -166,10 +165,9 @@ public class River extends TerrainPopulator implements Comparable<River> {
         return NoiseUtil.lerp(minBankHeight, maxBankHeight, bankHeightAlpha * bankHeightVariance);
     }
 
-    private float getBedHeight(float bankHeight, float widthModifier) {
+    private float getBedHeight(float bankHeight, float depthAlpha) {
         // scale depth of river by with it's width (wider == deeper)
         // depthAlpha changes the river depth up ${DEPTH_FADE_STRENGTH} %
-        float depthAlpha = depthFadeBias + (DEPTH_FADE_STRENGTH * widthModifier);
         return NoiseUtil.lerp(bankHeight, this.bedHeight, depthAlpha);
     }
 
@@ -192,11 +190,12 @@ public class River extends TerrainPopulator implements Comparable<River> {
         return false;
     }
 
-    private void carveBed(Cell cell, float bedHeight, float extraBedHeight) {
+    private void carveBed(Cell cell, float bedHeight, float depthAlpha) {
         cell.erosionMask = true;
         cell.terrain = terrains.river;
 
         if (cell.value < bedHeight) {
+            float extraBedHeight = NoiseUtil.lerp(bedHeight - extraBedDepth, bedHeight, depthAlpha);
             cell.value = getExtraBedHeight(cell.value, bedHeight, extraBedHeight);
         } else {
             cell.value = bedHeight;
@@ -204,7 +203,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
     }
 
     private float getMouthModifier(Cell cell) {
-        float modifier = NoiseUtil.map(cell.continentEdgeRaw, 0F, 0.5F, 0.5F);
+        float modifier = NoiseUtil.map(cell.continentEdge, 0F, 0.5F, 0.5F);
         return modifier * modifier;
     }
 

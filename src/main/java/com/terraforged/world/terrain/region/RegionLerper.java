@@ -41,7 +41,7 @@ public class RegionLerper implements Populator {
 
     @Override
     public void apply(Cell cell, float x, float y) {
-        float alpha = cell.regionEdge;
+        float alpha = cell.terrainRegionEdge;
         if (alpha == 0) {
             lower.apply(cell, x, y);
             return;

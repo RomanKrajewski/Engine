@@ -30,16 +30,15 @@ public class RiverGenerator {
     private static final Variance FORK_VALLEY = Variance.of(0.4, 0.75);
 
     // random angle between a river and it's fork
-    private static final Variance FORK_ANGLE = Variance.of(0.05, 0.1);
+    private static final Variance FORK_ANGLE = Variance.of(0.05, 0.075);
 
     // random spacing between forks along a given river
     private static final Variance MAIN_SPACING = Variance.of(0.05, 0.2);
 
     private final int count;
     private final LakeConfig lake;
-    private final RiverConfig primary;
-    private final RiverConfig secondary;
-    private final RiverConfig tertiary;
+    private final RiverConfig main;
+    private final RiverConfig fork;
     private final Terrains terrain;
     private final Heightmap heightmap;
     private final Levels levels;
@@ -50,7 +49,7 @@ public class RiverGenerator {
 
         count = context.settings.rivers.riverCount;
 
-        primary = RiverConfig.builder(context.levels)
+        main = RiverConfig.builder(context.levels)
                 .bankHeight(context.settings.rivers.primaryRivers.minBankHeight, context.settings.rivers.primaryRivers.maxBankHeight)
                 .bankWidth(context.settings.rivers.primaryRivers.bankWidth)
                 .bedWidth(context.settings.rivers.primaryRivers.bedWidth)
@@ -61,7 +60,7 @@ public class RiverGenerator {
                 .order(0)
                 .build();
 
-        secondary = RiverConfig.builder(context.levels)
+        fork = RiverConfig.builder(context.levels)
                 .bankHeight(context.settings.rivers.secondaryRiver.minBankHeight, context.settings.rivers.secondaryRiver.maxBankHeight)
                 .bankWidth(context.settings.rivers.secondaryRiver.bankWidth)
                 .bedWidth(context.settings.rivers.secondaryRiver.bedWidth)
@@ -69,16 +68,6 @@ public class RiverGenerator {
                 .fade(context.settings.rivers.secondaryRiver.fade)
                 .length(4500)
                 .order(1)
-                .build();
-
-        tertiary = RiverConfig.builder(context.levels)
-                .bankHeight(context.settings.rivers.tertiaryRivers.minBankHeight, context.settings.rivers.tertiaryRivers.maxBankHeight)
-                .bankWidth(context.settings.rivers.tertiaryRivers.bankWidth)
-                .bedWidth(context.settings.rivers.tertiaryRivers.bedWidth)
-                .bedDepth(context.settings.rivers.tertiaryRivers.bedDepth)
-                .fade(context.settings.rivers.tertiaryRivers.fade)
-                .length(2500)
-                .order(2)
                 .build();
 
         lake = LakeConfig.of(context.settings.rivers.lake, context.levels);
@@ -94,7 +83,7 @@ public class RiverGenerator {
         List<GenRiver> rootRivers = generateRoots(x, z, random, warp, rivers, lakes);
         Collections.shuffle(rootRivers, random);
         for (GenRiver root : rootRivers) {
-            generateForks(root.river, root.angle, MAIN_SPACING, secondary, random, warp, rivers, lakes);
+            generateForks(root.river, root.angle, MAIN_SPACING, fork, random, warp, rivers, lakes);
         }
         generateAdditionalLakes(x, z, random, warp, rootRivers, rivers, lakes);
         rivers.sort(Collections.reverseOrder());
@@ -134,13 +123,13 @@ public class RiverGenerator {
             RiverBounds bounds = new RiverBounds((int) x1, (int) z1, (int) x2, (int) z2);
 
             River.Settings settings = new River.Settings();
-            settings.fadeIn = primary.fade;
+            settings.fadeIn = main.fade;
             settings.valleySize = valleyWidth;
             settings.valleyCurve = River.getValleyType(random);
             settings.continentRiverModifier = 0.15F * random.nextFloat();
             settings.continentValleyModifier = settings.continentRiverModifier + (0.4F * random.nextFloat());
 
-            River river = new River(bounds, primary, settings, terrain, levels);
+            River river = new River(bounds, main, settings, terrain, levels);
             roots.add(new GenRiver(river, angle, dx, dz, length));
             rivers.add(river);
 
@@ -194,7 +183,7 @@ public class RiverGenerator {
     private void generateAdditionalLakes(int x, int z, Random random, GenWarp warp, List<GenRiver> roots, List<River> rivers, List<Lake> lakes) {
         Collections.sort(roots);
 
-        float size = 175;
+        float size = 150;
         Variance sizeVariance = Variance.of(1F, 0.25F);
         Variance angleVariance = Variance.of(1.99F, 0.02F);
         Variance distanceVariance = Variance.of(0.6F, 0.3F);

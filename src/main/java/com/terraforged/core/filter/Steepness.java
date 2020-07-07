@@ -71,6 +71,6 @@ public class  Steepness implements Filter, Filter.Visitor {
                 totalHeightDif += (Math.abs(cell.value - height) / radius);
             }
         }
-        cell.steepness = Math.min(1, totalHeightDif * scaler);
+        cell.gradient = Math.min(1, totalHeightDif * scaler);
     }
 }

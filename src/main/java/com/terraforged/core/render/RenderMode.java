@@ -54,7 +54,7 @@ public enum RenderMode {
     BIOME {
         @Override
         public void fill(Cell cell, float height, RenderBuffer buffer, RenderSettings context) {
-            float hue = cell.biome * 70;
+            float hue = cell.biomeIdentity * 70;
             color(buffer, hue, 70, 80, height, 0.4F, context.levels);
         }
     },
@@ -68,7 +68,7 @@ public enum RenderMode {
     STEEPNESS {
         @Override
         public void fill(Cell cell, float height, RenderBuffer buffer, RenderSettings context) {
-            float hue = hue(1 - cell.steepness, 64, 70);
+            float hue = hue(1 - cell.gradient, 64, 70);
             color(buffer, hue, 70, 70, height, 0.4F, context.levels);
         }
     },
@@ -88,7 +88,7 @@ public enum RenderMode {
     CONTINENT {
         @Override
         public void fill(Cell cell, float height, RenderBuffer buffer, RenderSettings context) {
-            float hue = cell.continent * 70;
+            float hue = cell.continentIdentity * 70;
             color(buffer, hue, 70, 70, height, 0.4F, context.levels);
         }
     },

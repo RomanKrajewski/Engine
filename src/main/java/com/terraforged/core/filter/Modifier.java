@@ -35,7 +35,7 @@ public interface Modifier {
     default float modify(Cell cell, float value) {
         float modifier = cell.terrain.erosionModifier();
         if (modifier != 1F) {
-            float alpha = NoiseUtil.map(cell.regionEdge, 0F, 0.15F, 0.15F);
+            float alpha = NoiseUtil.map(cell.terrainRegionEdge, 0F, 0.15F, 0.15F);
             modifier = NoiseUtil.lerp(1F, modifier, alpha);
         }
         return value * getModifier(cell.value) * modifier;

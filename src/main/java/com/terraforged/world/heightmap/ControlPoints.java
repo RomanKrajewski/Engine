@@ -2,7 +2,7 @@ package com.terraforged.world.heightmap;
 
 import com.terraforged.core.settings.WorldSettings;
 
-public class TransitionPoints {
+public class ControlPoints {
 
     public final float deepOcean;
     public final float shallowOcean;
@@ -11,9 +11,9 @@ public class TransitionPoints {
     public final float coastMarker;
     public final float inland;
 
-    public TransitionPoints(WorldSettings.TransitionPoints points) {
+    public ControlPoints(WorldSettings.ControlPoints points) {
         if (!validate(points)) {
-            points = new WorldSettings.TransitionPoints();
+            points = new WorldSettings.ControlPoints();
         }
 
         this.inland = points.inland;
@@ -24,7 +24,7 @@ public class TransitionPoints {
         this.coastMarker = coast + ((inland - coast) / 2F);
     }
 
-    public static boolean validate(WorldSettings.TransitionPoints points) {
+    public static boolean validate(WorldSettings.ControlPoints points) {
         return points.inland <= 1
                 && points.inland > points.coast
                 && points.coast > points.beach

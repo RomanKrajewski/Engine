@@ -61,7 +61,6 @@ public class Heightmap implements Populator {
     public static final float INLAND_VALUE = 0.502F;
 
     protected final Terrains terrain;
-    private final TransitionPoints transitionPoints;
 
     protected final Continent continentGenerator;
     protected final Populator regionModule;
@@ -78,7 +77,7 @@ public class Heightmap implements Populator {
         Settings settings = context.settings;
 
         WorldSettings world = context.settings.world;
-        transitionPoints = new TransitionPoints(world.transitionPoints);
+        ControlPoints controlPoints = new ControlPoints(world.controlPoints);
 
         Seed regionSeed = context.seed.nextSeed();
         Seed regionWarp = context.seed.nextSeed();
@@ -144,23 +143,20 @@ public class Heightmap implements Populator {
 
         // uses the continent noise to blend between deep ocean, to ocean, to coast
         ContinentLerper3 oceans = new ContinentLerper3(
-                climate,
                 register(context.terrain.deepOcean, terrainProvider.getLandforms().deepOcean(context.seed.next())),
                 register(context.terrain.ocean, Source.constant(context.levels.water(-7))),
                 register(context.terrain.coast, Source.constant(context.levels.water)),
-                transitionPoints.deepOcean, // below == deep, above == transition to shallow
-                transitionPoints.shallowOcean,  // below == transition to deep, above == transition to coast
-                transitionPoints.coast   // below == transition to shallow, above == beach
+                controlPoints.deepOcean, // below == deep, above == transition to shallow
+                controlPoints.shallowOcean,  // below == transition to deep, above == transition to coast
+                controlPoints.coast   // below == transition to shallow, above == beach
         );
 
         // blends between the ocean/coast terrain and land terrains
         root = new ContinentLerper2(
                 oceans,
                 land,
-                transitionPoints.shallowOcean, // below == pure ocean
-                transitionPoints.inland, // above == pure land
-                transitionPoints.coast, // split point
-                transitionPoints.beach
+                controlPoints.shallowOcean, // below == pure ocean
+                controlPoints.inland // above == pure land
         );
 
         riverMap = new RiverCache(this, context);
@@ -211,10 +207,6 @@ public class Heightmap implements Populator {
 
     public RiverCache getRivers() {
         return riverMap;
-    }
-
-    public TransitionPoints getTransitionPoints() {
-        return transitionPoints;
     }
 
     public Populator getPopulator(Terrain terrain, int id) {

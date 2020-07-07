@@ -101,8 +101,8 @@ public class RegionModule implements Populator {
             }
         }
 
-        cell.region = cellValue(seed, cellX, cellY);
-        cell.regionEdge = edgeValue(edgeDistance, edgeDistance2);
+        cell.terrainRegionIdentity = cellValue(seed, cellX, cellY);
+        cell.terrainRegionEdge = edgeValue(edgeDistance, edgeDistance2);
     }
 
     private float cellValue(int seed, int cellX, int cellY) {

@@ -66,7 +66,7 @@ public class DesertDunes implements Decorator {
         }
 
         float duneHeight = module.getValue(x, y);
-        float mask = cell.biomeEdge * cell.riverMask * cell.regionEdge * fade;
+        float mask = cell.biomeEdge * cell.riverMask * cell.terrainRegionEdge * fade;
 
         float height = duneHeight * mask;
         cell.value += height;

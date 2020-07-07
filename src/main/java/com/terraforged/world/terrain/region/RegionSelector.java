@@ -45,7 +45,7 @@ public class RegionSelector implements Populator {
 
     @Override
     public void apply(Cell cell, float x, float y) {
-        get(cell.region).apply(cell, x, y);
+        get(cell.terrainRegionIdentity).apply(cell, x, y);
     }
 
     public Populator get(float identity) {
