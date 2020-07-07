@@ -45,6 +45,8 @@ public class RiverSettings {
 
     public Lake lake = new Lake();
 
+    public Wetland wetland = new Wetland();
+
     @Serializable
     public static class River {
 
@@ -122,5 +124,21 @@ public class RiverSettings {
         public Lake() {
 
         }
+    }
+
+    @Serializable
+    public static class Wetland {
+
+        @Range(min = 0.0F, max = 1.0F)
+        @Comment("Controls how common wetlands are")
+        public float chance = 0.5F;
+
+        @Range(min = 50, max = 500)
+        @Comment("The minimum size of the wetlands")
+        public int sizeMin = 175;
+
+        @Range(min = 50, max = 500)
+        @Comment("The maximum size of the wetlands")
+        public int sizeMax = 225;
     }
 }

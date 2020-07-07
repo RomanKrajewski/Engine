@@ -143,7 +143,12 @@ public class Terrain implements ITerrain.Delegate {
     }
 
     public static Terrain wetlands(Settings settings) {
-        return new Terrain("wetlands", 5, TerrainType.WETLAND);
+        return new Terrain("wetlands", 5, TerrainType.WETLAND) {
+            @Override
+            public boolean overridesRiver() {
+                return true;
+            }
+        };
     }
 
     public static Terrain desert(Settings settings) {

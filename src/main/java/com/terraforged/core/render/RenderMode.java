@@ -24,6 +24,12 @@ public enum RenderMode {
                     Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
                 }
 
+//                if (cell.terrain == context.terrain.wetlands) {
+//                    hsb[0] = 1F;
+//                    hsb[1] = 1F;
+//                    hsb[2] = 0;
+//                }
+
                 color(buffer, hsb[0] * 100, hsb[1] * 100, hsb[2] * 100, height, 0.5F, context.levels);
             }
         }

@@ -13,10 +13,13 @@ import com.terraforged.world.rivermap.lake.LakeConfig;
 import com.terraforged.world.rivermap.river.River;
 import com.terraforged.world.rivermap.river.RiverBounds;
 import com.terraforged.world.rivermap.river.RiverConfig;
+import com.terraforged.world.rivermap.wetland.Wetland;
+import com.terraforged.world.rivermap.wetland.WetlandConfig;
 import com.terraforged.world.terrain.Terrains;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -39,6 +42,7 @@ public class RiverGenerator {
     private final LakeConfig lake;
     private final RiverConfig main;
     private final RiverConfig fork;
+    private final WetlandConfig wetland;
     private final Terrains terrain;
     private final Heightmap heightmap;
     private final Levels levels;
@@ -70,6 +74,8 @@ public class RiverGenerator {
                 .order(1)
                 .build();
 
+        wetland = new WetlandConfig(context.settings.rivers.wetland);
+
         lake = LakeConfig.of(context.settings.rivers.lake, context.levels);
 
         terrain = context.terrain;
@@ -80,6 +86,7 @@ public class RiverGenerator {
         GenWarp warp = new GenWarp((int) id);
         List<Lake> lakes = new LinkedList<>();
         List<River> rivers = new LinkedList<>();
+        List<Wetland> wetland = new LinkedList<>();
         List<GenRiver> rootRivers = generateRoots(x, z, random, warp, rivers, lakes);
         Collections.shuffle(rootRivers, random);
         for (GenRiver root : rootRivers) {
@@ -87,7 +94,8 @@ public class RiverGenerator {
         }
         generateAdditionalLakes(x, z, random, warp, rootRivers, rivers, lakes);
         rivers.sort(Collections.reverseOrder());
-        return new Rivermap(x, z, warp, rivers, lakes);
+        generateWetlands(random, rivers, wetland);
+        return new Rivermap(x, z, warp, rivers, lakes, wetland);
     }
 
     private List<GenRiver> generateRoots(int x, int z, Random random, GenWarp warp, List<River> rivers, List<Lake> lakes) {
@@ -202,6 +210,35 @@ public class RiverGenerator {
                 continue;
             }
             lakes.add(new Lake(center, size, variance, lake, terrain));
+        }
+    }
+
+    private void generateWetlands(Random random, List<River> rivers, List<Wetland> wetlands) {
+        Iterator<River> iterator = rivers.iterator();
+
+        while (iterator.hasNext()) {
+            River river = iterator.next();
+            int skip = random.nextInt(wetland.skipSize);
+
+            while (--skip > 0 && iterator.hasNext()) {
+                river = iterator.next();
+            }
+
+            if (river == null) {
+                break;
+            }
+
+            float width = wetland.width.next(random);
+            float length = wetland.length.next(random);
+            float riverLength = river.bounds.length();
+
+            float startPos = random.nextFloat() * 0.75F;
+            float endPos = startPos + (random.nextFloat() * (length / riverLength));
+
+            Vec2f start = river.bounds.pos(startPos);
+            Vec2f end = river.bounds.pos(endPos);
+
+            wetlands.add(new Wetland(start, end, width, levels, terrain));
         }
     }
 

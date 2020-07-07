@@ -38,10 +38,8 @@ import com.terraforged.core.tile.chunk.ChunkWriter;
 import com.terraforged.core.tile.gen.TileResources;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.Rivermap;
-import com.terraforged.world.terrain.decorator.Decorator;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -304,40 +302,6 @@ public class Tile implements Disposable, SafeCloseable {
             for (int gx = 0; gx < jobCount; gx++) {
                 int cx = gx * jobSize;
                 batcher.submit(new ChunkBatchTask.Zoom(cx, cz, jobSize, this, heightmap, translateX, translateZ, zoom));
-            }
-        }
-    }
-
-    public void decorate(Collection<Decorator> decorators) {
-        for (int dz = 0; dz < blockSize.total; dz++) {
-            for (int dx = 0; dx < blockSize.total; dx++) {
-                int index = blockSize.indexOf(dx, dz);
-                Cell cell = blocks[index];
-                for (Decorator decorator : decorators) {
-                    if (decorator.apply(cell, getBlockX() + dx, getBlockZ() + dz)) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    public void decorateZoom(Collection<Decorator> decorators, float offsetX, float offsetZ, float zoom) {
-        float translateX = offsetX - ((blockSize.size * zoom) / 2F);
-        float translateZ = offsetZ - ((blockSize.size * zoom) / 2F);
-        for (int cz = 0; cz < chunkSize.total; cz++) {
-            for (int cx = 0; cx < chunkSize.total; cx++) {
-                int index = chunkSize.indexOf(cx, cz);
-                GenChunk chunk = computeChunk(index, cx, cz);
-                chunk.iterate((cell, dx, dz) -> {
-                    float x = ((chunk.getBlockX() + dx) * zoom) + translateX;
-                    float z = ((chunk.getBlockZ() + dz) * zoom) + translateZ;
-                    for (Decorator decorator : decorators) {
-                        if (decorator.apply(cell, x, z)) {
-                            break;
-                        }
-                    }
-                });
             }
         }
     }

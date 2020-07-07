@@ -34,18 +34,15 @@ public class WorldGeneratorFactory implements Supplier<WorldGenerator> {
 
     private final Heightmap heightmap;
     private final WorldFilters filters;
-    private final WorldDecorators decorators;
 
     public WorldGeneratorFactory(GeneratorContext context) {
         this.heightmap = new Heightmap(context);
         this.filters = new WorldFilters(context);
-        this.decorators = new WorldDecorators(context);
     }
 
     public WorldGeneratorFactory(GeneratorContext context, Heightmap heightmap) {
         this.heightmap = heightmap;
         this.filters = new WorldFilters(context);
-        this.decorators = new WorldDecorators(context);
     }
 
     public Heightmap getHeightmap() {
@@ -56,16 +53,12 @@ public class WorldGeneratorFactory implements Supplier<WorldGenerator> {
         return getHeightmap().getClimate();
     }
 
-    public WorldDecorators getDecorators() {
-        return decorators;
-    }
-
     public WorldFilters getFilters() {
         return filters;
     }
 
     @Override
     public WorldGenerator get() {
-        return new WorldGenerator(heightmap, decorators, filters);
+        return new WorldGenerator(heightmap, filters);
     }
 }

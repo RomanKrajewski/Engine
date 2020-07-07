@@ -6,9 +6,7 @@ import com.terraforged.core.tile.Tile;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.world.GeneratorContext;
-import com.terraforged.world.WorldDecorators;
 import com.terraforged.world.WorldGeneratorFactory;
-import com.terraforged.world.terrain.decorator.Decorator;
 
 public class WorldLookup {
 
@@ -17,13 +15,11 @@ public class WorldLookup {
     private final TileCache cache;
     private final Heightmap heightmap;
     private final GeneratorContext context;
-    private final WorldDecorators decorators;
 
     public WorldLookup(WorldGeneratorFactory factory, GeneratorContext context) {
         this.context = context;
         this.cache = context.cache;
         this.heightmap = factory.getHeightmap();
-        this.decorators = factory.getDecorators();
         this.waterLevel = context.levels.water;
         this.beachLevel = context.levels.water(5);
     }
@@ -90,12 +86,6 @@ public class WorldLookup {
         // approximation - actual beaches depend on steepness but that's too expensive to calculate
         if (cell.terrain == context.terrain.coast && cell.value > waterLevel && cell.value <= beachLevel) {
             cell.terrain = context.terrain.beach;
-        }
-
-        for (Decorator decorator : decorators.getDecorators()) {
-            if (decorator.apply(cell, x, z)) {
-                break;
-            }
         }
     }
 }

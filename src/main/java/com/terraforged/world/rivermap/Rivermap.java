@@ -7,6 +7,7 @@ import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.rivermap.gen.GenWarp;
 import com.terraforged.world.rivermap.lake.Lake;
 import com.terraforged.world.rivermap.river.River;
+import com.terraforged.world.rivermap.wetland.Wetland;
 
 import java.util.List;
 
@@ -18,15 +19,17 @@ public class Rivermap implements ExpiringEntry {
     private final Domain riverWarp;
     private final List<Lake> lakes;
     private final List<River> rivers;
+    private final List<Wetland> wetland;
     private final long timestamp = System.currentTimeMillis();
 
-    public Rivermap(int x, int z, GenWarp warp, List<River> rivers, List<Lake> lakes) {
+    public Rivermap(int x, int z, GenWarp warp, List<River> rivers, List<Lake> lakes, List<Wetland> wetland) {
         this.x = x;
         this.z = z;
         this.lakes = lakes;
         this.rivers = rivers;
         this.lakeWarp = warp.lake;
         this.riverWarp = warp.river;
+        this.wetland = wetland;
     }
 
     public void apply(Cell cell, float x, float z) {
@@ -34,6 +37,10 @@ public class Rivermap implements ExpiringEntry {
         float rz = riverWarp.getY(x, z);
         for (River r : getRivers()) {
             r.apply(cell, rx, rz);
+        }
+
+        for (Wetland w : wetland) {
+            w.apply(cell, rx, rz, x, z);
         }
 
         float lx = lakeWarp.getX(x, z);

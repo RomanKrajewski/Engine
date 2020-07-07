@@ -30,21 +30,15 @@ import com.terraforged.world.heightmap.Heightmap;
 public class WorldGenerator {
 
     private final Heightmap heightmap;
-    private final WorldDecorators decorators;
     private final WorldFilters filters;
 
-    public WorldGenerator(Heightmap heightmap, WorldDecorators decorators, WorldFilters filters) {
+    public WorldGenerator(Heightmap heightmap, WorldFilters filters) {
         this.heightmap = heightmap;
-        this.decorators = decorators;
         this.filters = filters;
     }
 
     public Heightmap getHeightmap() {
         return heightmap;
-    }
-
-    public WorldDecorators getDecorators() {
-        return decorators;
     }
 
     public WorldFilters getFilters() {

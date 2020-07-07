@@ -71,6 +71,12 @@ public class RiverBounds {
         return y2;
     }
 
+    public float length() {
+        int dx = x1 - x2;
+        int dy = y1 - y2;
+        return (float) Math.sqrt(dx * dx + dy * dy);
+    }
+
     public boolean intersects(RiverBounds other) {
         return Line.intersect(other.x1, other.y1, other.x2, other.y2, x1, y1, x2, y2);
     }
