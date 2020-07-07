@@ -82,7 +82,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
         this.terrains = terrains;
         this.connecting = settings.connecting;
         this.bedHeight = config.bedHeight;
-        this.extraBedDepth = levels.scale(3);
+        this.extraBedDepth = levels.scale(1);
         this.minBankHeight = config.minBankHeight;
         this.maxBankHeight = config.maxBankHeight;
         this.valleyCurve = settings.valleyCurve;
@@ -142,7 +142,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
         // modifies the steepness of river banks the further inland the position is
         float riverMod = 1 - (continent * continentRiverModifier);
-        float depthAlpha = depthFadeBias + (DEPTH_FADE_STRENGTH * widthModifier);
+        float depthAlpha = NoiseUtil.clamp(depthFadeBias + (DEPTH_FADE_STRENGTH * widthModifier), 0, 1);
         float bedHeight = NoiseUtil.lerp(bankHeight, this.bedHeight, depthAlpha);
         if (!carveBanks(cell, banksAlpha * riverMod, bedHeight)) {
             return;
@@ -153,7 +153,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
             return;
         }
 
-        carveBed(cell, bedHeight, depthAlpha);
+        carveBed(cell, bedHeight, bedAlpha);
     }
 
     private float getBankHeight(Cell cell, float x, float z) {
@@ -184,21 +184,22 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
         // lerp the position's height to the riverbed height (ie the riverbank slopes)
         if (cell.value > bedHeight) {
+            banksAlpha = NoiseUtil.clamp(banksAlpha, 0, 1);
             cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
             return true;
         }
         return false;
     }
 
-    private void carveBed(Cell cell, float bedHeight, float depthAlpha) {
+    private void carveBed(Cell cell, float bedHeight, float bedAlpha) {
         cell.erosionMask = true;
         cell.terrain = terrains.river;
 
         if (cell.value < bedHeight) {
-            float extraBedHeight = NoiseUtil.lerp(bedHeight - extraBedDepth, bedHeight, depthAlpha);
+            float extraBedHeight = NoiseUtil.lerp(bedHeight - extraBedDepth, bedHeight, bedAlpha);
             cell.value = getExtraBedHeight(cell.value, bedHeight, extraBedHeight);
         } else {
-            cell.value = bedHeight;
+            cell.value = NoiseUtil.lerp(cell.value, bedHeight, bedAlpha);
         }
     }
 
