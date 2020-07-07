@@ -26,7 +26,7 @@ public class TileGeneratorBatched extends TileGenerator {
         try (Resource<Batcher> batcher = threadPool.batcher()) {
             tile.generateArea(generator.getHeightmap(), batcher.get(), batchSize, centerX, centerZ, zoom);
         }
-        postProcess(tile, centerX, centerZ, zoom, filter);
+        postProcess(tile, filter);
         return tile;
     }
 }

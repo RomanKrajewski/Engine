@@ -94,7 +94,7 @@ public class TileGenerator {
     public Tile generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
         Tile tile = createEmptyRegion(0, 0);
         tile.generate(generator.getHeightmap(), centerX, centerZ, zoom);
-        postProcess(tile, centerX, centerZ, zoom, filter);
+        postProcess(tile, filter);
         return tile;
     }
 
@@ -106,7 +106,7 @@ public class TileGenerator {
         generator.getFilters().apply(tile, true);
     }
 
-    protected void postProcess(Tile tile, float centerX, float centerZ, float zoom, boolean filter) {
+    protected void postProcess(Tile tile, boolean filter) {
         generator.getFilters().apply(tile, filter);
     }
 

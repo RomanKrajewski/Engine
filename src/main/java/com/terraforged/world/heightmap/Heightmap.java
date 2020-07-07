@@ -43,6 +43,7 @@ import com.terraforged.world.continent.Continent;
 import com.terraforged.world.continent.ContinentLerper2;
 import com.terraforged.world.continent.ContinentLerper3;
 import com.terraforged.world.rivermap.RiverCache;
+import com.terraforged.world.rivermap.Rivermap;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.Terrains;
 import com.terraforged.world.terrain.populator.TerrainPopulator;
@@ -190,6 +191,10 @@ public class Heightmap implements Populator {
 
     public void applyRivers(Cell cell, float x, float z) {
         riverMap.getRivers(cell).apply(cell, x, z);
+    }
+
+    public void applyRivers(Cell cell, float x, float z, Rivermap rivermap) {
+        rivermap.apply(cell, x, z);
     }
 
     public void applyClimate(Cell cell, float x, float z) {
