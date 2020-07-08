@@ -12,7 +12,9 @@ public class SingleContinentGenerator extends ContinentGenerator {
 
     public SingleContinentGenerator(Seed seed, WorldSettings settings) {
         super(seed, settings);
-        this.center = getCenter(0, 0);
+        MutableVeci pos = new MutableVeci();
+        getNearestCenter(0, 0, pos);
+        this.center = new Vec2i(pos.x, pos.z);
     }
 
     @Override
@@ -26,17 +28,5 @@ public class SingleContinentGenerator extends ContinentGenerator {
             cell.continentX = 0;
             cell.continentZ = 0;
         }
-    }
-
-    @Override
-    public void getNearestCenter(float x, float z, MutableVeci pos) {
-        pos.x = center.x;
-        pos.z = center.y;
-    }
-
-    private Vec2i getCenter(int px, int py) {
-        MutableVeci pos = new MutableVeci();
-        super.getNearestCenter(px, py, pos);
-        return new Vec2i(pos.x, pos.z);
     }
 }
