@@ -39,7 +39,6 @@ public class Terrains {
     public final Terrain beach;
     public final Terrain lake;
     public final Terrain river;
-    public final Terrain riverBanks;
     public final Terrain wetlands;
     public final Terrain desert;
     public final Terrain badlands;
@@ -66,7 +65,6 @@ public class Terrains {
                 lake = mutable.lake,
                 river = mutable.river,
                 torridonian = mutable.torridonian,
-                riverBanks = mutable.riverbanks,
                 wetlands = mutable.wetlands,
                 desert = mutable.desert,
                 badlands = mutable.badlands,
@@ -91,7 +89,6 @@ public class Terrains {
         terrain.beach = Terrain.beach(settings);
         terrain.lake = Terrain.lake(settings);
         terrain.river = Terrain.river(settings);
-        terrain.riverbanks = Terrain.riverBank(settings);
         terrain.wetlands = Terrain.wetlands(settings);
         terrain.desert = Terrain.desert(settings);
         terrain.badlands = Terrain.badlands(settings);
@@ -116,7 +113,6 @@ public class Terrains {
         public Terrain beach = Terrain.NONE;
         public Terrain lake = Terrain.NONE;
         public Terrain river = Terrain.NONE;
-        public Terrain riverbanks = Terrain.NONE;
         public Terrain wetlands = Terrain.NONE;
         public Terrain desert = Terrain.NONE;
         public Terrain badlands = Terrain.NONE;

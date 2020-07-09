@@ -47,6 +47,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
     public final boolean main;
     private final boolean connecting;
 
+    private final float waterLine;
     private final float bedHeight;
     private final float extraBedDepth;
     private final float minBankHeight;
@@ -81,6 +82,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
         this.main = config.main;
         this.terrains = terrains;
         this.connecting = settings.connecting;
+        this.waterLine = levels.water;
         this.bedHeight = config.bedHeight;
         this.extraBedDepth = levels.scale(1);
         this.minBankHeight = config.minBankHeight;
@@ -180,20 +182,22 @@ public class River extends TerrainPopulator implements Comparable<River> {
     }
 
     private boolean carveBanks(Cell cell, float banksAlpha, float bedHeight) {
-        cell.terrain = terrains.riverBanks;
-
         // lerp the position's height to the riverbed height (ie the riverbank slopes)
         if (cell.value > bedHeight) {
             banksAlpha = NoiseUtil.clamp(banksAlpha, 0, 1);
             cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
+            // tag after lerping the cell height value
+            tag(cell, bedHeight);
             return true;
+        } else {
+            tag(cell, bedHeight);
+            return false;
         }
-        return false;
     }
 
     private void carveBed(Cell cell, float bedHeight, float bedAlpha) {
         cell.erosionMask = true;
-        cell.terrain = terrains.river;
+        tag(cell, bedHeight);
 
         if (cell.value < bedHeight) {
             float extraBedHeight = NoiseUtil.lerp(bedHeight - extraBedDepth, bedHeight, bedAlpha);
@@ -201,6 +205,16 @@ public class River extends TerrainPopulator implements Comparable<River> {
         } else {
             cell.value = NoiseUtil.lerp(cell.value, bedHeight, bedAlpha);
         }
+    }
+
+    private void tag(Cell cell, float bedHeight) {
+        // don't tag as river if the current one overrides it and the cell value is above water level
+        // or below the riverbed height at this position
+        if (cell.terrain.overridesRiver() && (cell.value < bedHeight || cell.value > waterLine)) {
+            return;
+        }
+
+        cell.terrain = terrains.river;
     }
 
     private float getMouthModifier(Cell cell) {

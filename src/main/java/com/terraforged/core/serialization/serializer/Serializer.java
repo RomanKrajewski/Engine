@@ -152,6 +152,9 @@ public class Serializer {
 
             writer.name("limit_upper");
             writer.value(limit.upper());
+
+            writer.name("pad");
+            writer.value(limit.pad());
         }
 
         if (field.getType() == boolean.class) {

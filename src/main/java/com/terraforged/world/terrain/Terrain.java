@@ -194,6 +194,11 @@ public class Terrain implements ITerrain.Delegate {
             public boolean isMountain() {
                 return true;
             }
+
+            @Override
+            public boolean overridesRiver() {
+                return true;
+            }
         };
     }
 
@@ -201,6 +206,11 @@ public class Terrain implements ITerrain.Delegate {
         return new Terrain("mountain_chain", settings.terrain.mountains.weight, TerrainType.HIGHLAND) {
             @Override
             public boolean isMountain() {
+                return true;
+            }
+
+            @Override
+            public boolean overridesRiver() {
                 return true;
             }
         };

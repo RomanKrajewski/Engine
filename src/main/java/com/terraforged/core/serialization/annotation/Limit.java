@@ -12,4 +12,6 @@ public @interface Limit {
     String lower() default "";
 
     String upper() default "";
+
+    float pad() default -1F;
 }
