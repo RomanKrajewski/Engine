@@ -23,18 +23,24 @@ public class Wetland extends TerrainPopulator {
     private final Line line;
     private final float bed;
     private final float banks;
-    private final float mounds;
-    private final Module shape;
-    private final Module edge;
+    private final float moundMin;
+    private final float moundMax;
+    private final float moundVariance;
+    private final Module moundShape;
+    private final Module moundHeight;
+    private final Module terrainEdge;
 
     public Wetland(Seed seed, Vec2f a, Vec2f b, float radius, Levels levels, Terrains terrains) {
         super(terrains.wetlands, Source.ZERO, Source.ZERO);
         this.bed = levels.water(-1) - (0.5F / levels.worldHeight);
         this.banks = levels.ground(4);
-        this.mounds = levels.water(2);
+        this.moundMin = levels.water(1);
+        this.moundMax = levels.water(2);
+        this.moundVariance = moundMax - moundMin;
         this.line = Source.line(a.x, a.y, b.x, b.y, radius, 0, 0);
-        this.shape = Source.perlin(seed.next(), 10, 1).clamp(0.4, 0.6).map(0, 1);
-        this.edge = Source.perlin(seed.next(), 8, 1).clamp(0.2, 0.8).map(0, 0.9);
+        this.terrainEdge = Source.perlin(seed.next(), 8, 1).clamp(0.2, 0.8).map(0, 0.9);
+        this.moundShape = Source.simplex(seed.next(), 12, 1).clamp(0.4, 0.6).map(0, 1);
+        this.moundHeight = Source.simplex(seed.next(), 20, 1).clamp(0, 0.3).map(0, 1);
     }
 
     @Override
@@ -66,12 +72,13 @@ public class Wetland extends TerrainPopulator {
             cell.erosionMask = true;
         }
 
-        if (dist > VALLEY && poolsAlpha > edge.getValue(x, z)) {
+        if (dist > VALLEY && poolsAlpha > terrainEdge.getValue(x, z)) {
             cell.terrain = getType();
         }
 
-        if (cell.value >= bed && cell.value <= mounds) {
-            float shapeAlpha = shape.getValue(x, z) * poolsAlpha;
+        if (cell.value >= bed && cell.value < moundMax) {
+            float shapeAlpha = moundShape.getValue(x, z) * poolsAlpha;
+            float mounds = moundMin + moundHeight.getValue(x, z) * moundVariance;
             cell.value = NoiseUtil.lerp(cell.value, mounds, shapeAlpha);
         }
 
