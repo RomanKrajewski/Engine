@@ -38,9 +38,9 @@ public class Wetland extends TerrainPopulator {
         this.moundMax = levels.water(2);
         this.moundVariance = moundMax - moundMin;
         this.line = Source.line(a.x, a.y, b.x, b.y, radius, 0, 0);
-        this.terrainEdge = Source.perlin(seed.next(), 8, 1).clamp(0.2, 0.8).map(0, 0.9);
-        this.moundShape = Source.simplex(seed.next(), 12, 1).clamp(0.4, 0.6).map(0, 1);
+        this.moundShape = Source.perlin(seed.next(), 10, 1).clamp(0.3, 0.6).map(0, 1);
         this.moundHeight = Source.simplex(seed.next(), 20, 1).clamp(0, 0.3).map(0, 1);
+        this.terrainEdge = Source.perlin(seed.next(), 8, 1).clamp(0.2, 0.8).map(0, 0.9);
     }
 
     @Override
