@@ -36,16 +36,16 @@ public class RiverSettings {
      * RIVER PROPERTIES
      */
     @Range(min = 0, max = 30)
-    @Comment("Controls the number of major rivers per continent")
+    @Comment("Controls the number of main rivers per continent")
     public int riverCount = 13;
 
-    public River primaryRivers = new River(5, 2, 8, 20, 8, 0.95F);
+    public River mainRivers = new River(5, 2, 8, 20, 8, 0.95F);
 
-    public River secondaryRiver = new River(4, 1, 6, 14, 5, 0.95F);
+    public River branchRivers = new River(4, 1, 6, 14, 5, 0.95F);
 
-    public Lake lake = new Lake();
+    public Lake lakes = new Lake();
 
-    public Wetland wetland = new Wetland();
+    public Wetland wetlands = new Wetland();
 
     @Serializable
     public static class River {
@@ -87,6 +87,7 @@ public class RiverSettings {
         }
     }
 
+    @Serializable
     public static class Lake {
 
         @Range(min = 0.0F, max = 1.0F)

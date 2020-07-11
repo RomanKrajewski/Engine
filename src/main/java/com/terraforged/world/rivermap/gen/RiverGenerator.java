@@ -58,29 +58,29 @@ public class RiverGenerator {
         count = context.settings.rivers.riverCount;
 
         main = RiverConfig.builder(context.levels)
-                .bankHeight(context.settings.rivers.primaryRivers.minBankHeight, context.settings.rivers.primaryRivers.maxBankHeight)
-                .bankWidth(context.settings.rivers.primaryRivers.bankWidth)
-                .bedWidth(context.settings.rivers.primaryRivers.bedWidth)
-                .bedDepth(context.settings.rivers.primaryRivers.bedDepth)
-                .fade(context.settings.rivers.primaryRivers.fade)
+                .bankHeight(context.settings.rivers.mainRivers.minBankHeight, context.settings.rivers.mainRivers.maxBankHeight)
+                .bankWidth(context.settings.rivers.mainRivers.bankWidth)
+                .bedWidth(context.settings.rivers.mainRivers.bedWidth)
+                .bedDepth(context.settings.rivers.mainRivers.bedDepth)
+                .fade(context.settings.rivers.mainRivers.fade)
                 .length(5000)
                 .main(true)
                 .order(0)
                 .build();
 
         fork = RiverConfig.builder(context.levels)
-                .bankHeight(context.settings.rivers.secondaryRiver.minBankHeight, context.settings.rivers.secondaryRiver.maxBankHeight)
-                .bankWidth(context.settings.rivers.secondaryRiver.bankWidth)
-                .bedWidth(context.settings.rivers.secondaryRiver.bedWidth)
-                .bedDepth(context.settings.rivers.secondaryRiver.bedDepth)
-                .fade(context.settings.rivers.secondaryRiver.fade)
+                .bankHeight(context.settings.rivers.branchRivers.minBankHeight, context.settings.rivers.branchRivers.maxBankHeight)
+                .bankWidth(context.settings.rivers.branchRivers.bankWidth)
+                .bedWidth(context.settings.rivers.branchRivers.bedWidth)
+                .bedDepth(context.settings.rivers.branchRivers.bedDepth)
+                .fade(context.settings.rivers.branchRivers.fade)
                 .length(4500)
                 .order(1)
                 .build();
 
-        wetland = new WetlandConfig(context.settings.rivers.wetland);
+        wetland = new WetlandConfig(context.settings.rivers.wetlands);
 
-        lake = LakeConfig.of(context.settings.rivers.lake, context.levels);
+        lake = LakeConfig.of(context.settings.rivers.lakes, context.levels);
 
         terrain = context.terrain;
     }
