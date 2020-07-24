@@ -58,8 +58,8 @@ public class Stratum<T> {
         return new Stratum<>(t, depth);
     }
 
-    public interface Visitor<T> {
+    public interface Visitor<T, Context> {
 
-        boolean visit(int y, T value);
+        boolean visit(int y, T value, Context ctx);
     }
 }

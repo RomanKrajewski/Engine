@@ -72,7 +72,8 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
     public River(RiverBounds bounds, RiverConfig config, Settings settings, Terrains terrains, Levels levels) {
         super(terrains.river, Source.ZERO, Source.ZERO);
-        Module in = Source.constant(settings.fadeIn);
+        Module bedIn = Source.constant(settings.fadeIn);
+        Module banksIn = Source.constant(settings.fadeIn * 0.5);
         Module out = Source.constant(settings.fadeOut);
         Module bedWidth = Source.constant(config.bedWidth * config.bedWidth);
         Module bankWidth = Source.constant(config.bankWidth * config.bankWidth);
@@ -95,8 +96,8 @@ public class River extends TerrainPopulator implements Comparable<River> {
         this.bankAlphaRange = bankAlphaMax - bankAlphaMin;
         this.bankVariance = Source.perlin(1234, 150, 1);
         this.depthFadeBias = 1 - DEPTH_FADE_STRENGTH;
-        this.bed = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), bedWidth, in, out, 0.1F);
-        this.banks = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), bankWidth, in, out, 0.1F);
+        this.bed = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), bedWidth, bedIn, out, 0.1F);
+        this.banks = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), bankWidth, banksIn, out, 0.175F);
         this.valley = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), valleyWidth, Source.ZERO, Source.ZERO, 0.33F);
     }
 
@@ -118,7 +119,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
         valleyAlpha = valleyCurve.apply(valleyAlpha);
 
-        float continent = NoiseUtil.map(cell.continentEdge, 0.2F, 0.8F, 0.6F);
+        float continent = NoiseUtil.map(cell.continentEdge, 0.25F, 0.85F, 0.6F);
         float valleyMod = 1 - (continent * continentValleyModifier);
 
         // riverMask decreases the closer to the river the position gets

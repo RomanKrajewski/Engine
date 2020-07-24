@@ -30,19 +30,27 @@ import com.terraforged.n2d.util.NoiseUtil;
 
 public interface Modifier {
 
-    float getModifier(float value);
+    float getValueModifier(float value);
 
     default float modify(Cell cell, float value) {
-        float modifier = cell.terrain.erosionModifier();
-        if (modifier != 1F) {
+        float strengthModifier = 1F;
+
+        // reduce erosion strength towards the edge of terrain regions (that have an erosion modifier)
+        if (cell.terrain.erosionModifier() != 1F) {
             float alpha = NoiseUtil.map(cell.terrainRegionEdge, 0F, 0.15F, 0.15F);
-            modifier = NoiseUtil.lerp(1F, modifier, alpha);
+            strengthModifier = NoiseUtil.lerp(1F, cell.terrain.erosionModifier(), alpha);
         }
-        return value * getModifier(cell.value) * modifier;
+
+        // reduce erosion strength approaching rivers to prevent the bed getting filled up with sediment
+        if (cell.riverMask < 0.1F) {
+            strengthModifier *= NoiseUtil.map(cell.riverMask, 0.002F, 0.1F, 0.098F);
+        }
+
+        return getValueModifier(cell.value) * strengthModifier * value;
     }
 
     default Modifier invert() {
-        return v -> 1 - getModifier(v);
+        return v -> 1 - getValueModifier(v);
     }
 
     static Modifier range(float minValue, float maxValue) {
@@ -53,7 +61,7 @@ public interface Modifier {
             private final float range = maxValue - minValue;
 
             @Override
-            public float getModifier(float value) {
+            public float getValueModifier(float value) {
                 if (value > max) {
                     return 1F;
                 }

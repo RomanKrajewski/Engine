@@ -45,26 +45,26 @@ public class Strata<T> {
         this.heightMod = heightMod;
     }
 
-    public boolean downwards(final int x, final int y, final int z, final Stratum.Visitor<T> visitor) {
+    public <Context> boolean downwards(final int x, final int y, final int z, final Context context, final Stratum.Visitor<T, Context> visitor) {
         try (Resource<DepthBuffer> buffer = DepthBuffer.get()) {
             initBuffer(buffer.get(), x, z);
-            return downwards(x, y, z, buffer.get(), visitor);
+            return downwards(x, y, z, buffer.get(), context, visitor);
         }
     }
 
-    public boolean downwards(final int x, final int y, final int z, final DepthBuffer buffer, Stratum.Visitor<T> visitor) {
-        initBuffer(buffer, x, z);
+    public <Context> boolean downwards(final int x, final int y, final int z, final DepthBuffer depthBuffer, final Context ctx, Stratum.Visitor<T, Context> visitor) {
+        initBuffer(depthBuffer, x, z);
 
         int py = y;
         T last = null;
         for (int i = 0; i < strata.size(); i++) {
-            float depth = buffer.getDepth(i);
+            float depth = depthBuffer.getDepth(i);
             int height = NoiseUtil.round(depth * y);
             T value = strata.get(i).getValue();
             last = value;
             for (int dy = 0; dy < height; dy++) {
                 if (py <= y) {
-                    boolean cont = visitor.visit(py, value);
+                    boolean cont = visitor.visit(py, value, ctx);
                     if (!cont) {
                         return false;
                     }
@@ -76,7 +76,7 @@ public class Strata<T> {
         }
         if (last != null) {
             while (py > 0) {
-                visitor.visit(py, last);
+                visitor.visit(py, last, ctx);
                 py--;
             }
         }

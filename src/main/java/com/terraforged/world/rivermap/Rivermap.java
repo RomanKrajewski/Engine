@@ -32,21 +32,23 @@ public class Rivermap implements ExpiringEntry {
         this.wetland = wetland;
     }
 
+    @SuppressWarnings("ForLoopReplaceableByForEach")
     public void apply(Cell cell, float x, float z) {
         float rx = riverWarp.getX(x, z);
         float rz = riverWarp.getY(x, z);
-        for (River r : getRivers()) {
-            r.apply(cell, rx, rz);
+
+        for (int i = 0; i < rivers.size(); i++) {
+            rivers.get(i).apply(cell, rx, rz);
         }
 
-        for (Wetland w : wetland) {
-            w.apply(cell, rx, rz, x, z);
+        for (int i = 0; i < wetland.size(); i++) {
+            wetland.get(i).apply(cell, rx, rz, x, z);
         }
 
         float lx = lakeWarp.getX(x, z);
         float lz = lakeWarp.getY(x, z);
-        for (Lake l : getLakes()) {
-            l.apply(cell, lx, lz);
+        for (int i = 0; i < lakes.size(); i++) {
+            lakes.get(i).apply(cell, lx, lz);
         }
     }
 

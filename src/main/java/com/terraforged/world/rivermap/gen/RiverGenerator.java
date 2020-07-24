@@ -21,9 +21,9 @@ import com.terraforged.world.terrain.Terrains;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RiverGenerator {
 
@@ -38,6 +38,12 @@ public class RiverGenerator {
 
     // random spacing between forks along a given river
     private static final Variance MAIN_SPACING = Variance.of(0.05, 0.2);
+
+    // used to randomly produce ravines inland
+    private static final float CONTINENT_MODIFIER_MIN = 0.025F;
+    private static final float CONTINENT_MODIFIER_RANGE = 0.1F;
+
+    private static final AtomicInteger listSize = new AtomicInteger(32);
 
     private final int count;
     private final Seed seed;
@@ -88,9 +94,10 @@ public class RiverGenerator {
     public Rivermap compute(int x, int z, long id) {
         Random random = new Random(id);
         GenWarp warp = new GenWarp((int) id);
-        List<Lake> lakes = new LinkedList<>();
-        List<River> rivers = new LinkedList<>();
-        List<Wetland> wetland = new LinkedList<>();
+        int size = listSize.get();
+        List<Lake> lakes = new ArrayList<>(size);
+        List<River> rivers = new ArrayList<>(size);
+        List<Wetland> wetland = new ArrayList<>(size);
         List<GenRiver> rootRivers = generateRoots(x, z, random, warp, rivers, lakes);
         Collections.shuffle(rootRivers, random);
         for (GenRiver root : rootRivers) {
@@ -99,6 +106,9 @@ public class RiverGenerator {
         generateAdditionalLakes(x, z, random, warp, rootRivers, rivers, lakes);
         rivers.sort(Collections.reverseOrder());
         generateWetlands(random, rivers, wetland);
+        if (rivers.size() > size) {
+            listSize.set(rivers.size());
+        }
         return new Rivermap(x, z, warp, rivers, lakes, wetland);
     }
 
@@ -134,12 +144,9 @@ public class RiverGenerator {
             float valleyWidth = River.VALLEY_WIDTH * MAIN_VALLEY.next(random);
             RiverBounds bounds = new RiverBounds((int) x1, (int) z1, (int) x2, (int) z2);
 
-            River.Settings settings = new River.Settings();
+            River.Settings settings = creatSettings(random);
             settings.fadeIn = main.fade;
             settings.valleySize = valleyWidth;
-            settings.valleyCurve = River.getValleyType(random);
-            settings.continentRiverModifier = 0.15F * random.nextFloat();
-            settings.continentValleyModifier = settings.continentRiverModifier + (0.4F * random.nextFloat());
 
             River river = new River(bounds, main, settings, terrain, levels);
             roots.add(new GenRiver(river, angle, dx, dz, length));
@@ -172,13 +179,10 @@ public class RiverGenerator {
 
                 RiverBounds bounds = new RiverBounds((int) x2, (int) z2, (int) v1.x, (int) v1.y);
 
-                River.Settings settings = new River.Settings();
+                River.Settings settings = creatSettings(random);
                 settings.connecting = true;
                 settings.fadeIn = config.fade;
                 settings.valleySize = valleyWidth;
-                settings.valleyCurve = River.getValleyType(random);
-                settings.continentRiverModifier = 0.1F * random.nextFloat();
-                settings.continentValleyModifier = settings.continentRiverModifier + (0.3F * random.nextFloat());
 
                 River fork = new River(bounds, forkConfig, settings, terrain, levels);
 
@@ -285,5 +289,13 @@ public class RiverGenerator {
             }
         }
         return false;
+    }
+
+    private static River.Settings creatSettings(Random random) {
+        River.Settings settings = new River.Settings();
+        settings.valleyCurve = River.getValleyType(random);
+        settings.continentRiverModifier = CONTINENT_MODIFIER_MIN * random.nextFloat();
+        settings.continentValleyModifier = settings.continentRiverModifier + (CONTINENT_MODIFIER_RANGE * random.nextFloat());
+        return settings;
     }
 }
