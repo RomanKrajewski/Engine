@@ -172,25 +172,21 @@ public class RiverGenerator {
 
                 float x2 = v1.x - dx * length;
                 float z2 = v1.y - dz * length;
+                RiverBounds bounds = new RiverBounds((int) x2, (int) z2, (int) v1.x, (int) v1.y);
+                if (riverOverlaps(bounds, parent, rivers)) {
+                    continue;
+                }
+
                 float forkWidth = parent.config.bankWidth * offset * 0.75F;
                 float valleyWidth = River.VALLEY_WIDTH * FORK_VALLEY.next(random);
-
                 RiverConfig forkConfig = config.createFork(forkWidth);
-
-                RiverBounds bounds = new RiverBounds((int) x2, (int) z2, (int) v1.x, (int) v1.y);
 
                 River.Settings settings = creatSettings(random);
                 settings.connecting = true;
                 settings.fadeIn = config.fade;
                 settings.valleySize = valleyWidth;
 
-                River fork = new River(bounds, forkConfig, settings, terrain, levels);
-
-                if (riverOverlaps(fork, parent, rivers)) {
-                    continue;
-                }
-
-                rivers.add(fork);
+                rivers.add(new River(bounds, forkConfig, settings, terrain, levels));
             }
         }
         addLake(parent, random, warp, lakes);
@@ -263,9 +259,9 @@ public class RiverGenerator {
         }
     }
 
-    private boolean riverOverlaps(River river, River parent, List<River> rivers) {
+    private boolean riverOverlaps(RiverBounds bounds, River parent, List<River> rivers) {
         for (River other : rivers) {
-            if (other != parent && other.bounds.overlaps(river.bounds) && other.bounds.intersects(river.bounds)) {
+            if (other != parent && other.bounds.overlaps(bounds) && other.bounds.intersects(bounds, 150)) {
                 return true;
             }
         }
