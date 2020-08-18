@@ -39,9 +39,9 @@ public class RiverSettings {
     @Comment("Controls the number of main rivers per continent")
     public int riverCount = 13;
 
-    public River mainRivers = new River(5, 2, 8, 20, 8, 0.95F);
+    public River mainRivers = new River(5, 2, 8,250, 20, 8, 0.95F);
 
-    public River branchRivers = new River(4, 1, 6, 14, 5, 0.95F);
+    public River branchRivers = new River(4, 1, 6,100, 14, 5, 0.95F);
 
     public Lake lakes = new Lake();
 
@@ -74,16 +74,21 @@ public class RiverSettings {
         @Comment("Controls how much rivers taper")
         public float fade;
 
+        @Range(min = 0, max = 500)
+        @Comment("Controls the river valley width")
+        public int valleyWidth;
+
         public River() {
         }
 
-        public River(int depth, int minBank, int maxBank, int outer, int inner, float fade) {
+        public River(int depth, int minBank, int maxBank, int valleyWidth, int outer, int inner, float fade) {
             this.minBankHeight = minBank;
             this.maxBankHeight = maxBank;
             this.bankWidth = outer;
             this.bedWidth = inner;
             this.bedDepth = depth;
             this.fade = fade;
+            this.valleyWidth = valleyWidth;
         }
     }
 

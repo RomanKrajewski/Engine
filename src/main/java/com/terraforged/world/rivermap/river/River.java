@@ -40,7 +40,6 @@ import java.util.Random;
 
 public class River extends TerrainPopulator implements Comparable<River> {
 
-    public static final int VALLEY_WIDTH = 275;
     private static final float DEPTH_FADE_STRENGTH = 0.5F;
     private static final float MIN_WIDTH2 = 1.5F;
 
@@ -83,8 +82,8 @@ public class River extends TerrainPopulator implements Comparable<River> {
         this.main = config.main;
         this.terrains = terrains;
         this.connecting = settings.connecting;
-        this.waterLine = levels.water;
-        this.bedHeight = config.bedHeight;
+        this.waterLine = bounds.getWaterLine();
+        this.bedHeight = bounds.getWaterLine();
         this.extraBedDepth = levels.scale(1);
         this.minBankHeight = config.minBankHeight;
         this.maxBankHeight = config.maxBankHeight;
@@ -96,9 +95,9 @@ public class River extends TerrainPopulator implements Comparable<River> {
         this.bankAlphaRange = bankAlphaMax - bankAlphaMin;
         this.bankVariance = Source.perlin(1234, 150, 1);
         this.depthFadeBias = 1 - DEPTH_FADE_STRENGTH;
-        this.bed = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), bedWidth, bedIn, out, 0.1F);
-        this.banks = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), bankWidth, banksIn, out, 0.175F);
-        this.valley = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), valleyWidth, Source.ZERO, Source.ZERO, 0.33F);
+        this.bed = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), bedWidth, Source.ZERO, Source.ZERO, 0.0F);
+        this.banks = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), bankWidth, Source.ZERO, Source.ZERO, 0.0F);
+        this.valley = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), valleyWidth, Source.ZERO, Source.ZERO, 0.0F);
     }
 
     @Override
@@ -108,12 +107,14 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
     @Override
     public void apply(Cell cell, float x, float z) {
-        if (cell.value <= bedHeight) {
+
+        float valleyAlpha = valley.getValue(x, z, 1f);
+        if (valleyAlpha == 0) {
             return;
         }
 
-        float valleyAlpha = valley.getValue(x, z);
-        if (valleyAlpha == 0) {
+        if (cell.value <= bedHeight) {
+            setCellWaterLevel(cell);
             return;
         }
 
@@ -126,11 +127,13 @@ public class River extends TerrainPopulator implements Comparable<River> {
         cell.riverMask *= (1 - valleyAlpha);
         float bankHeight = getBankHeight(cell, x, z);
         if (!carveValley(cell, valleyAlpha * valleyMod, bankHeight)) {
+            setCellWaterLevel(cell);
             return;
         }
 
         // is a branching river and x,z is past the connecting point
         if (connecting && banks.clipEnd(x, z)) {
+            setCellWaterLevel(cell);
             return;
         }
 
@@ -140,23 +143,34 @@ public class River extends TerrainPopulator implements Comparable<River> {
         float widthModifier = banks.getWidthModifier(x, z);
         float banksAlpha = banks.getValue(x, z, MIN_WIDTH2, widthModifier / mouthModifier);
         if (banksAlpha == 0) {
+            setCellWaterLevel(cell);
             return;
         }
 
         // modifies the steepness of river banks the further inland the position is
+
         float riverMod = 1 - (continent * continentRiverModifier);
         float depthAlpha = NoiseUtil.clamp(depthFadeBias + (DEPTH_FADE_STRENGTH * widthModifier), 0, 1);
-        float bedHeight = NoiseUtil.lerp(bankHeight, this.bedHeight, depthAlpha);
+        float bedHeight = NoiseUtil.lerp(bankHeight, bankHeight - 0.05f, depthAlpha);
         if (!carveBanks(cell, banksAlpha * riverMod, bedHeight)) {
+            setCellWaterLevel(cell);
             return;
         }
 
+
         float bedAlpha = bed.getValue(x, z);
         if (bedAlpha == 0 || cell.value <= bedHeight) {
+            setCellWaterLevel(cell);
             return;
         }
 
         carveBed(cell, bedHeight, bedAlpha);
+    }
+
+    private void setCellWaterLevel(Cell cell) {
+        if (cell.value < waterLine){
+            cell.waterLevel = waterLine;
+        }
     }
 
     private float getBankHeight(Cell cell, float x, float z) {
@@ -165,7 +179,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
         // use perlin noise to add a little extra variance to the bank height
         float bankHeightVariance = bankVariance.getValue(x, z);
         // lerp between the min and max heights
-        return NoiseUtil.lerp(minBankHeight, maxBankHeight, bankHeightAlpha * bankHeightVariance);
+        return NoiseUtil.lerp(cell.value - 0.02f,cell.value - 0.06f, bankHeightAlpha * bankHeightVariance);
     }
 
     private float getBedHeight(float bankHeight, float depthAlpha) {
@@ -184,6 +198,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
     private boolean carveBanks(Cell cell, float banksAlpha, float bedHeight) {
         // lerp the position's height to the riverbed height (ie the riverbank slopes)
+
         if (cell.value > bedHeight) {
             banksAlpha = NoiseUtil.clamp(banksAlpha, 0, 1);
             cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
@@ -211,7 +226,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
     private void tag(Cell cell, float bedHeight) {
         // don't tag as river if the current one overrides it and the cell value is above water level
         // or below the riverbed height at this position
-        if (cell.terrain.overridesRiver() && (cell.value < bedHeight || cell.value > waterLine)) {
+        if (cell.terrain.overridesRiver() && (cell.value < bedHeight || cell.value > cell.waterLevel)) {
             return;
         }
 
@@ -233,7 +248,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
     public static class Settings {
 
-        public float valleySize = VALLEY_WIDTH;
+        public float valleySize = 150;
         public double fadeIn = 0.7F;
         public double fadeOut = 0F;
         public boolean connecting = false;

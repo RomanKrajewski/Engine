@@ -41,12 +41,13 @@ public class RiverBounds {
     private final int maxX;
     private final int maxY;
     private final float length;
+    private final float waterLine;
 
-    public RiverBounds(int x1, int y1, int x2, int y2) {
-        this(x1, y1, x2, y2, 0);
+    public RiverBounds(int x1, int y1, int x2, int y2, float waterLine) {
+        this(x1, y1, x2, y2, waterLine, 0);
     }
 
-    public RiverBounds(int x1, int y1, int x2, int y2, int radius) {
+    public RiverBounds(int x1, int y1, int x2, int y2, float waterLine, int radius) {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -56,6 +57,7 @@ public class RiverBounds {
         this.maxX = Math.max(x1, x2);
         this.maxY = Math.max(y1, y2);
         this.length = length();
+        this.waterLine = waterLine;
     }
 
     public int x1() {
@@ -73,6 +75,8 @@ public class RiverBounds {
     public int y2() {
         return y2;
     }
+
+    public float getWaterLine(){return waterLine;}
 
     public float length() {
         int dx = x1 - x2;
@@ -134,7 +138,7 @@ public class RiverBounds {
         int dy = y2() - y1();
         int x = NoiseUtil.round(x1 + dx * factor);
         int y = NoiseUtil.round(y1 + dy * factor);
-        return new RiverBounds(x, y, x2, y2);
+        return new RiverBounds(x, y, x2, y2, waterLine);
     }
 
     public static RiverBounds fromNodes(Vec2i p1, Vec2i p2) {

@@ -50,7 +50,7 @@ public class Lake extends TerrainPopulator {
     public Lake(Vec2f center, float radius, float multiplier, LakeConfig config, Terrains terrains) {
         super(terrains.lake, Source.ZERO, Source.ZERO);
         float lake = radius * multiplier;
-        float valley = River.VALLEY_WIDTH * multiplier;
+        float valley = 250 * multiplier;
         this.valley2 = valley * valley;
         this.center = center;
         this.depth = config.depth;

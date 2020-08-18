@@ -67,6 +67,7 @@ public class Heightmap implements Populator {
     protected final Populator regionModule;
 
     private final Climate climate;
+
     private final Populator root;
     private final RiverCache riverMap;
     private final TerrainProvider terrainProvider;
@@ -209,7 +210,9 @@ public class Heightmap implements Populator {
     public Continent getContinent() {
         return continentGenerator;
     }
-
+    public Populator getRoot() {
+        return root;
+    }
     public RiverCache getRivers() {
         return riverMap;
     }

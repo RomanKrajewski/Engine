@@ -71,6 +71,8 @@ public class Cell {
     // the actual height data
     public float value;
 
+    public float waterLevel = 0F;
+
     // climate data
     public float moisture = 0.5F;
     public float temperature = 0.5F;
@@ -89,6 +91,8 @@ public class Cell {
 
     public void copy(Cell other) {
         value = other.value;
+
+        waterLevel = other.waterLevel;
 
         continentIdentity = other.continentIdentity;
         continentEdge = other.continentEdge;

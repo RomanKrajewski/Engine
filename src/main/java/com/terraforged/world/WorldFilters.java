@@ -33,6 +33,7 @@ import com.terraforged.core.filter.Steepness;
 import com.terraforged.core.settings.FilterSettings;
 import com.terraforged.core.tile.Size;
 import com.terraforged.core.tile.Tile;
+import com.terraforged.world.rivermap.RiverPostProcessor;
 
 import java.util.function.IntFunction;
 
@@ -44,7 +45,6 @@ public class WorldFilters {
     private final FilterSettings settings;
     private final IntFunction<Erosion> erosionFactory;
     private final Object lock = new Object();
-
     private Erosion erosion = null;
 
     public WorldFilters(GeneratorContext context) {
@@ -63,7 +63,6 @@ public class WorldFilters {
             getErosion(map.getSize()).apply(map, tile.getRegionX(), tile.getRegionZ(), settings.erosion.iterations);
             smoothing.apply(map, tile.getRegionX(), tile.getRegionZ(), settings.smoothing.iterations);
         }
-
         steepness.apply(map, tile.getRegionX(), tile.getRegionZ(), 1);
         beach.apply(map, tile.getRegionX(), tile.getRegionZ(), 1);
     }
