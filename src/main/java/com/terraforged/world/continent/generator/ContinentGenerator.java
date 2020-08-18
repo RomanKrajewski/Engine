@@ -68,8 +68,13 @@ public abstract class ContinentGenerator implements Continent {
         this.clampMax = 1.0F;
         this.clampRange = clampMax - clampMin;
 
-        this.warp = Domain.warp(Source.PERLIN, seed.next(), 20, 2, 20)
-                .warp(Domain.warp(Source.SIMPLEX, seed.next(), continentScale, 3, continentScale));
+//        this.warp = Domain.warp(Source.PERLIN, seed.next(), 20, 2, 20)
+//                .warp(Domain.warp(Source.SIMPLEX, seed.next(), continentScale, 3, continentScale));
+
+        this.warp = Domain.warp(Source.PERLIN, seed.next(), 80, 2, 50).warp(Domain.direction(
+                Source.simplex(seed.next(), tectonicScale, 3),
+                Source.constant(continentScale * 0.65)
+        ));
 
         this.shape = Source.simplex(seed.next(), settings.continent.continentScale * 2, 1)
                 .bias(0.65).clamp(0, 1);

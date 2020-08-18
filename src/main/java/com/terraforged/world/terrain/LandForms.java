@@ -26,8 +26,10 @@ package com.terraforged.world.terrain;
 
 import com.terraforged.core.Seed;
 import com.terraforged.core.settings.TerrainSettings;
+import com.terraforged.core.util.erosion.PseudoErosion;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
+import com.terraforged.n2d.domain.Domain;
 import com.terraforged.n2d.func.EdgeFunc;
 import com.terraforged.n2d.func.Interpolation;
 import com.terraforged.world.heightmap.Levels;
@@ -92,7 +94,7 @@ public class LandForms {
                 .warp(warpX, warpY, Source.constant(scaleH / 4F))
                 .warp(seed.next(), 256, 1, 200);
 
-        return module.scale(0.08 * terrainHorizontalScale).bias(-0.02);
+        return wrap(seed, module).scale(0.08 * terrainHorizontalScale).bias(-0.02);
     }
 
     public Module plains(Seed seed) {
@@ -109,7 +111,7 @@ public class LandForms {
                 .warp(warpX, warpY, Source.constant(scaleH / 4F))
                 .warp(seed.next(), 256, 1, 256);
 
-        return module.scale(0.15F * terrainVerticalScale).bias(-0.02);
+        return wrap(seed, module).scale(0.15F * terrainVerticalScale).bias(-0.02);
     }
 
     public Module plateau(Seed seed) {
@@ -136,23 +138,25 @@ public class LandForms {
                 )
                 .add(surface);
 
-        return module.scale(0.475 * terrainVerticalScale);
+        return wrap(seed, module).scale(0.475 * terrainVerticalScale);
     }
 
     public Module hills1(Seed seed) {
-        return Source.perlin(seed.next(), 200, 3)
+        return wrap(seed, Source.perlin(seed.next(), 200, 3)
                 .mult(Source.billow(seed.next(), 400, 3).alpha(0.5))
                 .warp(seed.next(), 30, 3, 20)
                 .warp(seed.next(), 400, 3, 200)
+        )
                 .scale(0.6F * terrainVerticalScale);
     }
 
     public Module hills2(Seed seed) {
-        return Source.cubic(seed.next(), 128, 2)
+        return wrap(seed, Source.cubic(seed.next(), 128, 2)
                 .mult(Source.perlin(seed.next(), 32, 4).alpha(0.075))
                 .warp(seed.next(), 30, 3, 20)
                 .warp(seed.next(), 400, 3, 200)
                 .mult(Source.ridge(seed.next(), 512, 2).alpha(0.8))
+        )
                 .scale(0.55F * terrainVerticalScale);
     }
 
@@ -169,7 +173,7 @@ public class LandForms {
                 .pow(1.125)
                 .warp(seed.next(), 300, 1, 100);
 
-        return hills.scale(0.4);
+        return wrap(seed, hills).scale(0.4);
     }
 
     public Module mountains(Seed seed) {
@@ -179,7 +183,7 @@ public class LandForms {
                 .mult(Source.perlin(seed.next(), 24, 4).alpha(0.075))
                 .warp(seed.next(), 350, 1, 150);
 
-        return module.scale(MOUNTAINS_V * terrainVerticalScale);
+        return wrap(seed, module).scale(MOUNTAINS_V * terrainVerticalScale);
     }
 
     public Module mountains2(Seed seed) {
@@ -188,7 +192,7 @@ public class LandForms {
         Module blur = Source.perlin(seed.next(), 10, 1).alpha(0.025);
         Module surface = Source.ridge(seed.next(), 125, 4).alpha(0.37);
         Module mountains = cell.clamp(0, 1).mult(blur).mult(surface).pow(1.1);
-        return mountains.scale(MOUNTAINS2_V * terrainVerticalScale);
+        return wrap(seed, mountains).scale(MOUNTAINS2_V * terrainVerticalScale);
     }
 
     public Module mountains3(Seed seed) {
@@ -208,7 +212,7 @@ public class LandForms {
                 1
         );
 
-        return terraced.scale(MOUNTAINS2_V * terrainVerticalScale);
+        return wrap(seed, terraced).scale(MOUNTAINS2_V * terrainVerticalScale);
     }
 
     public Module badlands(Seed seed) {
@@ -234,7 +238,7 @@ public class LandForms {
 
         Module badlands = shape.mult(detail.alpha(0.5));
 
-        return badlands.scale(0.55).bias(0.025);
+        return wrap(seed, badlands).scale(0.55).bias(0.025);
     }
 
     public Module torridonian(Seed seed) {
@@ -260,6 +264,11 @@ public class LandForms {
                         1
                 ).boost();
 
-        return module.scale(0.5);
+        return wrap(seed, module).scale(0.5);
+    }
+
+    private static Module wrap(Seed seed, Module module) {
+        Domain domain = Domain.direction(Source.perlin(123, 10, 1), Source.constant(2));
+        return PseudoErosion.wrap(seed.next(), 0.45F, 50, module).warp(domain);
     }
 }
