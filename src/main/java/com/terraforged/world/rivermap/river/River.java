@@ -44,60 +44,37 @@ public class River extends TerrainPopulator implements Comparable<River> {
     private static final float MIN_WIDTH2 = 1.5F;
 
     public final boolean main;
-    private final boolean connecting;
-
-    private final float waterLine;
-    private final float bedHeight;
     private final float extraBedDepth;
-    private final float minBankHeight;
-    private final float maxBankHeight;
-    private final float bankAlphaMin;
-    private final float bankAlphaMax;
-    private final float bankAlphaRange;
     private final Module bankVariance;
 
-    private final Line bed;
-    private final Line banks;
-    private final Line valley;
     private final CurveFunc valleyCurve;
     public final RiverConfig config;
-    public final RiverBounds bounds;
 
     private final Terrains terrains;
 
-    private final float depthFadeBias;
     private final float continentValleyModifier;
     private final float continentRiverModifier;
 
-    public River(RiverBounds bounds, RiverConfig config, Settings settings, Terrains terrains, Levels levels) {
+    private final RiverPath valley;
+    private final RiverPath banks;
+    private final RiverPath bed;
+
+    private final Levels levels;
+
+    public River(RiverPath valley, RiverPath banks, RiverPath bed, RiverConfig config, Settings settings, Terrains terrains, Levels levels) {
         super(terrains.river, Source.ZERO, Source.ZERO);
-        Module bedIn = Source.constant(settings.fadeIn);
-        Module banksIn = Source.constant(settings.fadeIn * 0.5);
-        Module out = Source.constant(settings.fadeOut);
-        Module bedWidth = Source.constant(config.bedWidth * config.bedWidth);
-        Module bankWidth = Source.constant(config.bankWidth * config.bankWidth);
-        Module valleyWidth = Source.constant(settings.valleySize * settings.valleySize);
-        this.bounds = bounds;
+        this.levels = levels;
         this.config = config;
         this.main = config.main;
         this.terrains = terrains;
-        this.connecting = settings.connecting;
-        this.waterLine = bounds.getWaterLine();
-        this.bedHeight = bounds.getWaterLine();
+        this.valley = valley;
+        this.banks= banks;
+        this.bed = bed;
         this.extraBedDepth = levels.scale(1);
-        this.minBankHeight = config.minBankHeight;
-        this.maxBankHeight = config.maxBankHeight;
         this.valleyCurve = settings.valleyCurve;
         this.continentValleyModifier = settings.continentValleyModifier;
         this.continentRiverModifier = settings.continentRiverModifier;
-        this.bankAlphaMin = minBankHeight;
-        this.bankAlphaMax = Math.min(1, minBankHeight + 0.35F);
-        this.bankAlphaRange = bankAlphaMax - bankAlphaMin;
         this.bankVariance = Source.perlin(1234, 150, 1);
-        this.depthFadeBias = 1 - DEPTH_FADE_STRENGTH;
-        this.bed = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), bedWidth, Source.ZERO, Source.ZERO, 0.0F);
-        this.banks = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), bankWidth, Source.ZERO, Source.ZERO, 0.0F);
-        this.valley = Source.line(bounds.x1(), bounds.y1(), bounds.x2(), bounds.y2(), valleyWidth, Source.ZERO, Source.ZERO, 0.0F);
     }
 
     @Override
@@ -108,13 +85,17 @@ public class River extends TerrainPopulator implements Comparable<River> {
     @Override
     public void apply(Cell cell, float x, float z) {
 
-        float valleyAlpha = valley.getValue(x, z, 1f);
-        if (valleyAlpha == 0) {
-            return;
-        }
+        float [] alphaAndHeight = valley.getValues(x,z);
+        float alpha = alphaAndHeight[0];
+        float waterLevel = alphaAndHeight[1];
 
-        if (cell.value <= bedHeight) {
-            setCellWaterLevel(cell);
+        float bedHeight = waterLevel - levels.scale(config.bedDepth);
+        float minBankHeight = levels.scale(config.minBankHeight) + waterLevel;
+        float maxBankHeight = levels.scale(config.maxBankHeight) + waterLevel;
+        float bankAlphaMax = Math.min(1, minBankHeight + 0.35F);
+
+        float valleyAlpha = alpha;
+        if (valleyAlpha == 0) {
             return;
         }
 
@@ -125,91 +106,48 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
         // riverMask decreases the closer to the river the position gets
         cell.riverMask *= (1 - valleyAlpha);
-        float bankHeight = getBankHeight(cell, x, z);
-        if (!carveValley(cell, valleyAlpha * valleyMod, bankHeight)) {
-            setCellWaterLevel(cell);
-            return;
-        }
 
-        // is a branching river and x,z is past the connecting point
-        if (connecting && banks.clipEnd(x, z)) {
-            setCellWaterLevel(cell);
-            return;
-        }
+        //higher terrain = taller banks
+        float bankHeightAlpha = NoiseUtil.map(cell.value, minBankHeight, bankAlphaMax, bankAlphaMax - minBankHeight);
+        // use perlin noise to add a little extra variance to the bank height
+        float bankHeightVariance = bankVariance.getValue(x, z);
+        // lerp between the min and max heights
+        float bankHeight = NoiseUtil.lerp(minBankHeight, maxBankHeight, bankHeightAlpha * bankHeightVariance);
 
-        // width modifier widens the river the further from its start the coords are
-        // mouth modifier widens the river even more the closer to the ocean the coords are
-        float mouthModifier = getMouthModifier(cell);
-        float widthModifier = banks.getWidthModifier(x, z);
-        float banksAlpha = banks.getValue(x, z, MIN_WIDTH2, widthModifier / mouthModifier);
+
+        // lerp the position's height to the riverbank height
+        cell.value = NoiseUtil.lerp(cell.value, bankHeight, valleyAlpha * valleyMod);
+
+
+        float banksAlpha = banks.getValues(x, z)[0];
         if (banksAlpha == 0) {
-            setCellWaterLevel(cell);
             return;
         }
 
-        // modifies the steepness of river banks the further inland the position is
 
         float riverMod = 1 - (continent * continentRiverModifier);
-        float depthAlpha = NoiseUtil.clamp(depthFadeBias + (DEPTH_FADE_STRENGTH * widthModifier), 0, 1);
-        float bedHeight = NoiseUtil.lerp(bankHeight, bankHeight - 0.05f, depthAlpha);
-        if (!carveBanks(cell, banksAlpha * riverMod, bedHeight)) {
-            setCellWaterLevel(cell);
-            return;
-        }
 
+        banksAlpha = NoiseUtil.clamp(banksAlpha, 0, 1);
+        cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
+        // tag after lerping the cell height value
+        tag(cell, bedHeight);
 
-        float bedAlpha = bed.getValue(x, z);
+        float bedAlpha = bed.getValues(x, z)[0];
         if (bedAlpha == 0 || cell.value <= bedHeight) {
-            setCellWaterLevel(cell);
+            setCellWaterLevel(cell, waterLevel);
             return;
         }
 
         carveBed(cell, bedHeight, bedAlpha);
+        setCellWaterLevel(cell, waterLevel);
     }
 
-    private void setCellWaterLevel(Cell cell) {
+    private void setCellWaterLevel(Cell cell, float waterLine) {
         if (cell.value < waterLine){
             cell.waterLevel = waterLine;
         }
     }
 
-    private float getBankHeight(Cell cell, float x, float z) {
-        // scale bank height based on elevation of the terrain (higher terrain == taller banks)
-        float bankHeightAlpha = NoiseUtil.map(cell.value, bankAlphaMin, bankAlphaMax, bankAlphaRange);
-        // use perlin noise to add a little extra variance to the bank height
-        float bankHeightVariance = bankVariance.getValue(x, z);
-        // lerp between the min and max heights
-        return NoiseUtil.lerp(cell.value - 0.02f,cell.value - 0.06f, bankHeightAlpha * bankHeightVariance);
-    }
-
-    private float getBedHeight(float bankHeight, float depthAlpha) {
-        // scale depth of river by with it's width (wider == deeper)
-        // depthAlpha changes the river depth up ${DEPTH_FADE_STRENGTH} %
-        return NoiseUtil.lerp(bankHeight, this.bedHeight, depthAlpha);
-    }
-
-    private boolean carveValley(Cell cell, float valleyAlpha, float bankHeight) {
-        // lerp the position's height to the riverbank height
-        if (cell.value > bankHeight) {
-            cell.value = NoiseUtil.lerp(cell.value, bankHeight, valleyAlpha);
-        }
-        return true;
-    }
-
-    private boolean carveBanks(Cell cell, float banksAlpha, float bedHeight) {
-        // lerp the position's height to the riverbed height (ie the riverbank slopes)
-
-        if (cell.value > bedHeight) {
-            banksAlpha = NoiseUtil.clamp(banksAlpha, 0, 1);
-            cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
-            // tag after lerping the cell height value
-            tag(cell, bedHeight);
-            return true;
-        } else {
-            tag(cell, bedHeight);
-            return false;
-        }
-    }
 
     private void carveBed(Cell cell, float bedHeight, float bedAlpha) {
         cell.erosionMask = true;

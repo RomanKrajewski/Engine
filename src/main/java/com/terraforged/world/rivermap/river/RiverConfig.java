@@ -34,9 +34,9 @@ public class RiverConfig {
     public final boolean main;
     public final int bedWidth;
     public final int bankWidth;
-    public final float bedHeight;
-    public final float minBankHeight;
-    public final float maxBankHeight;
+    public final int bedDepth;
+    public final int minBankHeight;
+    public final int maxBankHeight;
     public final int length;
     public final int length2;
     public final double fade;
@@ -46,20 +46,20 @@ public class RiverConfig {
         order = builder.order;
         bedWidth = builder.bedWidth;
         bankWidth = builder.bankWidth;
-        bedHeight = builder.levels.water(-builder.bedDepth);
-        minBankHeight = builder.levels.water(builder.minBankHeight);
-        maxBankHeight = builder.levels.water(builder.maxBankHeight);
+        bedDepth = builder.bedDepth;
+        minBankHeight = builder.minBankHeight;
+        maxBankHeight = builder.maxBankHeight;
         length = builder.length;
         length2 = builder.length * builder.length;
         fade = builder.fade;
     }
 
-    private RiverConfig(boolean main, int order, int bedWidth, int bankWidth, float bedHeight, float minBankHeight, float maxBankHeight, int length, int length2, double fade) {
+    private RiverConfig(boolean main, int order, int bedWidth, int bankWidth, int bedHeight, int minBankHeight, int maxBankHeight, int length, int length2, double fade) {
         this.main = main;
         this.order = order;
         this.bedWidth = bedWidth;
         this.bankWidth = bankWidth;
-        this.bedHeight = bedHeight;
+        this.bedDepth = bedHeight;
         this.minBankHeight = minBankHeight;
         this.maxBankHeight = maxBankHeight;
         this.length = length;
@@ -78,7 +78,7 @@ public class RiverConfig {
                 order + 1,
                 NoiseUtil.round(bedWidth / scale),
                 NoiseUtil.round(bankWidth / scale),
-                bedHeight,
+                bedDepth,
                 minBankHeight,
                 maxBankHeight,
                 length,
@@ -87,8 +87,8 @@ public class RiverConfig {
         );
     }
 
-    public static Builder builder(Levels levels) {
-        return new Builder(levels);
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {
@@ -102,11 +102,7 @@ public class RiverConfig {
         private int minBankHeight = 1;
         private int length = 1000;
         private double fade = 0.2;
-        private final Levels levels;
 
-        private Builder(Levels levels) {
-            this.levels = levels;
-        }
 
         public Builder order(int order) {
             this.order = order;

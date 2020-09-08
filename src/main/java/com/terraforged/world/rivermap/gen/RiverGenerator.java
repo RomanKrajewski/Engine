@@ -5,6 +5,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.util.Variance;
+import com.terraforged.n2d.Source;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.n2d.util.Vec2f;
 import com.terraforged.world.GeneratorContext;
@@ -17,6 +18,7 @@ import com.terraforged.world.rivermap.lake.LakeConfig;
 import com.terraforged.world.rivermap.river.River;
 import com.terraforged.world.rivermap.river.RiverBounds;
 import com.terraforged.world.rivermap.river.RiverConfig;
+import com.terraforged.world.rivermap.river.RiverPath;
 import com.terraforged.world.rivermap.wetland.Wetland;
 import com.terraforged.world.rivermap.wetland.WetlandConfig;
 import com.terraforged.world.terrain.Terrains;
@@ -69,7 +71,7 @@ public class RiverGenerator {
         mainValleyWidth = context.settings.rivers.mainRivers.valleyWidth;
         forkValleyWidth = context.settings.rivers.branchRivers.valleyWidth;
 
-        main = RiverConfig.builder(context.levels)
+        main = RiverConfig.builder()
                 .bankHeight(context.settings.rivers.mainRivers.minBankHeight, context.settings.rivers.mainRivers.maxBankHeight)
                 .bankWidth(context.settings.rivers.mainRivers.bankWidth)
                 .bedWidth(context.settings.rivers.mainRivers.bedWidth)
@@ -80,7 +82,7 @@ public class RiverGenerator {
                 .order(0)
                 .build();
 
-        fork = RiverConfig.builder(context.levels)
+        fork = RiverConfig.builder()
                 .bankHeight(context.settings.rivers.branchRivers.minBankHeight, context.settings.rivers.branchRivers.maxBankHeight)
                 .bankWidth(context.settings.rivers.branchRivers.bankWidth)
                 .bedWidth(context.settings.rivers.branchRivers.bedWidth)
@@ -105,15 +107,27 @@ public class RiverGenerator {
 
         List<Lake> lakes = new ArrayList<>(size);
         List<Wetland> wetland = new ArrayList<>(size);
-        List<RiverBounds> riverPath = riverPath(heightmap, x, z);
+        List<float[]> riverPath = riverPath(heightmap, x, z);
         List<River> rivers = new ArrayList<>();
+        float heighestHeight = 0f;
         if(riverPath != null){
-            for (RiverBounds riverBounds : riverPath) {
-            River.Settings settings = createSettings(random);
-            settings.fadeIn = main.fade;
-            settings.valleySize = mainValleyWidth;
-            rivers.add(new River(riverBounds, main, settings, terrain, levels));
+            List<Integer> xs = new ArrayList<>();
+            List<Float> heights = new ArrayList<>();
+            List<Integer> zs = new ArrayList<>();
+            for (float[] coords : riverPath) {
+                xs.add((int) coords[0]);
+                zs.add((int) coords[1]);
+                heighestHeight = Math.max(coords[2], heighestHeight);
+                heights.add(heighestHeight);
             }
+        River.Settings settings = createSettings(random);
+        settings.fadeIn = main.fade;
+        settings.valleySize = mainValleyWidth;
+        RiverPath valley = new RiverPath(xs, zs, heights, Source.constant(settings.valleySize *settings.valleySize));
+        RiverPath banks = new RiverPath(xs, zs, heights, Source.constant(main.bankWidth * main.bankWidth));
+        RiverPath bed = new RiverPath(xs, zs, heights, Source.constant(main.bedWidth *main.bedWidth));
+
+        rivers.add(new River(valley,banks, bed, main, settings, terrain, levels));
         }
 
         return new Rivermap(x, z, warp, rivers, lakes, wetland);
@@ -142,7 +156,7 @@ public class RiverGenerator {
     }
 
 
-    public List<RiverBounds> riverPath(Heightmap heightmap,int x, int z) {
+    public List<float[]> riverPath(Heightmap heightmap,int x, int z) {
         MutableVeci pos = new MutableVeci(x,z);
         int topBorder = z - (int) heightmap.getContinent().getDistanceToEdge(x,z,0f,-1f, pos);
         int bottomBorder = z + (int) heightmap.getContinent().getDistanceToEdge(x,z,0f,1f, pos);
@@ -203,8 +217,8 @@ public class RiverGenerator {
 
         int startnode = highestTile;
         final Map<Integer, Integer> cameFrom = new HashMap<>();
-        Function<Integer, List<RiverBounds>> reconstructPath = (endNode) -> {
-            ArrayList<RiverBounds> path = new ArrayList<>();
+        Function<Integer, List<float[]>> reconstructPath = (endNode) -> {
+            ArrayList<float[]> path = new ArrayList<>();
             int current = endNode;
             int last;
             while (cameFrom.containsKey(current)) {
@@ -212,7 +226,7 @@ public class RiverGenerator {
                 current = cameFrom.get(current);
                 int[] xAndYCurrent = oneDtoTwoD(current, heightmapWidth);
                 int[] xAndYLast = oneDtoTwoD(last, heightmapWidth);
-                path.add(new RiverBounds(xAndYLast[0] * TILESIZE + leftBorder, xAndYLast[1] * TILESIZE + topBorder, xAndYCurrent[0] * TILESIZE + leftBorder, xAndYCurrent[1] * TILESIZE + topBorder, Math.min(terrainHeights[current], terrainHeights[last])));
+                path.add(new float[] {xAndYLast[0] * TILESIZE + leftBorder, xAndYLast[1] * TILESIZE + topBorder, terrainHeights[last]});
             }
             return path;
         };
