@@ -3,11 +3,8 @@ package com.terraforged.world.rivermap.gen;
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
-import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.util.Variance;
-import com.terraforged.n2d.Source;
-import com.terraforged.n2d.util.NoiseUtil;
-import com.terraforged.n2d.util.Vec2f;
+import com.terraforged.n2d.source.Rand;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.heightmap.Heightmap;
@@ -16,7 +13,6 @@ import com.terraforged.world.rivermap.Rivermap;
 import com.terraforged.world.rivermap.lake.Lake;
 import com.terraforged.world.rivermap.lake.LakeConfig;
 import com.terraforged.world.rivermap.river.River;
-import com.terraforged.world.rivermap.river.RiverBounds;
 import com.terraforged.world.rivermap.river.RiverConfig;
 import com.terraforged.world.rivermap.river.RiverPath;
 import com.terraforged.world.rivermap.wetland.Wetland;
@@ -123,9 +119,9 @@ public class RiverGenerator {
         River.Settings settings = createSettings(random);
         settings.fadeIn = main.fade;
         settings.valleySize = mainValleyWidth;
-        RiverPath valley = new RiverPath(xs, zs, heights, Source.constant(settings.valleySize *settings.valleySize));
-        RiverPath banks = new RiverPath(xs, zs, heights, Source.constant(main.bankWidth * main.bankWidth));
-        RiverPath bed = new RiverPath(xs, zs, heights, Source.constant(main.bedWidth *main.bedWidth));
+        RiverPath valley = new RiverPath(xs, zs, heights, (settings.valleySize *settings.valleySize));
+        RiverPath banks = new RiverPath(xs, zs, heights, (main.bankWidth * main.bankWidth));
+        RiverPath bed = new RiverPath(xs, zs, heights, (main.bedWidth *main.bedWidth));
 
         rivers.add(new River(valley,banks, bed, main, settings, terrain, levels));
         }
@@ -162,23 +158,32 @@ public class RiverGenerator {
         int bottomBorder = z + (int) heightmap.getContinent().getDistanceToEdge(x,z,0f,1f, pos);
         int leftBorder = x - (int) heightmap.getContinent().getDistanceToEdge(x,z,-1f,0f, pos);
         int rightBorder = x + (int) heightmap.getContinent().getDistanceToEdge(x,z,1f,0f, pos);
-        int TILESIZE = 100;
+        int TILESIZE = 50;
         int heightmapHeight = (bottomBorder - topBorder) /TILESIZE;
         int heightmapWidth = (rightBorder - leftBorder) /TILESIZE;
         if(heightmapHeight == 0 || heightmapWidth == 0){
             return null;
         }
         float[] terrainHeights = new float[heightmapWidth * heightmapHeight];
+        int [] xs = new int[heightmapWidth*heightmapHeight];
+        int [] ys = new int[heightmapWidth*heightmapHeight];
         Map<Integer, List<Adjacency>> adjacencyLists = new HashMap<>();
         int highestTile = 0;
+        Random random = new Random(1234L);
         float maxHeightTile = Float.MIN_VALUE;
         float minHeightTile = Float.MAX_VALUE;
         for (int i = 0; i < heightmapWidth; i ++ ) {
             for (int j = 0; j < heightmapHeight; j ++) {
                 try (Resource<Cell> cell = Cell.pooled()) {
-                    heightmap.applyBase(cell.get(), leftBorder + i*TILESIZE, topBorder + j*TILESIZE);
+                    int xCoord = leftBorder + i * TILESIZE + random.nextInt(TILESIZE/2) - TILESIZE/4;
+                    int yCoord = leftBorder + j * TILESIZE + random.nextInt(TILESIZE/2) - TILESIZE/4;
+
+                    heightmap.applyBase(cell.get(), xCoord, yCoord);
                     float value = cell.get().value;
-//                float value = heightmap.getRoot().getValue(leftBorder + i*TILESIZE, topBorder + j*TILESIZE);
+
+                    xs[twoDtoOneD(i,j,heightmapWidth)] = xCoord;
+                    ys[twoDtoOneD(i,j,heightmapWidth)] = yCoord;
+
                     terrainHeights[twoDtoOneD(i, j, heightmapWidth)] = value;
                     if (value > maxHeightTile) {
                         maxHeightTile = value;
@@ -191,50 +196,42 @@ public class RiverGenerator {
             }
         }
 
-        final float[] maxWeight = {0};
+        float maxWeight = 0;
 
-        for (int i = 0; i < heightmapWidth; i++) {
-            for (int j = 0; j < heightmapHeight; j++) {
-                if (i + 1 < heightmapWidth) {
-                    int left = twoDtoOneD(i, j, heightmapWidth);
-                    int right = twoDtoOneD(i + 1, j, heightmapWidth);
-                    createAdjecencies(terrainHeights, adjacencyLists, maxWeight, left, right);
-                }
-                if (j + 1 < heightmapHeight) {
-                    int top = twoDtoOneD(i, j, heightmapWidth);
-                    int bottom = twoDtoOneD(i, j + 1, heightmapWidth);
-                    createAdjecencies(terrainHeights, adjacencyLists, maxWeight, top, bottom);
-                }
+        for (int i = 0; i < heightmapWidth -1; i++) {
+            for (int j = 0; j < heightmapHeight -1; j++) {
+                    int topLeft = twoDtoOneD(i, j, heightmapWidth);
+                    int topRight = twoDtoOneD(i + 1, j, heightmapWidth);
+                    int bottomLeft = twoDtoOneD(i, j + 1, heightmapWidth);
+                    int bottomRight = twoDtoOneD(i + 1, j + 1, heightmapWidth);
+
+                    createAdjacencies(terrainHeights, adjacencyLists, maxWeight, topLeft, topRight);
+                    createAdjacencies(terrainHeights, adjacencyLists, maxWeight, topLeft, bottomLeft);
+
+                    createAdjacencies(terrainHeights, adjacencyLists, maxWeight, topLeft, bottomRight);
+                    createAdjacencies(terrainHeights, adjacencyLists, maxWeight, topRight, bottomLeft);
             }
         }
-        float[] fScores = new float[heightmapHeight * heightmapWidth];
         float[] gScores = new float[heightmapHeight * heightmapWidth];
 
-        for (int i = 0; i < fScores.length; i++) {
-            fScores[i] = Float.POSITIVE_INFINITY;
-            gScores[i] = Float.POSITIVE_INFINITY;
-        }
+        Arrays.fill(gScores, Float.POSITIVE_INFINITY);
 
         int startnode = highestTile;
         final Map<Integer, Integer> cameFrom = new HashMap<>();
         Function<Integer, List<float[]>> reconstructPath = (endNode) -> {
             ArrayList<float[]> path = new ArrayList<>();
             int current = endNode;
-            int last;
             while (cameFrom.containsKey(current)) {
-                last = current;
                 current = cameFrom.get(current);
-                int[] xAndYCurrent = oneDtoTwoD(current, heightmapWidth);
-                int[] xAndYLast = oneDtoTwoD(last, heightmapWidth);
-                path.add(new float[] {xAndYLast[0] * TILESIZE + leftBorder, xAndYLast[1] * TILESIZE + topBorder, terrainHeights[last]});
+//                int[] xAndYCurrent = oneDtoTwoD(current, heightmapWidth);
+                path.add(new float[] {xs[current], ys[current], terrainHeights[current]});
             }
             return path;
         };
 
         gScores[startnode] = 0;
-        fScores[startnode] = terrainHeights[startnode];
 
-        PriorityQueue<Integer> openList = new PriorityQueue<>(Comparator.comparing(e -> fScores[e]));
+        PriorityQueue<Integer> openList = new PriorityQueue<>(Comparator.comparing(e -> gScores[e]));
         openList.add(startnode);
 
         while (!openList.isEmpty()) {
@@ -246,11 +243,10 @@ public class RiverGenerator {
                 continue;
             }
             for (Adjacency neighbor : adjacencyLists.get(current)) {
-                float tentativeGScore = gScores[current] + maxWeight[0] + neighbor.weight;
+                float tentativeGScore = gScores[current] + maxWeight + neighbor.weight;
                 if (tentativeGScore < gScores[neighbor.to]) {
                     cameFrom.put(neighbor.to, current);
                     gScores[neighbor.to] = tentativeGScore;
-                    fScores[neighbor.to] = tentativeGScore + 0f; //replace 0f with heuristic
                     openList.remove(neighbor.to);
                     openList.add(neighbor.to);
                 }
@@ -259,16 +255,15 @@ public class RiverGenerator {
         return null;
     }
 
-    private void createAdjecencies(float[] heightmap, Map<Integer, List<Adjacency>> adjacencyLists, float[] maxWeight, int nodeA, int nodeB) {
-        float weightRight = heightmap[nodeB] - heightmap[nodeA];
-        if (Math.abs(weightRight) > maxWeight[0]) {
-            maxWeight[0] = Math.abs(weightRight);
-        }
-        adjacencyLists.putIfAbsent(nodeA, new ArrayList<>());
-        adjacencyLists.get(nodeA).add(new Adjacency(nodeA, nodeB, weightRight));
-        adjacencyLists.putIfAbsent(nodeB, new ArrayList<>());
-        adjacencyLists.get(nodeB).add(new Adjacency(nodeB, nodeA, -weightRight));
+    private float createAdjacencies(float[] heightmap, Map<Integer, List<Adjacency>> adjacencyLists, float maxWeight, int nodeA, int nodeB) {
+        float weightAtoB = heightmap[nodeB] - heightmap[nodeA];
 
+        adjacencyLists.putIfAbsent(nodeA, new ArrayList<>());
+        adjacencyLists.get(nodeA).add(new Adjacency(nodeA, nodeB, weightAtoB));
+        adjacencyLists.putIfAbsent(nodeB, new ArrayList<>());
+        adjacencyLists.get(nodeB).add(new Adjacency(nodeB, nodeA, -weightAtoB));
+
+        return Math.max(Math.abs(weightAtoB), maxWeight);
     }
 
     private int twoDtoOneD(int x, int y, int length) {

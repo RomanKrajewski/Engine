@@ -3,34 +3,41 @@ package com.terraforged.world.rivermap.river;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.source.Line;
+import com.terraforged.n2d.util.NoiseUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RiverPath {
 
-    private List<Line> path;
+    private List<RiverLine> path;
     private List<Float> heights;
 
-    public RiverPath(List<Integer> x, List<Integer> z, List<Float> heights, Module radius){
+    public RiverPath(List<Integer> x, List<Integer> z, List<Float> heights, float radius2){
         path = new ArrayList<>();
         this.heights = heights;
         for (int i = 1; i < x.size();i++) {
-            path.add(new Line(x.get(i-1), z.get(i-1), x.get(i), z.get(i), radius, Source.ZERO, Source.ZERO, 0.0f));
+            path.add(new RiverLine(x.get(i-1), z.get(i-1), x.get(i), z.get(i), radius2));
         }
     }
 
     public float[] getValues(float x, float y) {
-        float maxVal = 0.0f;
+        float[] maxValAndAccordingT = {0.0f, 0.0f};
         int minDistIndex = 0;
         for (int i = 0; i < path.size(); i++) {
-            float dist = path.get(i).getValue(x,y);
-            if(dist > maxVal){
-                maxVal = dist;
+            float[] distAndT = path.get(i).getAlphaAndT(x,y);
+            if(distAndT != null && distAndT[0] > maxValAndAccordingT[0]){
+                maxValAndAccordingT = distAndT;
                 minDistIndex = i;
             }
         }
-        return new float[] {maxVal, heights.get(minDistIndex)};
+        if(maxValAndAccordingT[0] == 0.0f){
+            return new float[] {0.0f, 0.0f, 0.0f, 0.0f};
+        }
+        return new float[] {maxValAndAccordingT[0],
+                heights.get(minDistIndex),
+                heights.get(Math.min(minDistIndex+1, heights.size())),
+                maxValAndAccordingT[1]};
     }
 
 

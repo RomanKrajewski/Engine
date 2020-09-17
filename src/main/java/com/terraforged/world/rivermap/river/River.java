@@ -85,11 +85,28 @@ public class River extends TerrainPopulator implements Comparable<River> {
     @Override
     public void apply(Cell cell, float x, float z) {
 
-        float [] alphaAndHeight = valley.getValues(x,z);
-        float alpha = alphaAndHeight[0];
-        float waterLevel = alphaAndHeight[1];
+        float [] alphaHeightSig = valley.getValues(x,z);
+        float alpha = alphaHeightSig[0];
+        float waterLevelA = alphaHeightSig[1];
+        float waterLevelB = alphaHeightSig[2];
+        float waterLevelT = alphaHeightSig[3];
 
-        float bedHeight = waterLevel - levels.scale(config.bedDepth);
+        float heightDifference = Math.abs(waterLevelA - waterLevelB);
+        float waterLevel;
+        float flowingWaterLevel;
+        float bedHeight;
+        if(heightDifference != 0f){
+            float sigHeight = NoiseUtil.curve(waterLevelT, 40);
+            waterLevel = NoiseUtil.lerp(waterLevelA, waterLevelB,
+                    sigHeight);
+            bedHeight = waterLevel - levels.scale(config.bedDepth);
+            flowingWaterLevel = getFlowingWaterLevel(waterLevel, waterLevelA, waterLevelB, sigHeight, bedHeight);
+        }else {
+            waterLevel = waterLevelA;
+            bedHeight = waterLevel - levels.scale(config.bedDepth);
+            flowingWaterLevel = waterLevelA;
+        }
+
         float minBankHeight = levels.scale(config.minBankHeight) + waterLevel;
         float maxBankHeight = levels.scale(config.maxBankHeight) + waterLevel;
         float bankAlphaMax = Math.min(1, minBankHeight + 0.35F);
@@ -98,6 +115,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
         if (valleyAlpha == 0) {
             return;
         }
+
 
         valleyAlpha = valleyCurve.apply(valleyAlpha);
 
@@ -124,64 +142,56 @@ public class River extends TerrainPopulator implements Comparable<River> {
             return;
         }
 
+        cell.terrain = terrains.river;
 
         float riverMod = 1 - (continent * continentRiverModifier);
 
         banksAlpha = NoiseUtil.clamp(banksAlpha, 0, 1);
         cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
-        // tag after lerping the cell height value
-        tag(cell, bedHeight);
 
-        float bedAlpha = bed.getValues(x, z)[0];
-        if (bedAlpha == 0 || cell.value <= bedHeight) {
-            setCellWaterLevel(cell, waterLevel);
-            return;
-        }
 
-        carveBed(cell, bedHeight, bedAlpha);
-        setCellWaterLevel(cell, waterLevel);
+        setCellWaterLevel(cell, flowingWaterLevel);
+    }
+
+    private float getFlowingWaterLevel(float lerpedWaterLevel, float waterLevelA, float waterLevelB, float sigHeight, float bedHeight) {
+
+        float waterLevelSigmoidDeriv = sigHeight* (1-sigHeight);
+//        float waterLevelSigmoidSecondDeriv = waterLevelSigmoidDeriv * (1-2*sigHeight);
+        float heightDifference = Math.abs(waterLevelA - waterLevelB);
+        float steepnessIndicator = waterLevelSigmoidDeriv * heightDifference;
+
+//        float waterHeightFactor = (0.012f - NoiseUtil.clamp(steepnessIndicator, 0f, 0.012f) )/0.012f;
+        float waterHeightFactor = (0.05f - waterLevelSigmoidDeriv)/0.05f;
+        float returnValue = bedHeight + waterHeightFactor * (lerpedWaterLevel-bedHeight);
+        return Math.max(returnValue, waterLevelA);
+//        if (cell.value < waterLine && ((waterLevelSigmoidDeriv < 0.2 && waterLevelSigmoidSecondDeriv > 0)
+//                || (waterLevelSigmoidDeriv < 0.05 && waterLevelSigmoidSecondDeriv < 0)
+//                || waterLevelSigmoid == 0f )){
+//            cell.waterLevel = waterLine;
+//        }
+
+//        if(cell.value < waterLine){
+//            if(waterLevelSigmoid == 0f || waterLevelSigmoidDeriv < 0.1){
+//                cell.waterLevel = waterLine;
+//            }
+//            else{
+//                cell.waterLevel = bedHeight + (waterLine-bedHeight)/2f;
+//            }
+//        }
     }
 
     private void setCellWaterLevel(Cell cell, float waterLine) {
-        if (cell.value < waterLine){
+        if(cell.value < waterLine) {
             cell.waterLevel = waterLine;
         }
-    }
-
-
-    private void carveBed(Cell cell, float bedHeight, float bedAlpha) {
-        cell.erosionMask = true;
-        tag(cell, bedHeight);
-
-        if (cell.value < bedHeight) {
-            float extraBedHeight = NoiseUtil.lerp(bedHeight - extraBedDepth, bedHeight, bedAlpha);
-            cell.value = getExtraBedHeight(cell.value, bedHeight, extraBedHeight);
-        } else {
-            cell.value = NoiseUtil.lerp(cell.value, bedHeight, bedAlpha);
-        }
-    }
-
-    private void tag(Cell cell, float bedHeight) {
-        // don't tag as river if the current one overrides it and the cell value is above water level
-        // or below the riverbed height at this position
-        if (cell.terrain.overridesRiver() && (cell.value < bedHeight || cell.value > cell.waterLevel)) {
-            return;
+            cell.erosionMask = true;
         }
 
-        cell.terrain = terrains.river;
-    }
+
 
     private float getMouthModifier(Cell cell) {
         float modifier = NoiseUtil.map(cell.continentEdge, 0F, 0.5F, 0.5F);
         return modifier * modifier;
-    }
-
-    private static float getExtraBedHeight(float height, float bedHeight, float extraBedHeight) {
-        if (height < extraBedHeight) {
-            return extraBedHeight;
-        }
-        float alpha = (height - extraBedHeight) / (bedHeight - extraBedHeight);
-        return NoiseUtil.lerp(extraBedHeight, bedHeight, alpha);
     }
 
     public static class Settings {
