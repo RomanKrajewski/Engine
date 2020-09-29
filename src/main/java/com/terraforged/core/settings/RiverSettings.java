@@ -53,11 +53,11 @@ public class RiverSettings {
         @Comment("Controls the depth of the river")
         public int bedDepth;
 
-        @Range(min = 0, max = 10)
+        @Range(min = 5, max = 10)
         @Comment("Controls the height of river banks")
         public int minBankHeight;
 
-        @Range(min = 1, max = 10)
+        @Range(min = 8, max = 10)
         @Comment("Controls the height of river banks")
         public int maxBankHeight;
 
@@ -73,7 +73,7 @@ public class RiverSettings {
         @Comment("Controls how much rivers taper")
         public float fade;
 
-        @Range(min = 0, max = 500)
+        @Range(min = 200, max = 300)
         @Comment("Controls the river valley width")
         public int valleyWidth;
 
