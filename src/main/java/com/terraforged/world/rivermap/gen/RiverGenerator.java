@@ -3,6 +3,7 @@ package com.terraforged.world.rivermap.gen;
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
+import com.terraforged.core.settings.Settings;
 import com.terraforged.core.util.Variance;
 import com.terraforged.n2d.source.Rand;
 import com.terraforged.world.GeneratorContext;
@@ -55,6 +56,7 @@ public class RiverGenerator {
     private final Terrains terrain;
     private final Heightmap heightmap;
     private final Levels levels;
+    private final Settings settings;
 
     public RiverGenerator(Heightmap heightmap, GeneratorContext context) {
         this.heightmap = heightmap;
@@ -63,7 +65,7 @@ public class RiverGenerator {
         seed = context.seed.nextSeed();
 
         count = context.settings.rivers.riverCount;
-
+        settings = context.settings;
         mainValleyWidth = context.settings.rivers.mainRivers.valleyWidth;
         forkValleyWidth = context.settings.rivers.branchRivers.valleyWidth;
 
@@ -103,7 +105,12 @@ public class RiverGenerator {
 
         List<Lake> lakes = new ArrayList<>(size);
         List<Wetland> wetland = new ArrayList<>(size);
+        long timeStamp = System.currentTimeMillis();
         List<float[]> riverPath = riverPath(heightmap, x, z);
+        long riverPathTime = System.currentTimeMillis() - timeStamp;
+        if(riverPathTime != 0){
+            System.out.println(settings.world.continent.continentScale + "\t" + riverPathTime);
+        }
         List<River> rivers = new ArrayList<>();
         float heighestHeight = 0f;
         if(riverPath != null){

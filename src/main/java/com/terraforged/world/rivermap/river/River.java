@@ -87,6 +87,12 @@ public class River extends TerrainPopulator implements Comparable<River> {
 
         float [] alphaHeightSig = valley.getValues(x,z);
         float alpha = alphaHeightSig[0];
+
+        float valleyAlpha = alpha;
+        if (valleyAlpha == 0) {
+            return;
+        }
+
         float waterLevelA = alphaHeightSig[1];
         float waterLevelB = alphaHeightSig[2];
         float waterLevelT = alphaHeightSig[3];
@@ -100,7 +106,7 @@ public class River extends TerrainPopulator implements Comparable<River> {
             waterLevel = NoiseUtil.lerp(waterLevelA, waterLevelB,
                     sigHeight);
             bedHeight = waterLevel - levels.scale(config.bedDepth);
-            flowingWaterLevel = getFlowingWaterLevel(waterLevel, waterLevelA, waterLevelB, sigHeight, bedHeight);
+            flowingWaterLevel = getFlowingWaterLevel(waterLevel, waterLevelA, sigHeight, bedHeight);
         }else {
             waterLevel = waterLevelA;
             bedHeight = waterLevel - levels.scale(config.bedDepth);
@@ -110,11 +116,6 @@ public class River extends TerrainPopulator implements Comparable<River> {
         float minBankHeight = levels.scale(config.minBankHeight) + waterLevel;
         float maxBankHeight = levels.scale(config.maxBankHeight) + waterLevel;
         float bankAlphaMax = Math.min(1, minBankHeight + 0.35F);
-
-        float valleyAlpha = alpha;
-        if (valleyAlpha == 0) {
-            return;
-        }
 
 
         valleyAlpha = valleyCurve.apply(valleyAlpha);
@@ -153,31 +154,13 @@ public class River extends TerrainPopulator implements Comparable<River> {
         setCellWaterLevel(cell, flowingWaterLevel);
     }
 
-    private float getFlowingWaterLevel(float lerpedWaterLevel, float waterLevelA, float waterLevelB, float sigHeight, float bedHeight) {
+    private float getFlowingWaterLevel(float lerpedWaterLevel, float waterLevelA, float sigHeight, float bedHeight) {
 
         float waterLevelSigmoidDeriv = sigHeight* (1-sigHeight);
-//        float waterLevelSigmoidSecondDeriv = waterLevelSigmoidDeriv * (1-2*sigHeight);
-        float heightDifference = Math.abs(waterLevelA - waterLevelB);
-        float steepnessIndicator = waterLevelSigmoidDeriv * heightDifference;
-
-//        float waterHeightFactor = (0.012f - NoiseUtil.clamp(steepnessIndicator, 0f, 0.012f) )/0.012f;
         float waterHeightFactor = (0.05f - waterLevelSigmoidDeriv)/0.05f;
         float returnValue = bedHeight + waterHeightFactor * (lerpedWaterLevel-bedHeight);
         return Math.max(returnValue, waterLevelA);
-//        if (cell.value < waterLine && ((waterLevelSigmoidDeriv < 0.2 && waterLevelSigmoidSecondDeriv > 0)
-//                || (waterLevelSigmoidDeriv < 0.05 && waterLevelSigmoidSecondDeriv < 0)
-//                || waterLevelSigmoid == 0f )){
-//            cell.waterLevel = waterLine;
-//        }
 
-//        if(cell.value < waterLine){
-//            if(waterLevelSigmoid == 0f || waterLevelSigmoidDeriv < 0.1){
-//                cell.waterLevel = waterLine;
-//            }
-//            else{
-//                cell.waterLevel = bedHeight + (waterLine-bedHeight)/2f;
-//            }
-//        }
     }
 
     private void setCellWaterLevel(Cell cell, float waterLine) {
